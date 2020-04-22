@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.sad.jetpack.architecture.appgo.api" >
+
+    <application>
+        <!-- 全局Context提供者、无侵入式App初始化类 -->
+        <provider
+            android:name=".ApplicationContextInitializerProvider"
+            android:authorities="${applicationId}.sad.jetpack.architecture.appgo.api.contextprovider"
+            android:exported="true" />
+    </application>
+
+</manifest>

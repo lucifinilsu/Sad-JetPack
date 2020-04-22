@@ -1,0 +1,133 @@
+ext {
+    android = [
+            buildToolsVersion: "29.0.2",
+            compileSdkVersion: 29,
+            minSdkVersion    : 21,
+            targetSdkVersion : 29,
+            abortOnLintError : false,
+            checkLintRelease : false,
+            useJack          : false,
+            abortOnLintError : false,
+            javaVersion      : JavaVersion.VERSION_1_8,
+            isDebug          : false
+    ]
+
+    dependVersion = [
+            "android_support"     : "latest.release",
+            "lifecycle_version"   : "latest.release",
+            "sad-architecture-api": "latest.release",
+            "sad-appgo-api"       : "latest.release",
+            "immersionbar"        : "latest.release",
+    ]
+
+
+    dependencies = [
+            //android
+            "appcompat"                : "androidx.appcompat:appcompat:${dependVersion["android_support"]}",
+            "constraintlayout"         : "androidx.constraintlayout:constraintlayout:${dependVersion["android_support"]}",
+            "multidex"                 : "androidx.multidex:multidex:${dependVersion["android_support"]}",
+            "lifecycle-extensions"     : "androidx.lifecycle:lifecycle-extensions:${dependVersion["lifecycle_version"]}",
+            "lifecycle-viewmodel"      : "androidx.lifecycle:lifecycle-viewmodel:${dependVersion["lifecycle_version"]}",
+            "lifecycle-livedata"       : "androidx.lifecycle:lifecycle-livedata:${dependVersion["lifecycle_version"]}",
+            "lifecycle-runtime"        : "androidx.lifecycle:lifecycle-runtime:${dependVersion["lifecycle_version"]}",
+            "lifecycle-compiler"       : "androidx.lifecycle:lifecycle-compiler:${dependVersion["lifecycle_version"]}",
+            "lifecycle-common-java8"   : "androidx.lifecycle:lifecycle-common-java8:${dependVersion["lifecycle_version"]}",
+            "lifecycle-reactivestreams": "androidx.lifecycle:lifecycle-reactivestreams:${dependVersion["lifecycle_version"]}",
+
+            //test
+            "junit"                    : "androidx.test.ext:junit:latest.release",
+            "espresso-core"            : "androidx.test.espresso:espresso-core:latest.release",
+
+            //self
+            "AndroidExtension_Api"     : ":android:AndroidExtension_Api",
+            "AI_SceneTuner_Api"        : ":android:AI_SceneTuner_Api",
+            "annotation"               : ":android:annotation",
+            "AI_SceneTuner_Impl"       : ":android:AI_SceneTuner_Impl",
+            "AppPermission_Api"        : ":application:movement:sdk:permission:AppPermission_Api",
+            "AppPermission_Impl"       : ":application:movement:sdk:permission:AppPermission_Impl",
+            "DataLine_Api"             : ":application:movement:middleware:DataLine_Api",
+            "DataLine_Impl"            : ":application:movement:middleware:DataLine_Impl",
+            "AndroidExtension_Impl"    : ":android:AndroidExtension_Impl",
+            "User_Api"                 : ":application:movement:business:cross:user:User_Api",
+            "User_Impl"                : ":application:movement:business:cross:user:User_Impl",
+            "CS_Api"                   : ":application:movement:sdk:data:CS_Api",
+            "CS_Impl"                  : ":application:movement:sdk:data:CS_Impl",
+            "Bean_Api"                 : ":application:movement:sdk:data:Bean_Api",
+            "Utils"                    : ":application:movement:sdk:Utils",
+            "ImageWorker"              : ":application:movement:sdk:media:ImageWorker",
+            "Main_Api"                 : ":application:movement:business:launcher:Main_Api",
+            "Main_Impl"                : ":application:movement:business:launcher:Main_Impl",
+            "Boot_Api"                 : ":application:movement:business:launcher:Boot_Api",
+
+            "local_appgo_annotation"   : ":architecture:appgo:annotation",
+            "appgo_annotation"         : "",
+
+
+            //SAD
+            /*"sad-architecture-api"     : "com.sad.architecture.api:sad-architecture-api:${dependVersion["sad-architecture-api"]}",
+            "sad-appgo-api"            : "com.sad.core.appgo:sad-appgo-api:${dependVersion["sad-appgo-api"]}",
+            "sad-architecture-compiler": "com.sad.architecture.compiler:sad-architecture-compiler:latest.release",
+            "sad-appgo-compiler"       : "com.sad.core.appgo:sad-appgo-compiler:latest.release",
+            "sad-cache"                : "com.sad.assistant:sad-cache:latest.release",
+            "sad-async"                : "com.sad.core.async:sad-async:latest.release",
+            "sad-datastore"            : "com.sad.assistant:sad-datastore:latest.release",
+            "sad-basic"                : "com.sad.basic:sad-basic:latest.release",*/
+
+            //第三方
+            "immersionbar"             : "com.gyf.immersionbar:immersionbar:${dependVersion["immersionbar"]}",
+            "immersionbar-components"  : "com.gyf.immersionbar:immersionbar-components:latest.release",
+            "auto-service"             : "com.google.auto.service:auto-service:latest.release",
+            "connectionclass"          : "com.facebook.network.connectionclass:connectionclass:latest.release",
+            "okhttp"                   : "com.squareup.okhttp3:okhttp:latest.release",
+            "logging-interceptor"      : "com.squareup.okhttp3:logging-interceptor:latest.release",
+            "okio"                     : "com.squareup.okio:okio:latest.release",
+            "jsoup"                    : "org.jsoup:jsoup:latest.release",
+            "gson"                     : "com.google.code.gson:gson:latest.release",
+            "glide"                    : "com.github.bumptech.glide:glide:latest.release",
+            "glide-compiler"           : "com.github.bumptech.glide:compiler:latest.release",
+            "hoko-blur"                : "com.hoko:hoko-blur:latest.release",
+            "picture_library"          : "com.github.LuckSiege.PictureSelector:picture_library:latest.release",
+            "permission"               : "com.yanzhenjie:permission:latest.release",
+
+
+            //android-support
+            /*"support-v4"            : "com.android.support:support-v4:${dependVersion.support}",
+            "appcompat-v7"          : "com.android.support:appcompat-v7:${dependVersion.support}",
+            "design"                : "com.android.support:design:${dependVersion.support}",
+            "recyclerview"          : "com.android.support:recyclerview-v7:${dependVersion.support}",
+            "cardview"              : "com.android.support:cardview-v7:${dependVersion.support}",
+            "appcompat-x"           : "androidx.appcompat:appcompat:${dependVersion.support}",
+            "constraintlayout-x"    : "androidx.constraintlayout:constraintlayout:${dependVersion.support}",
+
+            "lifecycle-common-java8": "android.arch.lifecycle:common-java8:latest.release",
+
+            "sad-architecture-api"  : "com.sad.architecture.api:sad-architecture-api:latest.release",
+            "sad-datastore"         : "com.sad.assistant:sad-datastore:latest.release",
+            "self-api"              : ":api",
+            "self-impl"             : ":impl",
+            "self-annotation"       : ":annotation",
+            "self-compiler"         : ":compiler",
+
+            "auto-service"          : "com.google.auto.service:auto-service:latest.release",
+            "javapoet"              : "com.squareup:javapoet:latest.release",
+            "jsoup"                 : "org.jsoup:jsoup:latest.release",
+            "javawriter"            : "com.squareup:javawriter:latest.release",
+
+            "commons-lang3"         : "org.apache.commons:commons-lang3:latest.release",
+            "commons-collections4"  : "org.apache.commons:commons-collections4:latest.release",
+
+            "okhttp"                : "com.squareup.okhttp3:okhttp:latest.release",
+            "okio"                  : "com.squareup.okio:okio:latest.release",
+            "gson"                  : "com.google.code.gson:gson:latest.release",
+
+            "hms-base"              : "com.huawei.android.hms:base:${dependVersion.hmsVersion}",
+            "hms-iap"               : "com.huawei.android.hms:iap:${dependVersion.hmsVersion}",
+            "hms-sns"               : "com.huawei.android.hms:sns:${dependVersion.hmsVersion}",
+            "hms-hwid"              : "com.huawei.android.hms:hwid:${dependVersion.hmsVersion}",
+            "hms-push"              : "com.huawei.android.hms:push:${dependVersion.hmsVersion}",
+            "hms-opendevice"        : "com.huawei.android.hms:opendevice:${dependVersion.hmsVersion}",
+            "hms-game"              : "com.huawei.android.hms:game:${dependVersion.hmsVersion}"*/
+
+
+    ]
+}

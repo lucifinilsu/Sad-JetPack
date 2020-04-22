@@ -1,0 +1,11 @@
+apply plugin: 'java-library'
+apply plugin: 'groovy'
+apply plugin: 'maven'
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api gradleApi()
+    api localGroovy()
+}
+
+sourceCompatibility = rootProject.ext.android.javaVersion
+targetCompatibility = rootProject.ext.android.javaVersion
