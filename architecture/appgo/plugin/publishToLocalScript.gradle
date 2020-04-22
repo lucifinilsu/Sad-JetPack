@@ -4,8 +4,8 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
 
-            groupId 'com.sad.jetpack.architecture.appgo.plugin'
-            artifactId 'plugin'
+            groupId 'com.sad.jetpack'
+            artifactId 'architecture-appgo-plugin'
             version '1.0.0'
             from components.java
 

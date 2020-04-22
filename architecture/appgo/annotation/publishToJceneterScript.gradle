@@ -1,11 +1,11 @@
 apply plugin: 'com.github.dcendents.android-maven'
 ext {
     bintrayRepo = 'sad-JetPack'
-    bintrayName = 'architecture-appgo-plugin'
+    bintrayName = 'architecture-appgo-annotation'
 
     publishedGroupId = 'com.sad.jetpack'
-    libraryName = 'architecture-appgo-plugin'
-    artifact = 'architecture-appgo-plugin'
+    libraryName = 'architecture-appgo-annotation'
+    artifact = 'architecture-appgo-annotation'
 
     libraryDescription = '...'
 
