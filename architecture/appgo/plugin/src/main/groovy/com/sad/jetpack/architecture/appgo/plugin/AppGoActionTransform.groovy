@@ -163,7 +163,7 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
                         /*String sp=i==processes.length-1?"":","
                         String temp='"'+processes[i]+'"'+sp;
                         ps.append(temp)*/
-                        ps.append("pNames["+i+"]="+"\""+processes[i]+"\";")
+                        ps.append("pNames["+i+"]="+"\""+processes[i]+"\";\n")
                     }
                     processNamesArray="pNames"
                 }
