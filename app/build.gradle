@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'architecture-appgo-plugin'
+//apply plugin: 'initiator'
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
     buildToolsVersion rootProject.ext.android.buildToolsVersion

@@ -7,7 +7,7 @@ import android.content.res.Configuration;
 
 public interface IApplicationLifecyclesObserver {
 
-    default public void onApplicationCreate(Application application){};
+    default public void onApplicationCreated(Application application){};
 
     default public void onApplicationLowMemory(){};
 
@@ -19,5 +19,19 @@ public interface IApplicationLifecyclesObserver {
 
     default public void attachApplicationBaseContext(Context base){};
 
+
+    //Pre
+
+    default public void onApplicationPreCreated(Application application){};
+
+    default public void onApplicationPreLowMemory(){};
+
+    default public void onApplicationPreConfigurationChanged(Configuration newConfig){};
+
+    default public void onApplicationPreTerminate(){};
+
+    default public void onApplicationPreTrimMemory(int level){};
+
+    default public void attachApplicationPreBaseContext(Context base){};
 
 }

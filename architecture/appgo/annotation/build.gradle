@@ -6,6 +6,6 @@ dependencies {
     api 'org.apache.commons:commons-collections4:latest.release'
     api 'commons-io:commons-io:latest.release'
 }
-
 sourceCompatibility = rootProject.ext.android.javaVersion
 targetCompatibility = rootProject.ext.android.javaVersion
+//apply from: rootProject.file('/architecture/appgo/annotation/publishToJceneterScript.gradle')

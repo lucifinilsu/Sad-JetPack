@@ -38,29 +38,11 @@ ext {
             "junit"                    : "androidx.test.ext:junit:latest.release",
             "espresso-core"            : "androidx.test.espresso:espresso-core:latest.release",
 
-            //self
-            "AndroidExtension_Api"     : ":android:AndroidExtension_Api",
-            "AI_SceneTuner_Api"        : ":android:AI_SceneTuner_Api",
-            "annotation"               : ":android:annotation",
-            "AI_SceneTuner_Impl"       : ":android:AI_SceneTuner_Impl",
-            "AppPermission_Api"        : ":application:movement:sdk:permission:AppPermission_Api",
-            "AppPermission_Impl"       : ":application:movement:sdk:permission:AppPermission_Impl",
-            "DataLine_Api"             : ":application:movement:middleware:DataLine_Api",
-            "DataLine_Impl"            : ":application:movement:middleware:DataLine_Impl",
-            "AndroidExtension_Impl"    : ":android:AndroidExtension_Impl",
-            "User_Api"                 : ":application:movement:business:cross:user:User_Api",
-            "User_Impl"                : ":application:movement:business:cross:user:User_Impl",
-            "CS_Api"                   : ":application:movement:sdk:data:CS_Api",
-            "CS_Impl"                  : ":application:movement:sdk:data:CS_Impl",
-            "Bean_Api"                 : ":application:movement:sdk:data:Bean_Api",
-            "Utils"                    : ":application:movement:sdk:Utils",
-            "ImageWorker"              : ":application:movement:sdk:media:ImageWorker",
-            "Main_Api"                 : ":application:movement:business:launcher:Main_Api",
-            "Main_Impl"                : ":application:movement:business:launcher:Main_Impl",
-            "Boot_Api"                 : ":application:movement:business:launcher:Boot_Api",
-
+            //sad-jetpack
             "local_appgo_annotation"   : ":architecture:appgo:annotation",
-            "appgo_annotation"         : "",
+            "appgo_annotation"         : "com.sad.jetpack.architecture.appgo:annotation:1.0.5",
+            "local_appgo_api"          : ":architecture:appgo:api",
+            "appgo_api"                : "com.sad.jetpack.architecture.appgo:api:1.0.3",
 
 
             //SAD

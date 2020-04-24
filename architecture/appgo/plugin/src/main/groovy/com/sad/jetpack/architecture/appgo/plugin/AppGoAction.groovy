@@ -6,6 +6,23 @@ public class AppGoAction implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
+        /*if (project.plugins.hasPlugin("com.android.application")
+                || project.plugins.hasPlugin("com.android.library")
+                || project.plugins.hasPlugin("java-library")) {
 
+
+        }
+
+        if (project.plugins.hasPlugin("com.android.application")) {
+            project.android.registerTransform(new AppGoActionTransformOld(project))
+        }*/
+
+
+        project.dependencies {
+            //implementation 'com.renny.initiator:engine:1.0.6'
+            api "com.sad.jetpack.architecture.appgo:api:1.0.3"//rootProject.ext.dependencies["appgo_api"]
+        }
+        project.logger.error("> appgo plugin is running")
+        project.android.registerTransform(new AppGoActionTransform(project))
     }
 }

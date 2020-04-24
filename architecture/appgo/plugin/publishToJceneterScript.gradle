@@ -1,38 +1,88 @@
-apply plugin: 'com.github.dcendents.android-maven'
-ext {
-    bintrayRepo = 'sad-JetPack'
-    bintrayName = 'architecture-appgo-plugin'
-
-    publishedGroupId = 'com.sad.jetpack'
-    libraryName = 'architecture-appgo-plugin'
-    artifact = 'architecture-appgo-plugin'
-
-    libraryDescription = '...'
-
-    siteUrl = 'https://github.com/lucifinilsu/Sad-JetPack'
-    gitUrl = 'https://github.com/lucifinilsu/Sad-JetPack'
-
-    libraryVersion = '1.0.0'
-
-    developerId = 'lucifinilsu'
-    developerName = 'lucifinilsu'
-    developerEmail = 'lucifinilsu@gmail.com'
-
-    licenseName = 'The Apache Software License, Version 2.0'
-    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    allLicenses = ["Apache-2.0"]
-}
-tasks.withType(Javadoc) {
-    options{
-        encoding "UTF-8"
-        charSet 'UTF-8'
-        links "http://docs.oracle.com/javase/7/docs/api"
+apply plugin: 'com.jfrog.bintray'
+/*apply plugin: 'com.github.dcendents.android-maven'*/
+//版本控制站点链接
+def siteUrl = 'https://github.com/lucifinilsu/Sad-JetPack'
+//git 链接
+def gitUrl = 'https://github.com/lucifinilsu/Sad-JetPack.git'
+//实例compile 'com.android.kit:permissionkit:1.0.0' ：group+name+version
+//仓库组
+group = 'com.sad.jetpack.architecture.appgo'
+//项目名称
+def pName='architecture-appgo-plugin'
+//版本
+def v="1.0.1"
+version = v
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'jar'
+                name pName
+                url siteUrl
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
     }
-    options.addStringOption('Xdoclint:none', '-quiet')
 }
+/*//编译 Javadoc
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+//编译 xxx-javadoc.jar
+task androidJavadocsJar(type: Jar) {
+    classifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+//编译 xxx-sources.jar
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}*/
 
-apply from: 'https://raw.githubusercontent.com/lucifinilsu/SmartAndroidDeveloper/master/install.gradle'
-apply from: 'https://raw.githubusercontent.com/lucifinilsu/SmartAndroidDeveloper/master/bintray.gradle'
-/*
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'*/
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    /*archives androidSourcesJar
+    archives androidJavadocsJar*/
+    archives javadocJar
+    archives sourcesJar
+}
+//读取配置的账户与apiKey
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        version {
+            name = v
+            desc = 'appgo在application的生命周期监控中使用的注解'
+        }
+        //repository 名称
+        repo = 'sad-JetPack'
+        name = pName
+        licenses = ['Apache-2.0']
+        vcsUrl = gitUrl
+        publish = true
+    }
+}
