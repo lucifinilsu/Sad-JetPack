@@ -19,10 +19,9 @@ public class AppGoAction implements Plugin<Project> {
 
 
         project.dependencies {
-            //implementation 'com.renny.initiator:engine:1.0.6'
-            api "com.sad.jetpack.architecture.appgo:api:1.0.3"//rootProject.ext.dependencies["appgo_api"]
+            api "com.sad.jetpack.architecture.appgo:api:1.0.9"//rootProject.ext.dependencies["appgo_api"]
         }
-        project.logger.error("> appgo plugin is running")
+        project.logger.error(">> appgo plugin is running")
         project.android.registerTransform(new AppGoActionTransform(project))
     }
 }

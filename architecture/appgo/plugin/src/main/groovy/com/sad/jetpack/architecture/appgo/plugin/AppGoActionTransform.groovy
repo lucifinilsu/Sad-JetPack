@@ -8,14 +8,22 @@ import com.android.build.api.transform.TransformInvocation
 import com.google.common.collect.Sets
 import com.sad.jetpack.architecture.appgo.annotation.ApplicationAccess
 import com.sad.jetpack.architecture.appgo.annotation.ApplicationLifeCycleAction
+import javassist.ClassPath
 import javassist.ClassPool
 import javassist.CtClass
+import javassist.CtClassType
+import javassist.CtField
 import javassist.CtMethod
+import javassist.CtNewMethod
+import javassist.Modifier
+import javassist.NotFoundException
+import javassist.bytecode.AnnotationsAttribute
+import javassist.bytecode.MethodInfo
 import org.gradle.api.Project
 
 import java.lang.reflect.Method
 
-class AppGoActionTransform extends Transform implements ClassScanner.OnFileScannedCallback{
+class AppGoActionTransform extends Transform implements ClassScanner.OnFileScannedCallback<ClassScanResult>{
     private Project project
 
     AppGoActionTransform(Project project){
@@ -66,16 +74,31 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
         ClassScanner.scan(project,classPool,transformInvocation,this);
     }
 
+    private boolean avaliableClass(CtClass ctClass){
+        return !Modifier.isAbstract(ctClass.getModifiers()) && !Modifier.isInterface(ctClass.getModifiers())
+    }
 
-
+    /*private Object getAnnotation(CtMethod method,Class<?> clz) throws ClassNotFoundException {
+        MethodInfo mi = method.getMethodInfo2();
+        AnnotationsAttribute ainfo = (AnnotationsAttribute)
+        mi.getAttribute(AnnotationsAttribute.invisibleTag);
+        AnnotationsAttribute ainfo2 = (AnnotationsAttribute)
+        mi.getAttribute(AnnotationsAttribute.visibleTag);
+        return CtClassType.getAnnotationType(clz,
+                method.getDeclaringClass().getClassPool(),
+                ainfo, ainfo2);
+    }*/
 
     @Override
     boolean onScanned(ClassPool classPool, File scannedFile, File dest,ClassScanResult scanResult) {
 
         CtClass applicationParentClass = classPool.get("android.app.Application")
         CtClass lifecyclesObserverInterface = classPool.get("com.sad.jetpack.architecture.appgo.api.IApplicationLifecyclesObserver")
+        /*CtClass contentProviderClass = classPool.get("com.sad.jetpack.architecture.appgo.api.ApplicationContextInitializerProvider")
+        CtClass onCreatedPreInterface = classPool.get("com.sad.jetpack.architecture.appgo.api.IApplicationOnCreatePre")*/
         classPool.importPackage("android.os")
         classPool.importPackage("android.util")
+        classPool.importPackage("android.content.res.Configuration")
 
         if (!scannedFile.name.endsWith("class")) {
             return false
@@ -88,13 +111,16 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
             project.logger.error("Parsing class file ${scannedFile.getAbsolutePath()} fail.", throwable)
             return false
         }
+        if (!avaliableClass(scannedClass)){
+            return false
+        }
         boolean handled = false
         //如果扫描到的class是Application的子类，则准备处理
         if (applicationParentClass != null && scannedClass.subclassOf(applicationParentClass)){
             Object accessAnnotation=scannedClass.getAnnotation(ApplicationAccess.class);
             if(accessAnnotation!=null){
                 //Application的子类被注解过了，说明是可埋点的宿主，记录并等待处理
-                project.logger.error("------------->Host Application is "+scannedClass.name)
+                project.logger.error(">> Host Application is "+scannedClass.name)
                 scanResult.setApplicationClass(scannedClass);
                 scanResult.setDest(dest)
                 scanResult.setHandled(true)
@@ -105,13 +131,17 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
         //如果扫描到的类是Application行为监听实现类
         if (lifecyclesObserverInterface != null && scannedClass.getInterfaces().contains(lifecyclesObserverInterface)){
             boolean isHandleThisObserverClass=false
-            project.logger.error("------------->find observer interface"+scannedClass.name)
+            project.logger.error(">>> find observer interface:"+scannedClass.name)
+            //String rM=scannedClass.name.replace(".","/")
+            //project.logger.error(">>> find observer interface rm:"+rM)
+            //classPool.insertClassPath(rM)
             //剔除没有任何显式注解埋点方法的的监听
-            CtMethod[] methods = scannedClass.getDeclaredMethods()
+            CtMethod[] methods = scannedClass.getMethods()
             for (CtMethod method:methods){
                 Object annotation = method.getAnnotation(ApplicationLifeCycleAction.class)
+                project.logger.error("^   find anchord method:"+method.name+" from "+scannedClass.name+" that has anntation ["+method.getAvailableAnnotations()+"] and info ["+method.getMethodInfo()+"]")
                 if (annotation!=null){
-                    project.logger.error("------------->find anchord method:"+method.name)
+                    //project.logger.error("^  find anchord method:"+method.name+" from "+scannedClass.name)
                     isHandleThisObserverClass=true
                     break
                 }
@@ -126,119 +156,186 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
     @Override
     void onScannedCompleted(ClassPool classPool,ClassScanResult scanResult) {
         if (scanResult.getHandled()){
-            setAnchorOnApplicationCreated(classPool,scanResult)
+            /*setAnchorOnApplicationCreated(classPool,scanResult,true)
+            setAnchorOnApplicationCreated(classPool,scanResult,false)
+
+            setAnchorOnApplicationConfigurationChanged(classPool,scanResult,true)
+            setAnchorOnApplicationConfigurationChanged(classPool,scanResult,false)*/
+            setAnchor(scanResult,
+                    "onCreate",
+                    "onApplicationPreCreated",
+                    "(Landroid/app/Application;)V",
+                    null)
+            setAnchor(scanResult,
+                    "onCreate",
+                    "onApplicationCreated",
+                    "(Landroid/app/Application;)V",
+                    null)
+            setAnchor(scanResult,
+                    "onConfigurationChanged",
+                    "onApplicationPreConfigurationChanged",
+                    "(Landroid/app/Application;Landroid/content/res/Configuration;)V",
+                    classPool.get("android.content.res.Configuration")
+            )
+            setAnchor(scanResult,
+                    "onConfigurationChanged",
+                    "onApplicationConfigurationChanged",
+                    "(Landroid/app/Application;Landroid/content/res/Configuration;)V",
+                    classPool.get("android.content.res.Configuration")
+            )
+
+            setAnchor(scanResult,
+                    "onLowMemory",
+                    "onApplicationPreLowMemory",
+                    "(Landroid/app/Application;)V",
+                    null
+            )
+            setAnchor(scanResult,
+                    "onLowMemory",
+                    "onApplicationLowMemory",
+                    "(Landroid/app/Application;)V",
+                    null
+            )
+
+            setAnchor(scanResult,
+                    "onTerminate",
+                    "onApplicationPreTerminate",
+                    "(Landroid/app/Application;)V",
+                    null
+            )
+            setAnchor(scanResult,
+                    "onTerminate",
+                    "onApplicationTerminate",
+                    "(Landroid/app/Application;)V",
+                    null
+            )
+            setAnchor(scanResult,
+                    "onTrimMemory",
+                    "onApplicationPreTrimMemory",
+                    "(Landroid/app/Application;I)V",
+                    classPool.get(int.class.name)
+            )
+            setAnchor(scanResult,
+                    "onTrimMemory",
+                    "onApplicationTrimMemory",
+                    "(Landroid/app/Application;I)V",
+                    classPool.get(int.class.name)
+            )
+            setAnchor(scanResult,
+                    "attachBaseContext",
+                    "attachApplicationPreBaseContext",
+                    "(Landroid/app/Application;Landroid/content/Context;)V",
+                    classPool.get("android.content.Context")
+            )
+            setAnchor(scanResult,
+                    "attachBaseContext",
+                    "attachApplicationBaseContext",
+                    "(Landroid/app/Application;Landroid/content/Context;)V",
+                    classPool.get("android.content.Context")
+            )
             //将埋点后的流写入class文件
             scanResult.getApplicationClass().writeFile(scanResult.getDest().absolutePath)
             scanResult.getApplicationClass().detach()
         }
     }
 
+    private CtField createApplicationLifeCycleObserverField(CtClass observerClass,String fieldName,CtClass applicationClass){
+        CtField field = null
+        try {
+            field=applicationClass.getDeclaredField(fieldName)
+        }catch(Exception e){
 
-    private void setAnchorOnApplicationCreated(ClassPool classPool,ClassScanResult scanResult){
-        String method="onCreate"
-        String defaultSuperMethodCode=
-                "public void onCreate(){\n" +
-                "        super.onCreate();\n" +
-                "}"
-        boolean afterOrg=true;
+        }
+
+        if (field == null) {
+            field = new CtField(observerClass, fieldName,applicationClass)
+            field.setModifiers(Modifier.PRIVATE)
+            applicationClass.addField(field)
+        }
+        return field
+    }
+
+
+
+    private void setAnchor(ClassScanResult scanResult,
+            String overwriteApplicationMethodName,
+            String anchorMethodName,
+            String anchorMethodNameDesc,
+            CtClass... anchorMethodParametersClass
+
+    ){
+        //String methodName="onConfigurationChanged"
+        //CtClass anchorMethodParametersClass=classPool.get("android.content.res.Configuration")
+
         ArrayList<CtClass> org=scanResult.getLifecyclesObserverClassList();
-        ArrayList<CtClass> applicationLifeCycleObserverList =sort(org,"onApplicationCreated",classPool.get("android.app.Application"))
+        //String anchorMethodName=after?"onApplicationConfigurationChanged":"onApplicationPreConfigurationChanged"
+        ArrayList<CtClass> applicationLifeCycleObserverList =Anchor.sort(org,anchorMethodName,anchorMethodNameDesc)
         String anchorCode="";
         StringBuilder ps = new StringBuilder()
-
         for (CtClass observerClass:applicationLifeCycleObserverList){
-            ApplicationLifeCycleAction action=observerClass.getDeclaredMethod("onApplicationCreated",classPool.get("android.app.Application")).getAnnotation(ApplicationLifeCycleAction.class)
-            if (action!=null){
-                String newObj="new "+observerClass.name+"()"
-                String processNamesArray=""
+            CtMethod anchorMethod=null
+            try {
+                /*CtMethod[] ms=observerClass.getMethods()
+                for (CtMethod m:ms){
+                    project.logger.error(">> anchor "+observerClass.name+"'s method contains:info=["+m.methodInfo.toString()+"]")
+                }*/
+                anchorMethod=observerClass.getMethod(anchorMethodName,anchorMethodNameDesc)//getDeclaredMethod(anchorMethodName,classPool.get("android.app.Application"))
 
-                //ps.append("com.sad.jetpack.architecture.appgo.api.ApplicationLifecycleObserverMaster.doOnCreatedAnchor(this, "+newObj+",")
+            }catch(Exception e){
+                e.printStackTrace()
+            }
+            if (anchorMethod==null){
+                project.logger.error(">> anchor "+observerClass.name+"'s method "+anchorMethodName+" is not found")
+                continue
+            }
+            String fieldName="m"+observerClass.getSimpleName()
+            createApplicationLifeCycleObserverField(observerClass,fieldName,scanResult.applicationClass)
+            ApplicationLifeCycleAction action=anchorMethod.getAnnotation(ApplicationLifeCycleAction.class)
+            if (action!=null){
+                ps.append("if("+fieldName+"==null){"+fieldName+"="+"new "+observerClass.name+"()"+";}\n")
                 String[] processes=action.processName()
                 boolean hasIncludeProcess=(processes!=null && (processes.length>0));
-                project.logger.error("------------->include processNames? "+hasIncludeProcess+" : "+processes)
-                //ps.append("new java.lang.String[]{")
+                project.logger.error(">> include processNames? "+hasIncludeProcess+" : "+processes)
+                String p="";
+                if (anchorMethodParametersClass!=null && anchorMethodParametersClass.length>0){
+                    p=",\$\$"
+                }
                 if (hasIncludeProcess){
-                    ps.append("java.lang.String[] pNames=new java.lang.String["+processes.length+"];")
+                    String pn="pNames"+(applicationLifeCycleObserverList.indexOf(observerClass))
+                    ps.append("java.lang.String[] "+pn+"=new java.lang.String["+processes.length+"];\n")
                     for (int i = 0; i < processes.length; i++) {
-                        /*String sp=i==processes.length-1?"":","
-                        String temp='"'+processes[i]+'"'+sp;
-                        ps.append(temp)*/
-                        ps.append("pNames["+i+"]="+"\""+processes[i]+"\";\n")
+                        ps.append(pn+"["+i+"]="+"\""+processes[i]+"\";\n")
                     }
-                    processNamesArray="pNames"
+                    ps.append("if (java.util.Arrays.asList("+pn+").contains(com.sad.jetpack.architecture.appgo.api.ApplicationLifecycleObserverMaster.getCurrAppProccessName(this)))\n")
+                    ps.append("{"+fieldName+"."+anchorMethodName+"(this"+p+");}")
                 }
                 else {
-                    processNamesArray="null"
+                    ps.append(fieldName+"."+anchorMethodName+"(this"+p+");")
                 }
-                ps.append("com.sad.jetpack.architecture.appgo.api.ApplicationLifecycleObserverMaster.doOnCreatedAnchor(this,"+newObj+","+processNamesArray+");")
-                //ps.append("});")
             }
         }
-        anchorCode=
-                //"java.lang.String[] ss2=new java.lang.String[]{\"hello\"};\n"
-                //"java.lang.String[] s=new java.lang.String[]{});"
-                ps.toString()
-        setAnchor(scanResult,method,defaultSuperMethodCode,anchorCode,afterOrg,null)
+        anchorCode=ps.toString()
+        if (anchorCode!=null && !"".equals(anchorCode.toString())){
+            CtMethod method=Anchor.getOverwirteMethodFromApplication(project,scanResult.applicationClass,overwriteApplicationMethodName,anchorMethodParametersClass)
+            setAnchor(scanResult,method,anchorCode,!anchorMethodName.contains("Pre"))
+        }
     }
 
     private void setAnchor(
             ClassScanResult scanResult,
-            String mn,
-            String defaultSuperMethodCode,
+            CtMethod method,
             String anchorCode,
-            boolean afterOrg,
-            CtClass... params){
-        CtClass applicationClass=scanResult.getApplicationClass();
-        CtMethod method = applicationClass.getDeclaredMethod(mn,params);
-        if (method==null){
-            method = CtNewMethod.make(defaultSuperMethodCode,applicationClass)
-            applicationClass.addMethod(method)
-        }
-        project.logger.error("------------->"+mn+"'s anchord code is=\n"+anchorCode)
-        if (afterOrg){
-            method.insertAfter(anchorCode)
-        }
-        else {
-            method.insertBefore(anchorCode)
-        }
-
-        /*method.insertBefore("com.renny.mylibrary.InitManager.addPath(${contentMethod});\n" +
-                "com.renny.mylibrary.InitManager.doInit(this);\n")*/
-
-                /*applicationClass.declaredMethods.find {
-            it.name == "onCreate" && it.parameterTypes == [] as CtClass[]
-        }*/
+            boolean afterOrg
+    ){
+        Anchor.newBuilder(scanResult)
+        .mthod(method)
+        .anchorCode(anchorCode)
+        .afterSuper(afterOrg)
+        .build()
+        .generate(project)
     }
 
-    private ArrayList<CtClass> sort(ArrayList<CtClass> classList,String methodName,CtClass... params){
-        ArrayList<CtClass> target=new ArrayList<>(classList)
-        Comparator comparator=new Comparator<CtClass>() {
 
-
-            @Override
-            public int compare(CtClass o1, CtClass o2) {
-                try {
-                    Method method2=o2.getDeclaredMethod(methodName,params)
-                    Method method1=o1.getDeclaredMethod(methodName,params);
-                    if (method2==null || method2.getAnnotation(ApplicationLifeCycleAction.class)==null){
-                        return -1
-                    }
-                    if (method1==null || method1.getAnnotation(ApplicationLifeCycleAction.class)==null){
-                        return 1
-                    }
-                    ApplicationLifeCycleAction priority1=method1.getAnnotation(ApplicationLifeCycleAction.class)
-                    ApplicationLifeCycleAction priority2=method2.getAnnotation(ApplicationLifeCycleAction.class)
-                    return (int) (priority2.priority()-priority1.priority())
-
-                } catch (Exception e) {
-                    e.printStackTrace()
-                }
-                return 0
-            }
-        };
-        Collections.sort(target,comparator)
-        return target
-    }
 
     /*static String generateNewOnCreateMethod(String superMethodCode) {
         StringBuilder stringBuilder = new StringBuilder()

@@ -5,7 +5,6 @@ import com.android.build.api.transform.TransformInvocation
 import groovy.io.FileType
 import javassist.ClassPath
 import javassist.ClassPool
-import javassist.CtClass
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import java.lang.reflect.Constructor;
@@ -128,11 +127,11 @@ class ClassScanner {
         }
     }
     
-    interface OnFileScannedCallback{
+    interface OnFileScannedCallback<T>{
         
-        boolean onScanned(ClassPool classPool,File scannedFile, File dest,ClassScanResult scanResult);
+        boolean onScanned(ClassPool classPool,File scannedFile, File dest,T scanResult);
         
-        void onScannedCompleted(ClassPool classPool,ClassScanResult scanResult);
+        void onScannedCompleted(ClassPool classPool,T scanResult);
         
     }
 }

@@ -40,9 +40,9 @@ ext {
 
             //sad-jetpack
             "local_appgo_annotation"   : ":architecture:appgo:annotation",
-            "appgo_annotation"         : "com.sad.jetpack.architecture.appgo:annotation:1.0.5",
+            "appgo_annotation"         : "com.sad.jetpack.architecture.appgo:annotation:1.0.7",
             "local_appgo_api"          : ":architecture:appgo:api",
-            "appgo_api"                : "com.sad.jetpack.architecture.appgo:api:1.0.3",
+            "appgo_api"                : "com.sad.jetpack.architecture.appgo:api:1.0.9",
 
 
             //SAD
@@ -72,43 +72,8 @@ ext {
             "permission"               : "com.yanzhenjie:permission:latest.release",
 
 
-            //android-support
-            /*"support-v4"            : "com.android.support:support-v4:${dependVersion.support}",
-            "appcompat-v7"          : "com.android.support:appcompat-v7:${dependVersion.support}",
-            "design"                : "com.android.support:design:${dependVersion.support}",
-            "recyclerview"          : "com.android.support:recyclerview-v7:${dependVersion.support}",
-            "cardview"              : "com.android.support:cardview-v7:${dependVersion.support}",
-            "appcompat-x"           : "androidx.appcompat:appcompat:${dependVersion.support}",
-            "constraintlayout-x"    : "androidx.constraintlayout:constraintlayout:${dependVersion.support}",
-
-            "lifecycle-common-java8": "android.arch.lifecycle:common-java8:latest.release",
-
-            "sad-architecture-api"  : "com.sad.architecture.api:sad-architecture-api:latest.release",
-            "sad-datastore"         : "com.sad.assistant:sad-datastore:latest.release",
-            "self-api"              : ":api",
-            "self-impl"             : ":impl",
-            "self-annotation"       : ":annotation",
-            "self-compiler"         : ":compiler",
-
-            "auto-service"          : "com.google.auto.service:auto-service:latest.release",
-            "javapoet"              : "com.squareup:javapoet:latest.release",
-            "jsoup"                 : "org.jsoup:jsoup:latest.release",
-            "javawriter"            : "com.squareup:javawriter:latest.release",
-
-            "commons-lang3"         : "org.apache.commons:commons-lang3:latest.release",
-            "commons-collections4"  : "org.apache.commons:commons-collections4:latest.release",
-
-            "okhttp"                : "com.squareup.okhttp3:okhttp:latest.release",
-            "okio"                  : "com.squareup.okio:okio:latest.release",
-            "gson"                  : "com.google.code.gson:gson:latest.release",
-
-            "hms-base"              : "com.huawei.android.hms:base:${dependVersion.hmsVersion}",
-            "hms-iap"               : "com.huawei.android.hms:iap:${dependVersion.hmsVersion}",
-            "hms-sns"               : "com.huawei.android.hms:sns:${dependVersion.hmsVersion}",
-            "hms-hwid"              : "com.huawei.android.hms:hwid:${dependVersion.hmsVersion}",
-            "hms-push"              : "com.huawei.android.hms:push:${dependVersion.hmsVersion}",
-            "hms-opendevice"        : "com.huawei.android.hms:opendevice:${dependVersion.hmsVersion}",
-            "hms-game"              : "com.huawei.android.hms:game:${dependVersion.hmsVersion}"*/
+            //self
+            "self-demo-TestModule1"    : ":demo:TestModule1"
 
 
     ]
