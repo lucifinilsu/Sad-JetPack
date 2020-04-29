@@ -57,6 +57,7 @@ public class Compressor {
                     compress(sourceFiles[i], out, basedir);
                 }
                 out.close();
+                fileOutputStream.close()
             }
 
 

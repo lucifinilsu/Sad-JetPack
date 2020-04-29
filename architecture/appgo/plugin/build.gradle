@@ -5,11 +5,11 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     api gradleApi()
     api localGroovy()
-    api 'com.android.tools.build:gradle-api:3.6.2'
+    api 'com.android.tools.build:gradle-api:3.1.3'
     //api 'com.android.tools.build:transform-api:latest.release'
     api rootProject.ext.dependencies["appgo_annotation"]
     //api project(rootProject.ext.dependencies["local_appgo_annotation"])
-    api 'org.javassist:javassist:latest.release'
+    api 'javassist:javassist:latest.release'
     //api 'com.alibaba:fastjson:latest.release'
 
 }

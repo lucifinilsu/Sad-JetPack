@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-
+apply plugin: 'architecture-appgo-plugin'
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
     buildToolsVersion rootProject.ext.android.buildToolsVersion
@@ -28,7 +28,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    api rootProject.ext.dependencies["appgo_api"]
     api rootProject.ext.dependencies["appcompat"]
     testImplementation 'junit:junit:4.12'
     androidTestImplementation rootProject.ext.dependencies["junit"]

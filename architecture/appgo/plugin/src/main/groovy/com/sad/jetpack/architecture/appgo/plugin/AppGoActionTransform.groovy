@@ -21,7 +21,6 @@ import javassist.bytecode.AnnotationsAttribute
 import javassist.bytecode.MethodInfo
 import org.gradle.api.Project
 
-import java.lang.reflect.Method
 
 class AppGoActionTransform extends Transform implements ClassScanner.OnFileScannedCallback<ClassScanResult>{
     private Project project
@@ -50,12 +49,23 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
     //    TESTED_CODE                   由当前变量(包括依赖项)测试的代码
     @Override
     Set<? super QualifiedContent.Scope> getScopes() {
-        Sets.immutableEnumSet(
+        /*Sets.immutableEnumSet(
                 QualifiedContent.Scope.PROJECT,
                 QualifiedContent.Scope.SUB_PROJECTS,
                 QualifiedContent.Scope.EXTERNAL_LIBRARIES
                 //QualifiedContent.Scope.PROVIDED_ONLY
-        )
+        )*/
+        if (project.plugins.hasPlugin("com.android.application")) {
+            return Sets.immutableEnumSet(
+                    QualifiedContent.Scope.PROJECT,
+                    QualifiedContent.Scope.SUB_PROJECTS,
+                    QualifiedContent.Scope.EXTERNAL_LIBRARIES)
+        } else if (project.plugins.hasPlugin("com.android.library") ||project.plugins.hasPlugin("java-library")) {
+            return Sets.immutableEnumSet(
+                    QualifiedContent.Scope.PROJECT)
+        } else {
+            return Collections.emptySet()
+        }
     }
 
     //指明当前Transform是否支持增量编译

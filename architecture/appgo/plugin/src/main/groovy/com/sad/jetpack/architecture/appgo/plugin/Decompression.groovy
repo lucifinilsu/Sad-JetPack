@@ -70,6 +70,14 @@ public class Decompression {
                     e.printStackTrace();
                 }
             }
+
+            if (ins!=null){
+                try {
+                    ins.close();
+                }catch(Exception e){
+                    e.printStackTrace()
+                }
+            }
         }
     }
 
