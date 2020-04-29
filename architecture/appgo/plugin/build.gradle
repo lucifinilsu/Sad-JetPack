@@ -9,12 +9,12 @@ dependencies {
     //api 'com.android.tools.build:transform-api:latest.release'
     api rootProject.ext.dependencies["appgo_annotation"]
     //api project(rootProject.ext.dependencies["local_appgo_annotation"])
-    api 'javassist:javassist:latest.release'
+    api 'org.javassist:javassist:latest.release'
     //api 'com.alibaba:fastjson:latest.release'
 
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8//rootProject.ext.android.javaVersion
 targetCompatibility = JavaVersion.VERSION_1_8//rootProject.ext.android.javaVersion
-apply from: rootProject.file('/architecture/appgo/plugin/publishToJceneterScript.gradle')
+//apply from: rootProject.file('/architecture/appgo/plugin/publishToJceneterScript.gradle')
 //apply from: rootProject.file('/architecture/appgo/plugin/publishToLocalScript.gradle')

@@ -12,6 +12,7 @@ public class AppGoAction implements Plugin<Project> {
 
 
         }*/
+
         project.dependencies {
             api "com.sad.jetpack.architecture.appgo:api:1.0.9"//rootProject.ext.dependencies["appgo_api"]
         }

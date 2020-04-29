@@ -1,5 +1,4 @@
 package com.sad.jetpack.architecture.appgo.plugin
-
 import com.android.build.api.transform.Format
 import com.android.build.api.transform.TransformInvocation
 import groovy.io.FileType
@@ -9,17 +8,43 @@ import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import java.lang.reflect.Constructor;
 class ClassScanner {
+    private Project project
+    private ClassPool classPool
+    private TransformInvocation transformInvocation
+    private OnFileScannedCallback scannedCallback
+    private ClassScanner(Project project){
+        this.project=project
+    }
+    static ClassScanner newInstance(Project project){
+        return new ClassScanner(project)
+    }
+    ClassScanner classPool(ClassPool classPool){
+        this.classPool=classPool
+        return this
+    }
 
-    public static void scan(Project project,ClassPool classPool ,TransformInvocation transformInvocation, OnFileScannedCallback scannedCallback){
+    ClassScanner transformInvocation(TransformInvocation transformInvocation){
+        this.transformInvocation=transformInvocation
+        return this
+    }
+    ClassScanner scannedCallback(OnFileScannedCallback scannedCallback){
+        this.scannedCallback=scannedCallback
+        return this
+    }
+
+    void into(ITarget target){
+        doScan(target)
+    }
+
+    private void doScan(ITarget target){
         def classPath = []
         try {
 
             Class jarClassPathClazz = Class.forName("javassist.JarClassPath")
             Constructor constructor = jarClassPathClazz.getDeclaredConstructor(String.class)
             constructor.setAccessible(true)
-            ClassScanResult classScanResult=new ClassScanResult();
+            //ClassScanResult classScanResult=new ClassScanResult();
             transformInvocation.inputs.each { input ->
-
 
                 def subProjectInputs = []
 
@@ -75,7 +100,7 @@ class ClassScanner {
                         unzipDir.eachFileRecurse(FileType.FILES) { File it ->
                             //checkAndTransformClass(classPool, it, repackageFolder)
                             if (scannedCallback!=null){
-                                scannedCallback.onScanned(classPool,it,repackageFolder,classScanResult)
+                                scannedCallback.onScanned(classPool,it,repackageFolder)
                             }
                         }
 
@@ -101,7 +126,7 @@ class ClassScanner {
                         } else {
                             boolean handled = false;//checkAndTransformClass(classPool, it, outDir)
                             if (scannedCallback!=null){
-                                handled=scannedCallback.onScanned(classPool, it, outDir,classScanResult)
+                                handled=scannedCallback.onScanned(classPool, it, outDir)
                             }
                             if (!handled) {
                                 // copy the file to output location
@@ -116,8 +141,8 @@ class ClassScanner {
                     }
                 }
             }
-            if (scannedCallback!=null){
-                scannedCallback.onScannedCompleted(classPool,classScanResult)
+            if (target!=null){
+                target.onScannedCompleted(classPool)
             }
 
         } finally {
@@ -126,12 +151,17 @@ class ClassScanner {
             }
         }
     }
+
+
+    /*static void scan(Project project,ClassPool classPool ,TransformInvocation transformInvocation, OnFileScannedCallback scannedCallback){
+
+    }*/
     
-    interface OnFileScannedCallback<T>{
-        
-        boolean onScanned(ClassPool classPool,File scannedFile, File dest,T scanResult);
-        
-        void onScannedCompleted(ClassPool classPool,T scanResult);
-        
+    interface OnFileScannedCallback{
+        boolean onScanned(ClassPool classPool,File scannedFile, File dest);
+    }
+
+    interface ITarget {
+        void onScannedCompleted(ClassPool classPool);
     }
 }

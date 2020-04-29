@@ -1,0 +1,15 @@
+apply plugin: 'java-library'
+apply plugin: 'groovy'
+apply plugin: 'maven'
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api gradleApi()
+    api localGroovy()
+    api 'com.android.tools.build:gradle-api:3.1.3'
+    api 'org.javassist:javassist:latest.release'
+    api 'commons-io:commons-io:latest.release'
+}
+
+sourceCompatibility = JavaVersion.VERSION_1_8//rootProject.ext.android.javaVersion
+targetCompatibility = JavaVersion.VERSION_1_8//rootProject.ext.android.javaVersion
+apply from: rootProject.file('/lib/ClassScanner/publishToJceneterScript.gradle')

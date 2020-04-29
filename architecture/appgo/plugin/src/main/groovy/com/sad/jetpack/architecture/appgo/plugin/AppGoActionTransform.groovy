@@ -22,7 +22,7 @@ import javassist.bytecode.MethodInfo
 import org.gradle.api.Project
 
 
-class AppGoActionTransform extends Transform implements ClassScanner.OnFileScannedCallback<ClassScanResult>{
+class AppGoActionTransform extends Transform implements ClassScanner.OnFileScannedCallback, ClassScanner.ITarget{
     private Project project
 
     AppGoActionTransform(Project project){
@@ -75,13 +75,20 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
     }
     /*private CtClass applicationParentClass
     private CtClass lifecyclesObserverInterface*/
+    private ClassScanResult scanResult=new ClassScanResult()
     @Override
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         super.transform(transformInvocation)
         ClassPool classPool = ClassPool.getDefault()
+
         //project.logger.error("==>project.android.bootClasspath="+project.android.bootClasspath)
         classPool.appendClassPath(project.android.bootClasspath[0].toString())
-        ClassScanner.scan(project,classPool,transformInvocation,this);
+        //ClassScanner.scan(project,classPool,transformInvocation,this);
+        ClassScanner.newInstance(project)
+            .classPool(classPool)
+            .transformInvocation(transformInvocation)
+            .scannedCallback(this)
+            .into(this)
     }
 
     private boolean avaliableClass(CtClass ctClass){
@@ -100,7 +107,7 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
     }*/
 
     @Override
-    boolean onScanned(ClassPool classPool, File scannedFile, File dest,ClassScanResult scanResult) {
+    boolean onScanned(ClassPool classPool, File scannedFile, File dest) {
 
         CtClass applicationParentClass = classPool.get("android.app.Application")
         CtClass lifecyclesObserverInterface = classPool.get("com.sad.jetpack.architecture.appgo.api.IApplicationLifecyclesObserver")
@@ -164,7 +171,7 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
     }
 
     @Override
-    void onScannedCompleted(ClassPool classPool,ClassScanResult scanResult) {
+    void onScannedCompleted(ClassPool classPool) {
         if (scanResult.getHandled()){
             /*setAnchorOnApplicationCreated(classPool,scanResult,true)
             setAnchorOnApplicationCreated(classPool,scanResult,false)

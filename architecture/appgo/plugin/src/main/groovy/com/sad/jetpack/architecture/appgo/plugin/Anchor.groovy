@@ -11,7 +11,6 @@ import javassist.bytecode.MethodInfo
 import org.gradle.api.Project
 
 import java.lang.reflect.Method
-
 class Anchor {
     private Builder builder;
     private Anchor(Builder builder){
