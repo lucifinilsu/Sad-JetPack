@@ -8,17 +8,13 @@ import com.android.build.api.transform.TransformInvocation
 import com.google.common.collect.Sets
 import com.sad.jetpack.architecture.appgo.annotation.ApplicationAccess
 import com.sad.jetpack.architecture.appgo.annotation.ApplicationLifeCycleAction
-import javassist.ClassPath
+import com.sad.jetpack.lib.classscanner.ClassScanner
 import javassist.ClassPool
 import javassist.CtClass
-import javassist.CtClassType
 import javassist.CtField
 import javassist.CtMethod
-import javassist.CtNewMethod
 import javassist.Modifier
-import javassist.NotFoundException
-import javassist.bytecode.AnnotationsAttribute
-import javassist.bytecode.MethodInfo
+
 import org.gradle.api.Project
 
 

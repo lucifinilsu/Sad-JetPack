@@ -6,6 +6,7 @@ buildscript {
         maven {
             url = uri("$rootDir/architecture/appgo/plugin-repo")
         }
+        maven {url "https://dl.bintray.com/lucifinilsu/sad-JetPack/"}
         google()
         jcenter()
         maven { url "https://jitpack.io" }
@@ -17,7 +18,9 @@ buildscript {
         classpath 'com.github.dcendents:android-maven-gradle-plugin:latest.release'
 
         classpath 'com.sad.jetpack.architecture.appgo:plugin:1.0.0-test'
-        classpath 'com.renny.initiator:plugin:latest.release'
+        /*classpath ('com.renny.initiator:plugin:latest.release'){
+            exclude group:"org.javassist"
+        }*/
 
         classpath "com.mob.sdk:MobSDK:2018.0319.1724"
         // NOTE: Do not place your application dependencies here; they belong
@@ -30,6 +33,7 @@ allprojects {
         maven {
             url = uri("$rootDir/architecture/appgo/plugin-repo")
         }
+        maven {url "https://dl.bintray.com/lucifinilsu/sad-JetPack/"}
         google()
         jcenter()
         maven { url "https://jitpack.io" }

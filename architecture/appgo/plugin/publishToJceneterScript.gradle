@@ -10,7 +10,7 @@ group = 'com.sad.jetpack.architecture.appgo'
 //项目名称
 def pName='architecture-appgo-plugin'
 //版本
-def v="1.0.7"
+def v="1.0.8"
 version = v
 install {
     repositories.mavenInstaller {
