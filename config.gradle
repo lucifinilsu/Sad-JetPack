@@ -23,28 +23,29 @@ ext {
 
     dependencies = [
             //android
-            "appcompat"                : "androidx.appcompat:appcompat:${dependVersion["android_support"]}",
-            "constraintlayout"         : "androidx.constraintlayout:constraintlayout:${dependVersion["android_support"]}",
-            "multidex"                 : "androidx.multidex:multidex:${dependVersion["android_support"]}",
-            "lifecycle-extensions"     : "androidx.lifecycle:lifecycle-extensions:${dependVersion["lifecycle_version"]}",
-            "lifecycle-viewmodel"      : "androidx.lifecycle:lifecycle-viewmodel:${dependVersion["lifecycle_version"]}",
-            "lifecycle-livedata"       : "androidx.lifecycle:lifecycle-livedata:${dependVersion["lifecycle_version"]}",
-            "lifecycle-runtime"        : "androidx.lifecycle:lifecycle-runtime:${dependVersion["lifecycle_version"]}",
-            "lifecycle-compiler"       : "androidx.lifecycle:lifecycle-compiler:${dependVersion["lifecycle_version"]}",
-            "lifecycle-common-java8"   : "androidx.lifecycle:lifecycle-common-java8:${dependVersion["lifecycle_version"]}",
-            "lifecycle-reactivestreams": "androidx.lifecycle:lifecycle-reactivestreams:${dependVersion["lifecycle_version"]}",
+            "appcompat"                        : "androidx.appcompat:appcompat:${dependVersion["android_support"]}",
+            "constraintlayout"                 : "androidx.constraintlayout:constraintlayout:${dependVersion["android_support"]}",
+            "multidex"                         : "androidx.multidex:multidex:${dependVersion["android_support"]}",
+            "lifecycle-extensions"             : "androidx.lifecycle:lifecycle-extensions:${dependVersion["lifecycle_version"]}",
+            "lifecycle-viewmodel"              : "androidx.lifecycle:lifecycle-viewmodel:${dependVersion["lifecycle_version"]}",
+            "lifecycle-livedata"               : "androidx.lifecycle:lifecycle-livedata:${dependVersion["lifecycle_version"]}",
+            "lifecycle-runtime"                : "androidx.lifecycle:lifecycle-runtime:${dependVersion["lifecycle_version"]}",
+            "lifecycle-compiler"               : "androidx.lifecycle:lifecycle-compiler:${dependVersion["lifecycle_version"]}",
+            "lifecycle-common-java8"           : "androidx.lifecycle:lifecycle-common-java8:${dependVersion["lifecycle_version"]}",
+            "lifecycle-reactivestreams"        : "androidx.lifecycle:lifecycle-reactivestreams:${dependVersion["lifecycle_version"]}",
 
             //test
-            "junit"                    : "androidx.test.ext:junit:latest.release",
-            "espresso-core"            : "androidx.test.espresso:espresso-core:latest.release",
+            "junit"                            : "androidx.test.ext:junit:latest.release",
+            "espresso-core"                    : "androidx.test.espresso:espresso-core:latest.release",
 
             //sad-jetpack
-            "local_appgo_annotation"   : ":architecture:appgo:annotation",
-            "appgo_annotation"         : "com.sad.jetpack.architecture.appgo:annotation:1.0.8",
-            "local_appgo_api"          : ":architecture:appgo:api",
-            "appgo_api"                : "com.sad.jetpack.architecture.appgo:api:1.0.9",
-            "lib-ClassScanner"         : "com.sad.jetpack.lib.classscanner:ClassScanner:1.0.0",
-
+            "local_appgo_annotation"           : ":architecture:appgo:annotation",
+            "appgo_annotation"                 : "com.sad.jetpack.architecture.appgo:annotation:1.0.8",
+            "local_appgo_api"                  : ":architecture:appgo:api",
+            "appgo_api"                        : "com.sad.jetpack.architecture.appgo:api:1.0.9",
+            "lib-ClassScanner"                 : "com.sad.jetpack.lib.classscanner:ClassScanner:1.0.0-G2",
+            "local_componentization_api"       : ":architecture:componentization:api",
+            "local_componentization_annotation": ":architecture:componentization:annotation",
 
             //SAD
             /*"sad-architecture-api"     : "com.sad.architecture.api:sad-architecture-api:${dependVersion["sad-architecture-api"]}",
@@ -57,24 +58,24 @@ ext {
             "sad-basic"                : "com.sad.basic:sad-basic:latest.release",*/
 
             //第三方
-            "immersionbar"             : "com.gyf.immersionbar:immersionbar:${dependVersion["immersionbar"]}",
-            "immersionbar-components"  : "com.gyf.immersionbar:immersionbar-components:latest.release",
-            "auto-service"             : "com.google.auto.service:auto-service:latest.release",
-            "connectionclass"          : "com.facebook.network.connectionclass:connectionclass:latest.release",
-            "okhttp"                   : "com.squareup.okhttp3:okhttp:latest.release",
-            "logging-interceptor"      : "com.squareup.okhttp3:logging-interceptor:latest.release",
-            "okio"                     : "com.squareup.okio:okio:latest.release",
-            "jsoup"                    : "org.jsoup:jsoup:latest.release",
-            "gson"                     : "com.google.code.gson:gson:latest.release",
-            "glide"                    : "com.github.bumptech.glide:glide:latest.release",
-            "glide-compiler"           : "com.github.bumptech.glide:compiler:latest.release",
-            "hoko-blur"                : "com.hoko:hoko-blur:latest.release",
-            "picture_library"          : "com.github.LuckSiege.PictureSelector:picture_library:latest.release",
-            "permission"               : "com.yanzhenjie:permission:latest.release",
+            "immersionbar"                     : "com.gyf.immersionbar:immersionbar:${dependVersion["immersionbar"]}",
+            "immersionbar-components"          : "com.gyf.immersionbar:immersionbar-components:latest.release",
+            "auto-service"                     : "com.google.auto.service:auto-service:latest.release",
+            "connectionclass"                  : "com.facebook.network.connectionclass:connectionclass:latest.release",
+            "okhttp"                           : "com.squareup.okhttp3:okhttp:latest.release",
+            "logging-interceptor"              : "com.squareup.okhttp3:logging-interceptor:latest.release",
+            "okio"                             : "com.squareup.okio:okio:latest.release",
+            "jsoup"                            : "org.jsoup:jsoup:latest.release",
+            "gson"                             : "com.google.code.gson:gson:latest.release",
+            "glide"                            : "com.github.bumptech.glide:glide:latest.release",
+            "glide-compiler"                   : "com.github.bumptech.glide:compiler:latest.release",
+            "hoko-blur"                        : "com.hoko:hoko-blur:latest.release",
+            "picture_library"                  : "com.github.LuckSiege.PictureSelector:picture_library:latest.release",
+            "permission"                       : "com.yanzhenjie:permission:latest.release",
 
 
             //self
-            "self-demo-TestModule1"    : ":demo:TestModule1"
+            "self-demo-TestModule1"            : ":demo:TestModule1"
 
 
     ]

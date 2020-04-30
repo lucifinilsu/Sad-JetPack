@@ -10,7 +10,7 @@ group = 'com.sad.jetpack.lib.classscanner'
 //项目名称
 def pName='lib-ClassScanner'
 //版本
-def v="1.0.0"
+def v="1.0.0-G2"
 version = v
 install {
     repositories.mavenInstaller {
