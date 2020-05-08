@@ -3,5 +3,10 @@
     <declare-styleable name="ArcLayout">
         <attr name="arcHeight" format="dimension"/>
         <attr name="arcColor" format="color"/>
+        <attr name="arcPosType" format="enum">
+            <enum name="top" value="1" />
+            <enum name="bottom" value="2" />
+        </attr>
     </declare-styleable>
+
 </resources>
