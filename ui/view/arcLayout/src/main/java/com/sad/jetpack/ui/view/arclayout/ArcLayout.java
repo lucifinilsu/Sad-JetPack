@@ -54,14 +54,25 @@ public class ArcLayout extends RelativeLayout {
         setWillNotDraw(false);
 
     }
-    public void setArcHeight(int arcHeight){
+    public void setArcHeight(int arcHeight,boolean requestLayout){
         this.arcHeight=arcHeight;
-        requestLayout();
+        if (requestLayout){
+            requestLayout();
+        }
+        else {
+            invalidate();
+        }
+
     }
 
-    public void setPosType(int posType) {
+    public void setPosType(int posType,boolean requestLayout) {
         this.posType = posType;
-        requestLayout();
+        if (requestLayout){
+            requestLayout();
+        }
+        else {
+            invalidate();
+        }
     }
 
     public int getArcHeight() {
