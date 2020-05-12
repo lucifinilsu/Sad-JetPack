@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ExposedService {
 
-    String name();
+    //String name();
 
     String uri() default "";
 

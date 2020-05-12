@@ -15,8 +15,10 @@ dependencies {
     //api 'org.javassist:javassist:3.20.0-GA'
 
 }
+sourceCompatibility = rootProject.ext.android.javaVersionInt
+targetCompatibility = rootProject.ext.android.javaVersionInt
 
-sourceCompatibility = JavaVersion.VERSION_1_8//rootProject.ext.android.javaVersion
-targetCompatibility = JavaVersion.VERSION_1_8//rootProject.ext.android.javaVersion
+//sourceCompatibility = JavaVersion.VERSION_1_8//rootProject.ext.android.javaVersion
+//targetCompatibility = JavaVersion.VERSION_1_8//rootProject.ext.android.javaVersion
 //apply from: rootProject.file('/architecture/appgo/plugin/publishToJceneterScript.gradle')
 //apply from: rootProject.file('/architecture/appgo/plugin/publishToLocalScript.gradle')

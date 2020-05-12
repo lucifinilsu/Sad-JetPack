@@ -1,0 +1,15 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    //提交
+    annotationProcessor rootProject.ext.dependencies["auto-service"]
+    compileOnly rootProject.ext.dependencies["auto-service"]
+    api project(rootProject.ext.dependencies["local_componentization_annotation"])
+    api rootProject.ext.dependencies["javapoet"]
+}
+sourceCompatibility = rootProject.ext.android.javaVersionInt
+targetCompatibility = rootProject.ext.android.javaVersionInt
+
+/*sourceCompatibility = "8"
+targetCompatibility = "8"*/

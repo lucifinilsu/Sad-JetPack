@@ -5,5 +5,5 @@ dependencies {
 
 }
 
-sourceCompatibility = rootProject.ext.android.javaVersion
-targetCompatibility = rootProject.ext.android.javaVersion
+sourceCompatibility = rootProject.ext.android.javaVersionInt
+targetCompatibility = rootProject.ext.android.javaVersionInt
