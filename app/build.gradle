@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.mob.sdk'
 apply plugin: 'architecture-appgo-plugin'
-
+apply plugin: 'architecture-componentization-plugin'
 apply plugin: 'initiator'
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion
@@ -43,6 +43,7 @@ dependencies {
     api project(rootProject.ext.dependencies["self-demo-TestModule1"])
     api rootProject.ext.dependencies["appcompat"]
     api rootProject.ext.dependencies["constraintlayout"]
+    api project(rootProject.ext.dependencies["local_componentization_annotation"])
     testImplementation 'junit:junit:4.12'
     api project(":ui:view:arcLayout")
     androidTestImplementation rootProject.ext.dependencies["junit"]

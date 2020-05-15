@@ -1,0 +1,88 @@
+apply plugin: 'com.jfrog.bintray'
+/*apply plugin: 'com.github.dcendents.android-maven'*/
+//版本控制站点链接
+def siteUrl = 'https://github.com/lucifinilsu/Sad-JetPack'
+//git 链接
+def gitUrl = 'https://github.com/lucifinilsu/Sad-JetPack.git'
+//实例compile 'com.android.kit:permissionkit:1.0.0' ：group+name+version
+//仓库组
+group = 'com.sad.jetpack.architecture.componentization'
+//项目名称
+def pName='architecture-componentization-plugin'
+//版本
+def v="1.0.0"
+version = v
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'jar'
+                name pName
+                url siteUrl
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+/*//编译 Javadoc
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+//编译 xxx-javadoc.jar
+task androidJavadocsJar(type: Jar) {
+    classifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+//编译 xxx-sources.jar
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}*/
+
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    /*archives androidSourcesJar
+    archives androidJavadocsJar*/
+    archives javadocJar
+    archives sourcesJar
+}
+//读取配置的账户与apiKey
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        version {
+            name = v
+            desc = '组件化方案插件'
+        }
+        //repository 名称
+        repo = 'sad-JetPack'
+        name = pName
+        licenses = ['Apache-2.0']
+        vcsUrl = gitUrl
+        publish = true
+    }
+}

@@ -18,11 +18,14 @@ public abstract class AbsProcessor extends AbstractProcessor {
     protected Filer filer;
     protected Messager messager;//因为在注解处理器里面不可以抛出Exception！为什么了？因为在编译阶段抛出错误后，注解处理器就不会运行完，也就没什么用了。所以Message就是为了输出错误信息。
     protected ProcessorLog log;
-    protected boolean isLog=false;
+    protected boolean isLog=true;
     @Override
-    public synchronized void init(ProcessingEnvironment processingEnvironment) {
-        super.init(processingEnvironment);
-
+    public synchronized void init(ProcessingEnvironment env) {
+        super.init(env);
+        elementUtils = env.getElementUtils();
+        processingEnv=env;
+        filer = env.getFiler();
+        typeUtils = env.getTypeUtils();
     }
 
 }

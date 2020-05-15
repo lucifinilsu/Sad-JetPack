@@ -1,16 +1,15 @@
 package com.sad.jetpack.architecture.componentization.compiler;
 
 import com.google.auto.service.AutoService;
-import com.sad.architecture.annotation.AppComponent;
-import com.sad.architecture.annotation.Constant;
-import com.squareup.javapoet.ClassName;
+import com.sad.jetpack.architecture.componentization.annotation.ExposedService;
 import com.squareup.javapoet.CodeBlock;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeSpec;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Set;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -30,106 +29,71 @@ import javax.lang.model.element.TypeElement;
  */
 @AutoService(Processor.class)
 @SupportedSourceVersion(value = SourceVersion.RELEASE_8)
-@SupportedOptions({"moduleName","log"})
+@SupportedOptions({"log"})
 @SupportedAnnotationTypes({
         Constant.PACKAGE__ANNOTATION +".ExposedService"
 })
 public class RelationshipMappingProcessor extends AbsProcessor{
-    private String moduleName=null;
-    private int flag=0;
-    private CodeBlock codeBlockRegisterComponentProvider;
 
     @Override
     public synchronized void init(ProcessingEnvironment env) {
         super.init(env);
-        moduleName=env.getOptions().get("moduleName").replaceAll("[^0-9a-zA-Z_]+", "");
         isLog=Boolean.valueOf(env.getOptions().getOrDefault("log","false"));
-        info("==========>hhhh");
+        log=new ProcessorLog(messager,isLog);
+        log.config_err("log");
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotationedElements, RoundEnvironment roundEnv) {
-        flag+=1;
         if (CollectionUtils.isNotEmpty(annotationedElements)){
-            //第一步，解析AppComponent注解的类t
-            Set<? extends Element> listServiceElements=roundEnv.getElementsAnnotatedWith(AppComponent.class);
-            if (isLog){
-                info("-------------->"+moduleName+"本次注解："+annotationedElements+",含有AppComponentProvider的元素有"+listServiceElements.size()+"个："+listServiceElements+"。标记："+flag);
+            //第一步，解析ExposedService注解的类
+            Set<? extends Element> listServiceElements=roundEnv.getElementsAnnotatedWith(ExposedService.class);
+            if (!CollectionUtils.isNotEmpty(listServiceElements)){
+                log.error(">>>未发现注解ExposedService");
+                return true;
             }
-            //遍历所有注解类元素
-            for (Element serviceElement:listServiceElements
-                    ){
-                if (serviceElement.getKind() != ElementKind.CLASS) {
-                    error(serviceElement, "错误的注解类型，只有【类】才能够被该 @%s 注解处理", AppComponent.class.getSimpleName());
-                    return true;
+            for (Element element:listServiceElements
+                 ) {
+                if (element.getKind() != ElementKind.CLASS) {
+                    log.error(">>>错误的注解类型，只有【类】才能够被该ExposedService注解处理");
+                    continue;
                 }
-                //强转为类注解元素
-                TypeElement serviceElementIntf= (TypeElement) serviceElement;
-                String note="";//错误提示
-                //判断一下是否是抽象类
-                Set<Modifier> mod=serviceElementIntf.getModifiers();
+                Set<Modifier> mod=element.getModifiers();
                 if (mod.contains(Modifier.ABSTRACT)){
-                    note=serviceElement.getSimpleName().toString()+"是抽象类，故无法进行注册:";
+                   log.error(">>>"+element.getSimpleName().toString()+"是抽象类，故无法进行注册:");
+                   continue;
                 }
-                //再判断被注解的类是否实现了IAppComponent
-                //模拟一个Element进行判断
-                //2019.5.10开放接口限制，不再局限IComponent实现
-                /*Element elementIAC=elementUtils.getTypeElement(Constant.PACKAGE_SAD_ARCHITECTURE_API_COMPONENTIZATION+".IComponent");
-                if ("".equals(note) && !typeUtils.isSubtype(typeUtils.erasure(serviceElementIntf.asType()),typeUtils.erasure(elementIAC.asType()))){
-                    info("请检查"+serviceElementIntf.getSimpleName()+"的type是"+serviceElementIntf.asType()+",是否实现了IAppComponent接口:"+elementIAC.asType());
-                    note="请检查"+serviceElementIntf.getSimpleName()+"是否实现了IAppCompoent接口,若否则无法注册:";
-                }*/
-                //编辑注册方法的代码块
-                generateServiceRigesterCodeBlock(serviceElementIntf,note);
+
+                try {
+                    appendToDoc(element);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
+
         }
 
         if (roundEnv.processingOver()){
             //结束解析，生成注册类
-            generateServiceRigester();
+
         }
         return false;
     }
 
+    private final static String dir="";
+    private void appendToDoc(Element element) throws Exception{
+        ExposedService annotation=element.getAnnotation(ExposedService.class);
+        String u=annotation.url();
+        String des=annotation.description();
+        URL url=new URL(u);
+        String protocol=url.getProtocol();
+        String host=url.getHost();
+        String path=url.getPath();
+        String name=path.substring(path.lastIndexOf('/')+1);
+        String query=url.getQuery();
 
-    protected void generateServiceRigester(){
-        try {
-            TypeSpec.Builder tb=TypeSpec.classBuilder("ModuleComponentRegister$$"+moduleName)
-                    .addModifiers(Modifier.PUBLIC)
-                    .addSuperinterface(ClassName.bestGuess(Constant.PACKAGE_SAD_ARCHITECTURE_API_INIT+".IModuleComponentRegister"))
-                    ;
-            //ConcurrentHashMap<String, IAppComponent> AppComponents
-            MethodSpec.Builder mb_RegisterIn=MethodSpec.methodBuilder("registerIn")
-                    .addAnnotation(Override.class)
-                    .addModifiers(Modifier.PUBLIC)
-                    .addCode(codeBlockRegisterComponentProvider)
-                    ;
-            tb.addMethod(mb_RegisterIn.build());
-            JavaFile.Builder jb= JavaFile.builder(Constant.PACKAGE_SAD_ARCHITECTURE_API_COMPONENTIZATION_COMPONENT_REGISTER,tb.build());
-            jb.build().writeTo(filer);
 
-        }catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
-    protected void generateServiceRigesterCodeBlock(TypeElement serviceRegisterElement,String note){
-        AppComponent appService =serviceRegisterElement.getAnnotation(AppComponent.class);
-
-        if (codeBlockRegisterComponentProvider ==null){
-
-            codeBlockRegisterComponentProvider =CodeBlock.builder().build();
-
-            ;
-        }
-        ClassName componentStorageCName=ClassName.bestGuess(Constant.PACKAGE_SAD_ARCHITECTURE_API_COMPONENTIZATION_INTERNAL+".ComponentsStorage");
-        codeBlockRegisterComponentProvider = codeBlockRegisterComponentProvider.toBuilder().addStatement(
-                (note!=null && !"".equals(note)?"//"+note:"")+"$T.registerComponentClass($S,$T.class)",
-                componentStorageCName,
-                appService.name(),
-                ClassName.get(elementUtils.getPackageOf(serviceRegisterElement).toString(),serviceRegisterElement.getSimpleName().toString())
-        ).build()
-        ;
-    }
 
 }

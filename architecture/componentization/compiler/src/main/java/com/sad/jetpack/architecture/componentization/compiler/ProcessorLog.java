@@ -29,5 +29,27 @@ public class ProcessorLog {
             messager.printMessage(Diagnostic.Kind.NOTE, info);
         }
     }
-
+    public boolean config_err(String opt){
+        if (opt==null ||"".equals(opt)){
+            error("未在Gradle脚本里配置Log开关,后续日志将关闭,若要启动日志请按照以下格式配置：\n" +
+                    "android{\n" +
+                    "   ...\n"+
+                    "   defaultConfig{\n" +
+                    "       ...\n"+
+                    "       javaCompileOptions {\n" +
+                    "            annotationProcessorOptions {\n" +
+                    "                arguments = [\n" +
+                    "                        log:true,\n"+
+                    "                ]\n" +
+                    "            }\n" +
+                    "        }\n" +
+                    "       ...\n"+
+                    "   }\n" +
+                    "   ...\n"+
+                    "}\n"
+            );
+            return true;
+        }
+        return false;
+    }
 }

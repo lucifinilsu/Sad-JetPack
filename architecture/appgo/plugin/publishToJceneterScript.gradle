@@ -76,7 +76,7 @@ bintray {
     pkg {
         version {
             name = v
-            desc = 'appgo在application的生命周期监控中使用的注解'
+            desc = 'appgo监控application的生命周期插件'
         }
         //repository 名称
         repo = 'sad-JetPack'

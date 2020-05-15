@@ -8,6 +8,9 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.sad.jetpack.architecture.appgo.annotation.ApplicationAccess;
+
+import java.io.IOException;
+
 @ApplicationAccess
 public class App extends Application {
     @Override

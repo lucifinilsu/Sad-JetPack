@@ -11,7 +11,7 @@ public @interface ExposedService {
 
     //String name();
 
-    String uri() default "";
+    String url() default "";
 
     String description() default "";
 }

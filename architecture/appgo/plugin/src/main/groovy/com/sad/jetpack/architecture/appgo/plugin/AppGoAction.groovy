@@ -16,7 +16,7 @@ public class AppGoAction implements Plugin<Project> {
         project.dependencies {
             api "com.sad.jetpack.architecture.appgo:api:1.0.9"//rootProject.ext.dependencies["appgo_api"]
         }
-        project.logger.error(">> appgo plugin is running in ["+project.getName()+"]-["+project.getRootProject()+"]")
+        project.logger.error(">> appgo plugin is running in ["+project.getName()+"]-["/*+ project.android.applicationVariants.all*/+"]-["+project.getRootProject()+"]")
 
         if (project.plugins.hasPlugin("com.android.application")) {
             project.android.registerTransform(new AppGoActionTransform(project))

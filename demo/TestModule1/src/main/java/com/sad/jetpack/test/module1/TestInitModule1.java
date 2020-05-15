@@ -3,9 +3,12 @@ package com.sad.jetpack.test.module1;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.os.FileUtils;
 
 import com.sad.jetpack.architecture.appgo.annotation.ApplicationLifeCycleAction;
 import com.sad.jetpack.architecture.appgo.api.IApplicationLifecyclesObserver;
+
+import java.io.File;
 
 public class TestInitModule1 implements IApplicationLifecyclesObserver {
     @ApplicationLifeCycleAction(priority = 1561)

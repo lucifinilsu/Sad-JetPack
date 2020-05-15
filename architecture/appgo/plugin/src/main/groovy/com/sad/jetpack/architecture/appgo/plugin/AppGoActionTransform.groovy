@@ -33,6 +33,7 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
     //CLASSES和RESOURCES，CLASSES代表处理的java的class文件，RESOURCES代表要处理java的资源
     @Override
     Set<QualifiedContent.ContentType> getInputTypes() {
+
         Collections.singleton(QualifiedContent.DefaultContentType.CLASSES)
     }
 
@@ -75,8 +76,8 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
     @Override
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         super.transform(transformInvocation)
-        ClassPool classPool = ClassPool.getDefault()
 
+        ClassPool classPool = ClassPool.getDefault()
         //project.logger.error("==>project.android.bootClasspath="+project.android.bootClasspath)
         classPool.appendClassPath(project.android.bootClasspath[0].toString())
         //ClassScanner.scan(project,classPool,transformInvocation,this);
@@ -369,4 +370,6 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
         pathCtField.setModifiers(Modifier.PRIVATE | Modifier.STATIC)
         ctClass.addField(pathCtField, CtField.Initializer.constant(path))
     }*/
+
+
 }
