@@ -52,8 +52,21 @@ class ComponentRegisterTransform extends Transform{
     @Override
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         super.transform(transformInvocation)
-
         project.logger.error(">>> ComponentRegisterTransform'method transform is called ")
+        ClassPool classPool = ClassPool.getDefault()
+        classPool.appendClassPath(project.android.bootClasspath[0].toString())
+        ClassScanner.newInstance(project)
+                .classPool(classPool)
+                .transformInvocation(transformInvocation)
+                .scannedCallback(new ClassScanner.OnFileScannedCallback(){
+
+                    @Override
+                    boolean onScanned(ClassPool pool, File scannedFile, File dest) {
+
+                        return false
+                    }
+                })
+                .into(null)
 
     }
 

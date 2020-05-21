@@ -1,5 +1,6 @@
 package com.sad.jetpack.architecture.componentization.annotation;
 
+import java.io.File;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -9,9 +10,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ExposedService {
 
-    //String name();
+    String[] assetsDir() default {"src\\main\\assets\\"};
 
-    String url() default "";
+    String url();
 
     String description() default "";
 }

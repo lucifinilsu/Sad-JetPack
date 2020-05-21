@@ -4,7 +4,6 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import org.apache.commons.io.IOUtils;
-import org.jsoup.Jsoup;
 
 import java.io.File;
 import java.util.ArrayList;

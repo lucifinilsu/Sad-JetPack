@@ -9,7 +9,7 @@ buildscript {
         maven {
             url = uri("$rootDir/architecture/componentization/plugin-repo")
         }
-        //maven {url "https://dl.bintray.com/lucifinilsu/sad-JetPack/"}
+        maven {url "https://dl.bintray.com/lucifinilsu/sad-JetPack/"}
         google()
         jcenter()
         maven { url "https://jitpack.io" }
@@ -41,7 +41,7 @@ allprojects {
         maven {
             url = uri("$rootDir/architecture/componentization/plugin-repo")
         }
-        //maven {url "https://dl.bintray.com/lucifinilsu/sad-JetPack/"}
+        maven {url "https://dl.bintray.com/lucifinilsu/sad-JetPack/"}
         google()
         jcenter()
         maven { url "https://jitpack.io" }

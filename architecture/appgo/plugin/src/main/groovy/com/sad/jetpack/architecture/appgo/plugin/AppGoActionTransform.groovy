@@ -33,8 +33,7 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
     //CLASSES和RESOURCES，CLASSES代表处理的java的class文件，RESOURCES代表要处理java的资源
     @Override
     Set<QualifiedContent.ContentType> getInputTypes() {
-
-        Collections.singleton(QualifiedContent.DefaultContentType.CLASSES)
+        return Collections.singleton(QualifiedContent.DefaultContentType.CLASSES)
     }
 
     //    EXTERNAL_LIBRARIES        只有外部库

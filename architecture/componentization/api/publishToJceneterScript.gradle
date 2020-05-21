@@ -8,14 +8,14 @@ def gitUrl = 'https://github.com/lucifinilsu/Sad-JetPack.git'
 //仓库组
 group = 'com.sad.jetpack.architecture.componentization'
 //版本
-def v="1.0.3"
+def v="1.0.2"
 version = v
 install {
     repositories.mavenInstaller {
         pom {
             project {
-                packaging 'jar'
-                name 'architecture-componentization-annotation'
+                packaging 'aar'
+                name 'architecture-componentization-api'
                 url siteUrl
                 licenses {
                     license {
@@ -32,7 +32,7 @@ install {
         }
     }
 }
-/*//编译 Javadoc
+//编译 Javadoc
 task androidJavadocs(type: Javadoc) {
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
@@ -46,22 +46,22 @@ task androidJavadocsJar(type: Jar) {
 task androidSourcesJar(type: Jar) {
     classifier = 'sources'
     from android.sourceSets.main.java.srcDirs
-}*/
+}
 
 
-task sourcesJar(type: Jar, dependsOn: classes) {
+/*task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
-}
+}*/
 artifacts {
-    /*archives androidSourcesJar
-    archives androidJavadocsJar*/
-    archives javadocJar
-    archives sourcesJar
+    archives androidSourcesJar
+    archives androidJavadocsJar
+    /*archives javadocJar
+    archives sourcesJar*/
 }
 //读取配置的账户与apiKey
 Properties properties = new Properties()
@@ -74,11 +74,11 @@ bintray {
     pkg {
         version {
             name = v
-            desc = 'componentization在组件化中使用的注解'
+            desc = 'componentization框架的接口及默认实现'
         }
         //repository 名称
         repo = 'sad-JetPack'
-        name = 'architecture-componentization-annotation'
+        name = 'architecture-componentization-api'
         licenses = ['Apache-2.0']
         vcsUrl = gitUrl
         publish = true

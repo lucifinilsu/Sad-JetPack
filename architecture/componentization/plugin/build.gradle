@@ -9,6 +9,7 @@ dependencies {
     implementation rootProject.ext.dependencies["componentization_annotation"]
     //api project(rootProject.ext.dependencies["local_appgo_annotation"])
     implementation rootProject.ext.dependencies["lib-ClassScanner"]
+    implementation rootProject.ext.dependencies["gson"]
     //implementation project(":lib:ClassScanner")
     implementation 'com.android.tools.build:gradle-api:3.1.3'
     implementation 'org.javassist:javassist:latest.release'
@@ -21,4 +22,4 @@ targetCompatibility = rootProject.ext.android.javaVersionInt
 //sourceCompatibility = JavaVersion.VERSION_1_8//rootProject.ext.android.javaVersion
 //targetCompatibility = JavaVersion.VERSION_1_8//rootProject.ext.android.javaVersion
 //apply from: rootProject.file('/architecture/componentization/plugin/publishToJceneterScript.gradle')
-apply from: rootProject.file('/architecture/componentization/plugin/publishToLocalScript.gradle')
+//apply from: rootProject.file('/architecture/componentization/plugin/publishToLocalScript.gradle')

@@ -9,13 +9,19 @@
     <dependency>
       <groupId>com.sad.jetpack.architecture.componentization</groupId>
       <artifactId>annotation</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.3</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.sad.jetpack.lib.classscanner</groupId>
       <artifactId>ClassScanner</artifactId>
       <version>1.0.0-G2</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>RELEASE</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
