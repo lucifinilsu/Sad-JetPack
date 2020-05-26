@@ -1,5 +1,5 @@
 {
-  "path": "erm\\\\xxx\\45\\cc\\wfw",
+  "path": "erm\\xxx\\45\\cc\\wfw",
   "element": {
     "url": "https://www.baidu.com/xxx/45/cc/wfw",
     "class": "com.sad.jetpack.demo.TestWorkerService",

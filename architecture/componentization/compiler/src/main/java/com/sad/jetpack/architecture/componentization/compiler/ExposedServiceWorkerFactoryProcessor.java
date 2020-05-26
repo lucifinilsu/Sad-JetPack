@@ -158,7 +158,7 @@ public class ExposedServiceWorkerFactoryProcessor extends AbsProcessor{
             StringBuilder sbApath=new StringBuilder();
             StringBuilder ermPath=new StringBuilder();
             ermPath
-                    .append(ERM_DIR+File.separator)
+                    .append(ERM_DIR/*+File.separator*/)
                     //.append(packageName)
                     .append(path.replace("/",File.separator));
             sbApath
