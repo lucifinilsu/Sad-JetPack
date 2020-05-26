@@ -1,0 +1,8 @@
+{
+  "path": "erm\\\\xxx\\45\\cc\\gg",
+  "element": {
+    "url": "https://www.baidu.com/xxx/45/cc/gg",
+    "class": "com.sad.jetpack.demo.TestWorkerAsyncService",
+    "description": ""
+  }
+}

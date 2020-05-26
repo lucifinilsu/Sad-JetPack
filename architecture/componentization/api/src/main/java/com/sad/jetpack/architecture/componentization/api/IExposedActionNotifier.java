@@ -1,7 +1,7 @@
 package com.sad.jetpack.architecture.componentization.api;
 
-public interface IExposedActionNotifier {
+public interface IExposedActionNotifier<D> {
 
-    boolean notifyBy(Object... o);
+    boolean notifyBy(D d);
 
 }

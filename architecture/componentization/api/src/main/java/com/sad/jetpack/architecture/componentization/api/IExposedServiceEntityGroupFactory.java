@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 
 public interface IExposedServiceEntityGroupFactory {
 
-    LinkedHashMap<String,ExposdServiceRelationMappingEntity> getEntityGroup(String url);
+    LinkedHashMap<String, ExposedServiceRelationMappingEntity> getEntityGroup(String url);
 
 
 

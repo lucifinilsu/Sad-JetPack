@@ -34,7 +34,7 @@ public class Utils {
         StringBuilder ermPath=new StringBuilder();
         ermPath
                 .append("erm"+ File.separator)
-                .append(InternalContextHolder.get().getContext().getPackageName())
+                //.append(InternalContextHolder.get().getContext().getPackageName())
                 .append(path.replace("/",File.separator));
         String e=ermPath.toString();
         elist.add(e);

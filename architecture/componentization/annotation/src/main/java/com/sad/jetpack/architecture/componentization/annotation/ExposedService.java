@@ -15,4 +15,6 @@ public @interface ExposedService {
     String url();
 
     String description() default "";
+
+    boolean asyncWorker() default false;
 }

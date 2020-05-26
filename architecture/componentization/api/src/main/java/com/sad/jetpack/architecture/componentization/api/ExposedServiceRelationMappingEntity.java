@@ -1,8 +1,8 @@
 package com.sad.jetpack.architecture.componentization.api;
 
-public class ExposdServiceRelationMappingEntity {
+public class ExposedServiceRelationMappingEntity {
     private String path="";
-    private ExposdServiceRelationMappingElement element;
+    private ExposedServiceRelationMappingElement element;
 
     public String getPath() {
         return path;
@@ -12,11 +12,11 @@ public class ExposdServiceRelationMappingEntity {
         this.path = path;
     }
 
-    public ExposdServiceRelationMappingElement getElement() {
+    public ExposedServiceRelationMappingElement getElement() {
         return element;
     }
 
-    public void setElement(ExposdServiceRelationMappingElement element) {
+    public void setElement(ExposedServiceRelationMappingElement element) {
         this.element = element;
     }
 

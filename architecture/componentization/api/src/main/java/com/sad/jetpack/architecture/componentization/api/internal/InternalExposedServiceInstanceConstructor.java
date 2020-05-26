@@ -1,11 +1,10 @@
-package com.sad.jetpack.architecture.componentization.api.impl;
+package com.sad.jetpack.architecture.componentization.api.internal;
 
-import com.sad.jetpack.architecture.componentization.api.ExposdServiceRelationMappingEntity;
 import com.sad.jetpack.architecture.componentization.api.IExposedServiceInstanceConstructor;
 
 import java.lang.reflect.Constructor;
 
-public class DefaultExposedServiceInstanceConstructor implements IExposedServiceInstanceConstructor {
+public class InternalExposedServiceInstanceConstructor implements IExposedServiceInstanceConstructor {
     //1w 5-10 5 2 1/元
     //2、30w 1000/天
     //
@@ -14,7 +13,7 @@ public class DefaultExposedServiceInstanceConstructor implements IExposedService
     public Class[] classes;
     public Object[] objects;
 
-    public DefaultExposedServiceInstanceConstructor(Class cls){
+    public InternalExposedServiceInstanceConstructor(Class cls){
         this.cls=cls;
     }
 

@@ -3,8 +3,8 @@ package com.sad.jetpack.architecture.componentization.api.impl;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
-import com.sad.jetpack.architecture.componentization.api.ExposdServiceRelationMappingElement;
-import com.sad.jetpack.architecture.componentization.api.ExposdServiceRelationMappingEntity;
+import com.sad.jetpack.architecture.componentization.api.ExposedServiceRelationMappingElement;
+import com.sad.jetpack.architecture.componentization.api.ExposedServiceRelationMappingEntity;
 import com.sad.jetpack.architecture.componentization.api.IExposedServiceEntityGroupFactory;
 import com.sad.jetpack.architecture.componentization.api.Utils;
 
@@ -22,7 +22,7 @@ public class DefaultExposedServiceEntityGroupFactory implements IExposedServiceE
         this.context=context;
     }
     @Override
-    public LinkedHashMap<String, ExposdServiceRelationMappingEntity> getEntityGroup(String url){
+    public LinkedHashMap<String, ExposedServiceRelationMappingEntity> getEntityGroup(String url){
         if (Utils.isURL(url)){
             if (url.endsWith("/")){
                 url=url.substring(0,url.length()-1);
@@ -34,8 +34,8 @@ public class DefaultExposedServiceEntityGroupFactory implements IExposedServiceE
     }
 
 
-    private LinkedHashMap<String, ExposdServiceRelationMappingEntity> doGetEntityGroup(String url) {
-        LinkedHashMap<String, ExposdServiceRelationMappingEntity> map=new LinkedHashMap<>();
+    private LinkedHashMap<String, ExposedServiceRelationMappingEntity> doGetEntityGroup(String url) {
+        LinkedHashMap<String, ExposedServiceRelationMappingEntity> map=new LinkedHashMap<>();
         if (ObjectUtils.isEmpty(url) || !Utils.isURL(url)){
             return map;
         }
@@ -52,14 +52,14 @@ public class DefaultExposedServiceEntityGroupFactory implements IExposedServiceE
         return map;
     }
 
-    private void traverse(LinkedHashMap<String, ExposdServiceRelationMappingEntity> map, Context context, String path) throws Exception{
+    private void traverse(LinkedHashMap<String, ExposedServiceRelationMappingEntity> map, Context context, String path) throws Exception{
         String s=readStringFrom(context,path);
         if (!TextUtils.isEmpty(s)){
             try {
                 JSONObject jsonObject=new JSONObject(s);
-                ExposdServiceRelationMappingEntity entity=new ExposdServiceRelationMappingEntity();
+                ExposedServiceRelationMappingEntity entity=new ExposedServiceRelationMappingEntity();
                 entity.setPath(path);
-                ExposdServiceRelationMappingElement element=new ExposdServiceRelationMappingElement();
+                ExposedServiceRelationMappingElement element=new ExposedServiceRelationMappingElement();
                 JSONObject jo_e=jsonObject.optJSONObject("element");
                 element.setClassName(jo_e.optString("class"));
                 element.setDecription(jo_e.optString("description"));

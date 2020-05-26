@@ -34,6 +34,9 @@ ext {
             "lifecycle-compiler"               : "androidx.lifecycle:lifecycle-compiler:${dependVersion["lifecycle_version"]}",
             "lifecycle-common-java8"           : "androidx.lifecycle:lifecycle-common-java8:${dependVersion["lifecycle_version"]}",
             "lifecycle-reactivestreams"        : "androidx.lifecycle:lifecycle-reactivestreams:${dependVersion["lifecycle_version"]}",
+            "workmanager"                      : "androidx.work:work-runtime:latest.release",
+            "workmanager-gcm"                  : "androidx.work:work-gcm:latest.release",
+
 
             //test
             "junit"                            : "androidx.test.ext:junit:latest.release",
@@ -48,7 +51,7 @@ ext {
             "local_componentization_api"       : ":architecture:componentization:api",
             "local_componentization_annotation": ":architecture:componentization:annotation",
             "local_componentization_compiler"  : ":architecture:componentization:compiler",
-            "componentization_annotation"      : "com.sad.jetpack.architecture.componentization:annotation:1.0.3",
+            "componentization_annotation"      : "com.sad.jetpack.architecture.componentization:annotation:1.0.4",
             "componentization_api"             : "com.sad.jetpack.architecture.componentization:api:1.0.0",
 
             //SAD

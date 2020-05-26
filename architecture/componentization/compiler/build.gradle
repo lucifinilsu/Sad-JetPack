@@ -8,6 +8,7 @@ dependencies {
     api project(rootProject.ext.dependencies["local_componentization_annotation"])
     api rootProject.ext.dependencies["javapoet"]
     api rootProject.ext.dependencies["jsoup"]
+    implementation rootProject.ext.dependencies["gson"]
 }
 sourceCompatibility = rootProject.ext.android.javaVersionInt
 targetCompatibility = rootProject.ext.android.javaVersionInt

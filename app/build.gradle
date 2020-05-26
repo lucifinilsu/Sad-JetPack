@@ -45,6 +45,7 @@ dependencies {
     api rootProject.ext.dependencies["constraintlayout"]
     //api project(rootProject.ext.dependencies["local_componentization_annotation"])
     api project(rootProject.ext.dependencies["local_componentization_api"])
+    annotationProcessor project(rootProject.ext.dependencies["local_componentization_compiler"])
     testImplementation 'junit:junit:4.12'
     api project(":ui:view:arcLayout")
     androidTestImplementation rootProject.ext.dependencies["junit"]

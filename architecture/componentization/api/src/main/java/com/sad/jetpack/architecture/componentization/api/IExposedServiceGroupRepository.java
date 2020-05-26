@@ -1,9 +1,16 @@
 package com.sad.jetpack.architecture.componentization.api;
 
+import androidx.work.ListenableWorker;
+import androidx.work.WorkRequest;
+import androidx.work.Worker;
+
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 
 public interface IExposedServiceGroupRepository {
+
+    LinkedHashMap<String, ExposedServiceRelationMappingEntity> entityGroup();
+
+    //IExposedServiceGroupRepository serviceClassFactory(IExposedServiceClassFactory serviceClassFactory);
 
     LinkedHashMap<String,Class> serviceClassList();
 
@@ -11,13 +18,11 @@ public interface IExposedServiceGroupRepository {
 
     IExposedServiceInstanceConstructor serviceInstanceFirst() throws Exception;
 
-    Creator creator();
+    LinkedHashMap<String, Class<ListenableWorker>> workerClassGroup();
 
-    interface Creator{
+    //LinkedHashMap<String, WorkRequest> workRequestGroup();
 
-        Creator serviceFactory(IExposedServiceClassFactory serviceFactory);
+    IPerformer commit();
 
-        IExposedServiceGroupRepository create();
-    }
 
 }

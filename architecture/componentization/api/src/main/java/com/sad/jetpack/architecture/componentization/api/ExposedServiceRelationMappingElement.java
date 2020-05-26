@@ -1,6 +1,6 @@
 package com.sad.jetpack.architecture.componentization.api;
 
-public class ExposdServiceRelationMappingElement {
+public class ExposedServiceRelationMappingElement {
     private String url="";
     private String decription="";
     private String className="";
