@@ -119,7 +119,7 @@ class Anchor {
             public int compare(CtClass o1, CtClass o2) {
                 try {
                     CtMethod method2=o2.getMethod(methodName,desc)
-                    CtMethod method1=o1.getMethod(methodName,desc);
+                    CtMethod method1=o1.getMethod(methodName,desc)
                     if (method2==null || method2.getAnnotation(ApplicationLifeCycleAction.class)==null){
                         return -1
                     }

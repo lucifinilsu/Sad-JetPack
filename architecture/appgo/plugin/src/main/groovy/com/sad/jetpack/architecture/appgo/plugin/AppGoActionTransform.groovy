@@ -76,7 +76,7 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         super.transform(transformInvocation)
 
-        ClassPool classPool = ClassPool.getDefault()
+        ClassPool classPool = new ClassPool(true);//ClassPool.getDefault()
         //project.logger.error("==>project.android.bootClasspath="+project.android.bootClasspath)
         classPool.appendClassPath(project.android.bootClasspath[0].toString())
         //ClassScanner.scan(project,classPool,transformInvocation,this);
@@ -107,8 +107,8 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
 
         CtClass applicationParentClass = classPool.get("android.app.Application")
         CtClass lifecyclesObserverInterface = classPool.get("com.sad.jetpack.architecture.appgo.api.IApplicationLifecyclesObserver")
-        /*CtClass contentProviderClass = classPool.get("com.sad.jetpack.architecture.appgo.api.ApplicationContextInitializerProvider")
-        CtClass onCreatedPreInterface = classPool.get("com.sad.jetpack.architecture.appgo.api.IApplicationOnCreatePre")*/
+//        CtClass onCreatedPreInterface = classPool.get("com.sad.jetpack.architecture.appgo.api.IApplicationOnCreatePre")
+//        CtClass contentProviderClass = classPool.get("com.sad.jetpack.architecture.appgo.api.ApplicationContextInitializerProvider")
         classPool.importPackage("android.os")
         classPool.importPackage("android.util")
         classPool.importPackage("android.content.res.Configuration")
@@ -118,17 +118,21 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
         }
         //获取扫描到的class
         CtClass scannedClass=null
+        InputStream is=null
         try {
-            scannedClass = classPool.makeClass(new FileInputStream(scannedFile))
+            is=new FileInputStream(scannedFile)
+            scannedClass = classPool.makeClass(is)
+            is.close()
         } catch (Throwable throwable) {
+            throwable.printStackTrace()
             project.logger.error("Parsing class file ${scannedFile.getAbsolutePath()} fail.", throwable)
+            is.close()
             return false
         }
         if (!avaliableClass(scannedClass)){
             return false
         }
         boolean handled = false
-        //如果扫描到的class是Application的子类，则准备处理
         if (applicationParentClass != null && scannedClass.subclassOf(applicationParentClass)){
             Object accessAnnotation=scannedClass.getAnnotation(ApplicationAccess.class);
             if(accessAnnotation!=null){
@@ -137,7 +141,48 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
                 scanResult.setApplicationClass(scannedClass);
                 scanResult.setDest(dest)
                 scanResult.setHandled(true)
-                handled=true;
+                handled=false;
+            }
+        }
+        //如果扫描到的类是Application行为监听实现类
+        if (lifecyclesObserverInterface != null && scannedClass.getInterfaces().contains(lifecyclesObserverInterface)){
+            boolean isHandleThisObserverClass=false
+            project.logger.error(">>> find observer interface:"+scannedClass.name)
+            //剔除没有任何显式注解埋点方法的的监听
+            CtMethod[] methods = scannedClass.getDeclaredMethods()//.getMethods()
+            for (CtMethod method:methods){
+                Object annotation = method.getAnnotation(ApplicationLifeCycleAction.class)
+                project.logger.error("^   find anchord method:"+method.name+" from "+scannedClass.name+" that has anntation ["+method.getAvailableAnnotations()+"] and info ["+method.getMethodInfo()+"]")
+                if (annotation!=null){
+                    //project.logger.error("^  find anchord method:"+method.name+" from "+scannedClass.name)
+                    isHandleThisObserverClass=true
+                    break
+                }
+            }
+            if (isHandleThisObserverClass){
+                scanResult.getLifecyclesObserverClassList().add(scannedClass)
+            }
+        }
+        return handled
+
+
+
+
+
+
+
+
+        /*
+        //如果扫描到的class是Application的子类，则准备处理
+        if (applicationParentClass != null && scannedClass.subclassOf(applicationParentClass)){
+            Object accessAnnotation=scannedClass.getAnnotation(ApplicationAccess.class);
+            if(accessAnnotation!=null){
+                //Application的子类被注解过了，说明是可埋点的宿主，记录并等待处理
+                project.logger.error(">> Host Application is "+scannedClass.name)
+                scanResult.setApplicationClass(scannedClass);
+                scanResult.setDest(dest)
+                scanResult.setHandled(false)
+                handled=false;
             }
         }
 
@@ -163,17 +208,12 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
                 scanResult.getLifecyclesObserverClassList().add(scannedClass)
             }
         }
-        return handled
+        return handled*/
     }
 
     @Override
     void onScannedCompleted(ClassPool classPool) {
         if (scanResult.getHandled()){
-            /*setAnchorOnApplicationCreated(classPool,scanResult,true)
-            setAnchorOnApplicationCreated(classPool,scanResult,false)
-
-            setAnchorOnApplicationConfigurationChanged(classPool,scanResult,true)
-            setAnchorOnApplicationConfigurationChanged(classPool,scanResult,false)*/
             setAnchor(scanResult,
                     "onCreate",
                     "onApplicationPreCreated",
@@ -249,6 +289,7 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
             //将埋点后的流写入class文件
             scanResult.getApplicationClass().writeFile(scanResult.getDest().absolutePath)
             scanResult.getApplicationClass().detach()
+
         }
     }
 

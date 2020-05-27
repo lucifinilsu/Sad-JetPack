@@ -33,6 +33,9 @@ public class Compressor {
             }
             out.close();
         } catch (Exception e) {
+            if (out!=null){
+                out.close()
+            }
             throw new RuntimeException(e);
         }
     }
@@ -41,28 +44,38 @@ public class Compressor {
         File file = new File(srcPathName);
         if (!file.exists())
             throw new RuntimeException(srcPathName + "不存在！");
+        ZipOutputStream out=null
+        FileOutputStream fileOutputStream=null
+        CheckedOutputStream cos=null
         try {
             File[] sourceFiles = file.listFiles();
             if(null == sourceFiles || sourceFiles.length<1){
                 System.out.println(">*待压缩的文件目录：" + srcPathName + "里面不存在文件，无需压缩.");
             }else{
-                FileOutputStream fileOutputStream = new FileOutputStream(fileName);
-                CheckedOutputStream cos = new CheckedOutputStream(fileOutputStream,
+                fileOutputStream = new FileOutputStream(fileName);
+                cos = new CheckedOutputStream(fileOutputStream,
                         new CRC32());
-                ZipOutputStream out = new ZipOutputStream(cos);
-                String basedir = "";
+                out = new ZipOutputStream(cos)
+                String basedir = ""
                 for(int i=0;i<sourceFiles.length;i++){
-                    compress(sourceFiles[i], out, basedir);
+                    compress(sourceFiles[i], out, basedir)
                 }
-                out.close();
+                out.close()
                 fileOutputStream.close()
+                cos.close()
             }
 
-
-
-
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            if (out!=null){
+                out.close()
+            }
+            if (fileOutputStream!=null){
+                fileOutputStream.close()
+            }
+            if (cos!=null){
+                cos.close()
+            }
+            throw new RuntimeException(e)
         }
     }
 
@@ -100,10 +113,11 @@ public class Compressor {
      */
     private void compressFile(File file, ZipOutputStream out, String basedir) {
         if (!file.exists()) {
-            return;
+            return
         }
+        BufferedInputStream bis=null
         try {
-            BufferedInputStream bis = new BufferedInputStream(
+            bis= new BufferedInputStream(
                     new FileInputStream(file));
             String filePath = (basedir + file.getName())
                     .replaceAll(getOriginalUrl() + "/", "");
@@ -118,6 +132,9 @@ public class Compressor {
             }
             bis.close();
         } catch (Exception e) {
+            if (bis!=null){
+                bis.close()
+            }
             throw new RuntimeException(e);
         }
     }

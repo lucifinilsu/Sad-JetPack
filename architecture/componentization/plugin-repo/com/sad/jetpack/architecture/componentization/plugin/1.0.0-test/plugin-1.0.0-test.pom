@@ -15,7 +15,7 @@
     <dependency>
       <groupId>com.sad.jetpack.lib.classscanner</groupId>
       <artifactId>ClassScanner</artifactId>
-      <version>1.0.0-G2</version>
+      <version>1.0.1-G3-test</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

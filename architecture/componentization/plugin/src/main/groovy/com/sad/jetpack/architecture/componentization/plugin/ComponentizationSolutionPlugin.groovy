@@ -12,6 +12,7 @@ class ComponentizationSolutionPlugin implements Plugin<Project>{
         if (project.plugins.hasPlugin("com.android.application")) {
             //project.logger.error(">>>appid is "+project.android.defaultConfig.applicationId)
             project.logger.error(">> componentization plugin is running in ["+project.getName()+"]-["+project.getRootProject()+"]")
+
             //project.android.registerTransform(new RelationshipMappingTransform(project))
             //project.android.registerTransform(new ComponentRegisterTransform(project))
             /*project.afterEvaluate{

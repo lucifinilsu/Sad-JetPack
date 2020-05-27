@@ -21,11 +21,11 @@ public class TestInit extends TestInitParent implements IApplicationLifecyclesOb
     public void onApplicationPreCreated(Application application) {
 
     }
-    @ApplicationLifeCycleAction(priority = 1156)
+    /*@ApplicationLifeCycleAction(priority = 1156)
     @Override
     public void onApplicationPreConfigurationChanged(Application application, Configuration newConfig) {
 
-    }
+    }*/
     @ApplicationLifeCycleAction(priority = 11)
     @Override
     public void onApplicationTrimMemory(Application application, int level) {

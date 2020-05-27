@@ -39,6 +39,10 @@ class ClassScanner {
         doScan(target)
     }
 
+    private void doScan2(ITarget target){
+
+    }
+
     private void doScan(ITarget target){
         def classPath = []
         try {
@@ -52,7 +56,7 @@ class ClassScanner {
                 def subProjectInputs = []
 
                 input.jarInputs.each { jarInput ->
-                    // project.logger.error("jar input=   " + jarInput.file.getAbsolutePath())
+                    project.logger.error(">>>>jar input=   " + jarInput.file.getAbsolutePath())
                     ClassPath clazzPath = (ClassPath) constructor.newInstance(jarInput.file.absolutePath)
                     classPath.add(clazzPath)
                     classPool.appendClassPath(clazzPath)
@@ -148,7 +152,11 @@ class ClassScanner {
                 target.onScannedCompleted(classPool)
             }
 
-        } finally {
+        }
+        catch (Exception e){
+            e.printStackTrace()
+        }
+        finally {
             classPath.each { it ->
                 classPool.removeClassPath(it)
             }

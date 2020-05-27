@@ -20,6 +20,7 @@ public class AppGoAction implements Plugin<Project> {
 
         if (project.plugins.hasPlugin("com.android.application")) {
             project.android.registerTransform(new AppGoActionTransform(project))
+            //project.android.registerTransform(new EmptyTransform(project))
         }
 
 
