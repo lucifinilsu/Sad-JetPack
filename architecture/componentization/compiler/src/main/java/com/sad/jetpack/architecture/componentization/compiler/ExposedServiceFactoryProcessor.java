@@ -47,7 +47,7 @@ import javax.tools.StandardLocation;
 @SupportedAnnotationTypes({
         Constant.PACKAGE__ANNOTATION +".ExposedService"
 })
-public class ExposedServiceWorkerFactoryProcessor extends AbsProcessor{
+public class ExposedServiceFactoryProcessor extends AbsProcessor{
 
     @Override
     public synchronized void init(ProcessingEnvironment env) {
@@ -105,21 +105,33 @@ public class ExposedServiceWorkerFactoryProcessor extends AbsProcessor{
     private List<String> assetsDirs=new ArrayList<>();
     private void registerERM(Element element){
         ExposedService exposedAnnotation=element.getAnnotation(ExposedService.class);
+
         if (exposedAnnotation!=null){
-            String url=exposedAnnotation.url();
-            if (!ObjectUtils.isEmpty(url)){
-                log.error(">>> 目标url："+url);
-                String[] assetsDs=exposedAnnotation.assetsDir();
-                if (!ObjectUtils.isEmpty(assetsDs)){
-                    for (String a:assetsDs){
+            String[] assetsDs=exposedAnnotation.assetsDir();
+            String[] urls=exposedAnnotation.url();
+            if (!ObjectUtils.isEmpty(assetsDs)){
+                for (String a:assetsDs){
+                    for (String url:urls
+                         ) {
                         try {
-                            createMap(((TypeElement)element).getQualifiedName().toString(),exposedAnnotation.url(),a,exposedAnnotation.description());
+                            log.error(">>> 目标url："+url);
+                            createMap(((TypeElement)element).getQualifiedName().toString(),url,a,exposedAnnotation.description());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
                 }
             }
+            /*String url=exposedAnnotation.url();
+            if (!ObjectUtils.isEmpty(url)){
+                log.error(">>> 目标url："+url);
+                String[] assetsDs=exposedAnnotation.assetsDir();
+                if (!ObjectUtils.isEmpty(assetsDs)){
+                    for (String a:assetsDs){
+
+                    }
+                }
+            }*/
         }
 
     }
@@ -212,7 +224,7 @@ public class ExposedServiceWorkerFactoryProcessor extends AbsProcessor{
         try {
             String workerPackage="androidx.work";
             ExposedService exposedService=element.getAnnotation(ExposedService.class);
-            String url=exposedService.url();
+
             TypeSpec.Builder tb=TypeSpec.classBuilder("ExposedServiceWorker$$"+element.getSimpleName())
                     .addModifiers(Modifier.PUBLIC)
                     .superclass(ClassName.bestGuess("androidx.work.ExposedServiceWorker"))

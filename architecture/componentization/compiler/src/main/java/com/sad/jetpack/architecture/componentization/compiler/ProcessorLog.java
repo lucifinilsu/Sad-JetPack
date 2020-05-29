@@ -20,13 +20,15 @@ public class ProcessorLog {
     //打印错误信息
     public void error(String err) {
         if (isLog){
-            messager.printMessage(Diagnostic.Kind.ERROR, err);
+            //messager.printMessage(Diagnostic.Kind.ERROR, err);
+            System.err.println(err);
         }
     }
 
     public void info(String info){
         if (isLog){
-            messager.printMessage(Diagnostic.Kind.NOTE, info);
+            //messager.printMessage(Diagnostic.Kind.NOTE, info);
+            System.out.println(info);
         }
     }
     public boolean config_err(String opt){

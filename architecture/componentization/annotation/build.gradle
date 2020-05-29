@@ -8,4 +8,4 @@ dependencies {
 }
 sourceCompatibility = rootProject.ext.android.javaVersionInt
 targetCompatibility = rootProject.ext.android.javaVersionInt
-//apply from: rootProject.file('/architecture/componentization/annotation/publishToJceneterScript.gradle')
+apply from: rootProject.file('/architecture/componentization/annotation/publishToJceneterScript.gradle')

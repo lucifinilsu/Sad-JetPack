@@ -26,6 +26,7 @@ public abstract class AbsProcessor extends AbstractProcessor {
         processingEnv=env;
         filer = env.getFiler();
         typeUtils = env.getTypeUtils();
+        messager=env.getMessager();
     }
 
 }

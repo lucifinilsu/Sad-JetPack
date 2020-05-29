@@ -12,7 +12,7 @@ public @interface ExposedService {
 
     String[] assetsDir() default {"src\\main\\assets\\"};
 
-    String url();
+    String[] url();
 
     String description() default "";
 
