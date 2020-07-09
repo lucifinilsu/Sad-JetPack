@@ -3,10 +3,11 @@ package com.sad.jetpack.architecture.componentization.api.impl;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.sad.jetpack.architecture.componentization.annotation.Utils;
 import com.sad.jetpack.architecture.componentization.api.ExposedServiceRelationMappingElement;
 import com.sad.jetpack.architecture.componentization.api.ExposedServiceRelationMappingEntity;
 import com.sad.jetpack.architecture.componentization.api.IExposedServiceEntityGroupFactory;
-import com.sad.jetpack.architecture.componentization.api.Utils;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.json.JSONObject;

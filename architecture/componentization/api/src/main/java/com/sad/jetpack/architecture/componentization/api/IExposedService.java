@@ -6,14 +6,18 @@ import java.lang.annotation.Annotation;
 
 public interface IExposedService {
 
-    <T> T action(IExposedActionNotifier notifier, Object... params);
+    <T> T action(IPCMessenger messenger);
 
-    default String url(){
+    default <T> T action(){
+        return action(null);
+    };
+
+    default String[] url(){
         ExposedService exposedService=info();
         if (exposedService!=null){
             return exposedService.url();
         }
-        return "";
+        return null;
     };
 
     default String description(){

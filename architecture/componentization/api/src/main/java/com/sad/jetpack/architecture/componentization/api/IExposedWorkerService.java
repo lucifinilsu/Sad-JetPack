@@ -4,16 +4,14 @@ import androidx.work.ListenableWorker;
 
 import com.sad.jetpack.architecture.componentization.annotation.ExposedService;
 
-import java.lang.annotation.Annotation;
-
 public interface IExposedWorkerService extends IExposedService{
 
-    ListenableWorker.Result actionForWorker(IExposedActionNotifier<ListenableWorker.Result> notifier, ListenableWorker worker);
+    //ListenableWorker.Result actionForWorker(IPCSession<ListenableWorker.Result> session, ListenableWorker worker);
+
+    ListenableWorker.Result actionForWorker(IPCMessenger messenger);
 
     @Override
-    default <T> T action(IExposedActionNotifier notifier, Object... params) {
-        return null;
-    }
+    default <T> T action(IPCMessenger messenger){return null;};
 
     default boolean asyncWork(){
         ExposedService exposedService=info();

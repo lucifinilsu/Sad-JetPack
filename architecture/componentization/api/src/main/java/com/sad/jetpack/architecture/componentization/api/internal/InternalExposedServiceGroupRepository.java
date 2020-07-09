@@ -7,6 +7,7 @@ import androidx.work.ListenableWorker;
 import androidx.work.NetworkType;
 import androidx.work.WorkRequest;
 
+import com.sad.jetpack.architecture.componentization.annotation.Utils;
 import com.sad.jetpack.architecture.componentization.api.ExposedServiceRelationMappingElement;
 import com.sad.jetpack.architecture.componentization.api.ExposedServiceRelationMappingEntity;
 import com.sad.jetpack.architecture.componentization.api.IExposedServiceClassFactory;
@@ -55,7 +56,7 @@ public class InternalExposedServiceGroupRepository implements IExposedServiceGro
                                 serviceClassGroup.put(ermPath,cls);
                                 try {
                                     String p="androidx.work";
-                                    String wcn="ExposedServiceWorker$$"+cls.getSimpleName();
+                                    String wcn= Utils.creatExposedWorkerClassName(cls.getSimpleName(),ermPath);//"ExposedServiceWorker$$"+cls.getSimpleName()+"$$"+ValidUtils.element.getUrl();
                                     String w=p+"."+wcn;
                                     Log.e("sad-jetpack",">>>>查询工作类："+w);
                                     Class wc=Class.forName(w);

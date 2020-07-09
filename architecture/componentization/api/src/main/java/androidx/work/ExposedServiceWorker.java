@@ -5,15 +5,11 @@ import android.content.Context;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
-import androidx.work.Data;
-import androidx.work.ListenableWorker;
-import androidx.work.Worker;
-import androidx.work.WorkerParameters;
 import androidx.work.impl.utils.futures.SettableFuture;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.sad.jetpack.architecture.componentization.api.IExposedActionNotifier;
-import com.sad.jetpack.architecture.componentization.api.IExposedService;
+import com.sad.jetpack.architecture.componentization.api.IPCMessenger;
+import com.sad.jetpack.architecture.componentization.api.IPCSession;
 import com.sad.jetpack.architecture.componentization.api.IExposedWorkerService;
 
 public abstract class ExposedServiceWorker extends ListenableWorker {
@@ -39,15 +35,48 @@ public abstract class ExposedServiceWorker extends ListenableWorker {
                 return mFuture;
             }
             if (service.asyncWork()) {
-                service.actionForWorker(new IExposedActionNotifier<Result>() {
+                /*service.actionForWorker(new IPCSession<Result>() {
                     @Override
-                    public boolean notifyBy(Result o) {
+                    public boolean chat(IPCSession session, Result o) {
                         mFuture.set(o);
                         return false;
                     }
-                }, this);
+                }, this);*/
+                service.actionForWorker(new IPCMessenger() {
+                    @Override
+                    public boolean reply(Object d) {
+                        mFuture.set((Result) d);
+                        return false;
+                    }
+
+                    @Override
+                    public String messengerId() {
+                        return getId().toString();
+                    }
+
+                    @Override
+                    public ListenableWorker getMessage() {
+                        return ExposedServiceWorker.this;
+                    }
+                });
+
             } else {
-                Result result = service.actionForWorker(null, this);
+                Result result = service.actionForWorker(new IPCMessenger() {
+                    @Override
+                    public boolean reply(Object d) {
+                        return false;
+                    }
+
+                    @Override
+                    public String messengerId() {
+                        return null;
+                    }
+
+                    @Override
+                    public ListenableWorker getMessage() {
+                        return ExposedServiceWorker.this;
+                    }
+                });
                 mFuture.set(result);
             }
         }catch (Exception e){

@@ -7,14 +7,15 @@ import androidx.work.Data;
 import androidx.work.ListenableWorker;
 
 import com.sad.jetpack.architecture.componentization.annotation.ExposedService;
-import com.sad.jetpack.architecture.componentization.api.IExposedActionNotifier;
+import com.sad.jetpack.architecture.componentization.api.IPCMessenger;
+import com.sad.jetpack.architecture.componentization.api.IPCSession;
 import com.sad.jetpack.architecture.componentization.api.IExposedWorkerService;
 
 @ExposedService(url = "https://www.baidu.com/xxx/45/cc/gg",asyncWorker = true)
 public class TestWorkerAsyncService implements IExposedWorkerService {
     @SuppressLint("RestrictedApi")
     @Override
-    public ListenableWorker.Result actionForWorker(IExposedActionNotifier<ListenableWorker.Result> notifier, ListenableWorker worker) {
+    public ListenableWorker.Result actionForWorker(IPCMessenger messenger) {
         /*new Thread(){
             @Override
             public void run() {
@@ -26,6 +27,7 @@ public class TestWorkerAsyncService implements IExposedWorkerService {
                 notifier.notifyBy(ListenableWorker.Result.success(data));
             }
         }.start();*/
+        ListenableWorker worker=messenger.getMessage();
         worker.getBackgroundExecutor().execute(new Runnable() {
             @Override
             public void run() {
@@ -33,7 +35,7 @@ public class TestWorkerAsyncService implements IExposedWorkerService {
                         .putString("data1","a")
                         .build();
                 Log.e("sad-jetpack",">>>>异步任务1执行完毕");
-                notifier.notifyBy(ListenableWorker.Result.success(data));
+                messenger.reply(ListenableWorker.Result.success(data));
             }
         });
 

@@ -7,28 +7,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.work.BackoffPolicy;
 import androidx.work.Constraints;
-import androidx.work.ListenableWorker;
 import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.Operation;
-import androidx.work.WorkContinuation;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
 import com.sad.jetpack.architecture.appgo.api.AppGo;
-import com.sad.jetpack.architecture.componentization.api.ExposedServiceRelationMappingEntity;
 import com.sad.jetpack.architecture.componentization.api.ExposedServiceManager;
-import com.sad.jetpack.architecture.componentization.api.IExposedActionNotifier;
+import com.sad.jetpack.architecture.componentization.api.IPCMessenger;
+import com.sad.jetpack.architecture.componentization.api.IPCSession;
 import com.sad.jetpack.architecture.componentization.api.IExposedService;
 import com.sad.jetpack.architecture.componentization.api.IPerformer;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
@@ -65,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
                     .repository("https://www.baidu.com/xxx/")
                     .workerClassGroup();
             Log.e("sad-jetpack","WorkerClass列表："+mw);*/
-            testWorker2();
+            test9();
             //测试
             //scascs
             //scscsc sss
@@ -74,13 +68,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void test9(){}
+    public void test9(){
+        try {
+            IExposedService exposedService=ExposedServiceManager.exposedServiceFirst("xxx://ssss.php.cn/java/base7/")
+                    .instance();
+            exposedService.action(new IPCMessenger() {
+                @Override
+                public boolean reply(Object d) {
+                    Log.e("sad-jetpack","------------->模块回复:"+d);
+                    return false;
+                }
+
+                @Override
+                public String messengerId() {
+                    return "交给模块的测试工作";
+                }
+
+                @Override
+                public String getMessage() {
+                    return "gogogo";
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
     public void testWorker(){
         ExposedServiceManager.newInstance()
                 .repository("https://www.baidu.com/xxx/")
                 .commit()
-                .perform(new IPerformer.IWorkerDispatcher() {
+                .performByWorkerRequest(new IPerformer.IWorkerDispatcher() {
                     @Override
                     public void onWorkerDispatched(WorkManager manager, LinkedHashMap<String, WorkRequest> requestGroup) {
                         List<OneTimeWorkRequest> requests=new ArrayList<>();

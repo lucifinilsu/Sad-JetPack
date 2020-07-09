@@ -15,7 +15,7 @@ public interface IPerformer {
 
     IPerformer constraints(Constraints constraints);
 
-    void perform(IWorkerDispatcher dispatcher);
+    void performByWorkerRequest(IWorkerDispatcher dispatcher);
 
     interface IWorkerRequestFactory{
 

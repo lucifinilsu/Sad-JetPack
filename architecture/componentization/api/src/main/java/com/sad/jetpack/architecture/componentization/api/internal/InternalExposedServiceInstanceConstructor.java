@@ -9,9 +9,9 @@ public class InternalExposedServiceInstanceConstructor implements IExposedServic
     //2、30w 1000/天
     //
 
-    public Class cls;
-    public Class[] classes;
-    public Object[] objects;
+    private Class cls;
+    private Class[] classes;
+    private Object[] objects;
 
     public InternalExposedServiceInstanceConstructor(Class cls){
         this.cls=cls;

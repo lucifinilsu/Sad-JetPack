@@ -29,9 +29,9 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     api rootProject.ext.dependencies["appcompat"]
-    //api project(rootProject.ext.dependencies["local_componentization_annotation"])
+    api project(rootProject.ext.dependencies["local_componentization_annotation"])
     //api rootProject.ext.dependencies["jsoup"]
-    api rootProject.ext.dependencies["componentization_annotation"]
+    //api rootProject.ext.dependencies["componentization_annotation"]
     api rootProject.ext.dependencies["workmanager"]
     testImplementation 'junit:junit:4.12'
     androidTestImplementation rootProject.ext.dependencies["junit"]

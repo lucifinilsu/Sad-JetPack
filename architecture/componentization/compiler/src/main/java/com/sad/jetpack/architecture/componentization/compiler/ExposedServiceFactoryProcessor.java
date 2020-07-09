@@ -5,6 +5,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.sad.jetpack.architecture.componentization.annotation.ExposedService;
+import com.sad.jetpack.architecture.componentization.annotation.Utils;
+import com.sad.jetpack.architecture.componentization.annotation.ValidUtils;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
@@ -224,51 +226,55 @@ public class ExposedServiceFactoryProcessor extends AbsProcessor{
         try {
             String workerPackage="androidx.work";
             ExposedService exposedService=element.getAnnotation(ExposedService.class);
+            String[] urls=exposedService.url();
+            for (String url:urls
+                 ) {
+                TypeSpec.Builder tb=TypeSpec.classBuilder(Utils.creatExposedWorkerClassName(element.getSimpleName().toString(),Utils.ermPaths(url).get(0)))
+                        .addModifiers(Modifier.PUBLIC)
+                        .superclass(ClassName.bestGuess("androidx.work.ExposedServiceWorker"))
+                        ;
+                MethodSpec m_constructor=MethodSpec.constructorBuilder()
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(
+                                ParameterSpec
+                                        .builder(ClassName.bestGuess("android.content.Context"),"context")
+                                        .build()
+                        )
+                        .addParameter(ClassName.bestGuess("androidx.work.WorkerParameters"),"workerParams")
+                        .addStatement("super(context,workerParams)")
+                        .build();
 
-            TypeSpec.Builder tb=TypeSpec.classBuilder("ExposedServiceWorker$$"+element.getSimpleName())
-                    .addModifiers(Modifier.PUBLIC)
-                    .superclass(ClassName.bestGuess("androidx.work.ExposedServiceWorker"))
-                    ;
-            MethodSpec m_constructor=MethodSpec.constructorBuilder()
-                    .addModifiers(Modifier.PUBLIC)
-                    .addParameter(
-                            ParameterSpec
-                                    .builder(ClassName.bestGuess("android.content.Context"),"context")
-                                    .build()
-                    )
-                    .addParameter(ClassName.bestGuess("androidx.work.WorkerParameters"),"workerParams")
-                    .addStatement("super(context,workerParams)")
-                    .build();
+                MethodSpec.Builder mb_serviceInstance=MethodSpec.methodBuilder("exposedWorkerServiceInstance")
+                        .addAnnotation(Override.class)
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(
+                                ParameterSpec
+                                        .builder(ClassName.bestGuess("android.content.Context"),"context")
+                                        .build()
+                        )
+                        .addParameter(ClassName.bestGuess("androidx.work.WorkerParameters"),"workerParams")
+                        .beginControlFlow("try")
+                        .addStatement("$T exposedService= $T.exposedServiceFirst($S).instance()"
+                                ,ClassName.bestGuess("com.sad.jetpack.architecture.componentization.api.IExposedWorkerService")
+                                ,ClassName.bestGuess("com.sad.jetpack.architecture.componentization.api.ExposedServiceManager")
+                                ,url
+                        )
+                        .addStatement("return exposedService")
+                        .endControlFlow()
+                        .beginControlFlow("catch($T e)",Exception.class)
+                        .addStatement("e.printStackTrace()")
+                        .endControlFlow()
+                        .addStatement("return null")
+                        .returns(ClassName.bestGuess("com.sad.jetpack.architecture.componentization.api.IExposedWorkerService"))
+                        ;
+                tb.addMethod(m_constructor)
+                        .addMethod(mb_serviceInstance.build())
+                ;
 
-            MethodSpec.Builder mb_serviceInstance=MethodSpec.methodBuilder("exposedWorkerServiceInstance")
-                    .addAnnotation(Override.class)
-                    .addModifiers(Modifier.PUBLIC)
-                    .addParameter(
-                            ParameterSpec
-                                    .builder(ClassName.bestGuess("android.content.Context"),"context")
-                                    .build()
-                    )
-                    .addParameter(ClassName.bestGuess("androidx.work.WorkerParameters"),"workerParams")
-                    .beginControlFlow("try")
-                    .addStatement("$T exposedService= $T.exposedServiceFirst($S).instance()"
-                            ,ClassName.bestGuess("com.sad.jetpack.architecture.componentization.api.IExposedWorkerService")
-                            ,ClassName.bestGuess("com.sad.jetpack.architecture.componentization.api.ExposedServiceManager")
-                            ,url
-                    )
-                    .addStatement("return exposedService")
-                    .endControlFlow()
-                    .beginControlFlow("catch($T e)",Exception.class)
-                    .addStatement("e.printStackTrace()")
-                    .endControlFlow()
-                    .addStatement("return null")
-                    .returns(ClassName.bestGuess("com.sad.jetpack.architecture.componentization.api.IExposedWorkerService"))
-                    ;
-            tb.addMethod(m_constructor)
-                    .addMethod(mb_serviceInstance.build())
-            ;
+                JavaFile.Builder jb= JavaFile.builder(workerPackage,tb.build());
+                jb.build().writeTo(filer);
+            }
 
-            JavaFile.Builder jb= JavaFile.builder(workerPackage,tb.build());
-            jb.build().writeTo(filer);
         }catch (Exception e){
             e.printStackTrace();
         }

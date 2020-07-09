@@ -34,7 +34,7 @@ public class InternalPerformer implements IPerformer {
     }
 
     @Override
-    public void perform(IWorkerDispatcher dispatcher) {
+    public void performByWorkerRequest(IWorkerDispatcher dispatcher) {
         if (dispatcher!=null){
             LinkedHashMap<String,Class<ListenableWorker>> workerClassGroup=repository.workerClassGroup();
             LinkedHashMap<String, WorkRequest> workRequestGroup=new LinkedHashMap<>();

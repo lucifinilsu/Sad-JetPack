@@ -1,0 +1,8 @@
+{
+  "path": "erm\\java\\base7\\index",
+  "element": {
+    "url": "xxx://ssss.php.cn/java/base7/index?dww=cs",
+    "class": "com.sad.jetpack.test.module1.TestInitModule1",
+    "description": ""
+  }
+}
