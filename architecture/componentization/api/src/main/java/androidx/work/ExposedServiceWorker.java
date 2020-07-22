@@ -55,7 +55,7 @@ public abstract class ExposedServiceWorker extends ListenableWorker {
                     }
 
                     @Override
-                    public ListenableWorker getMessage() {
+                    public ListenableWorker extraMessage() {
                         return ExposedServiceWorker.this;
                     }
                 });
@@ -73,7 +73,7 @@ public abstract class ExposedServiceWorker extends ListenableWorker {
                     }
 
                     @Override
-                    public ListenableWorker getMessage() {
+                    public ListenableWorker extraMessage() {
                         return ExposedServiceWorker.this;
                     }
                 });

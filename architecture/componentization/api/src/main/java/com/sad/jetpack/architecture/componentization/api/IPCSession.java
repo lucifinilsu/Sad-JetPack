@@ -1,11 +1,11 @@
 package com.sad.jetpack.architecture.componentization.api;
-@Deprecated
-public interface IPCSession<D> {
+
+public interface IPCSession {
 
     //boolean openChat(IPCMessenger messenger, D message);
 
-    String sessionId();
+    default String sessionId(){return hashCode()+"";};
 
-    boolean onChat(IPCMessenger messenger);
+    boolean componentChat(Object o,IPCMessenger messenger);
 
 }

@@ -10,8 +10,6 @@ public interface IExposedServiceGroupRepository {
 
     LinkedHashMap<String, ExposedServiceRelationMappingEntity> entityGroup();
 
-    //IExposedServiceGroupRepository serviceClassFactory(IExposedServiceClassFactory serviceClassFactory);
-
     LinkedHashMap<String,Class> serviceClassList();
 
     IExposedServiceInstanceConstructor serviceInstance(String ermPath) throws Exception;
@@ -20,9 +18,7 @@ public interface IExposedServiceGroupRepository {
 
     LinkedHashMap<String, Class<ListenableWorker>> workerClassGroup();
 
-    //LinkedHashMap<String, WorkRequest> workRequestGroup();
 
-    IPerformer commit();
 
 
 }

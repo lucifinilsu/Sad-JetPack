@@ -8,7 +8,6 @@ import androidx.work.ListenableWorker;
 
 import com.sad.jetpack.architecture.componentization.annotation.ExposedService;
 import com.sad.jetpack.architecture.componentization.api.IPCMessenger;
-import com.sad.jetpack.architecture.componentization.api.IPCSession;
 import com.sad.jetpack.architecture.componentization.api.IExposedWorkerService;
 
 @ExposedService(url = "https://www.baidu.com/xxx/45/cc/gg",asyncWorker = true)
@@ -27,7 +26,7 @@ public class TestWorkerAsyncService implements IExposedWorkerService {
                 notifier.notifyBy(ListenableWorker.Result.success(data));
             }
         }.start();*/
-        ListenableWorker worker=messenger.getMessage();
+        ListenableWorker worker=messenger.extraMessage();
         worker.getBackgroundExecutor().execute(new Runnable() {
             @Override
             public void run() {

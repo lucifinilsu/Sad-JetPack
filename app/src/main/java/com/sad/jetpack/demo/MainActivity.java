@@ -1,8 +1,10 @@
 package com.sad.jetpack.demo;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.work.BackoffPolicy;
@@ -19,6 +21,7 @@ import com.sad.jetpack.architecture.componentization.api.IPCMessenger;
 import com.sad.jetpack.architecture.componentization.api.IPCSession;
 import com.sad.jetpack.architecture.componentization.api.IExposedService;
 import com.sad.jetpack.architecture.componentization.api.IPerformer;
+import com.sad.jetpack.architecture.componentization.api.InternalPerformer;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -33,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         String s="";
         AppGo.get().getApplication();
-
+        //华安生态 宝盈互联网 鹏华混合 融通新能源、景气AB 国投新能源 广发新经济
         try {
             /*Map<String, ExposedServiceRelationMappingEntity> map= ExposedServiceManager
                     .newInstance()
@@ -70,12 +73,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void test9(){
         try {
-            IExposedService exposedService=ExposedServiceManager.exposedServiceFirst("xxx://ssss.php.cn/java/base7/")
+            IExposedService exposedService=ExposedServiceManager.getFirst("xxx://ssss.php.cn/java/base7/")
                     .instance();
             exposedService.action(new IPCMessenger() {
                 @Override
-                public boolean reply(Object d) {
+                public boolean reply(Object d,IPCSession session) {
                     Log.e("sad-jetpack","------------->模块回复:"+d);
+                    if (session!=null){
+                        session.componentChat("干的很好，给你加鸡腿！",this);
+                    }
                     return false;
                 }
 
@@ -85,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public String getMessage() {
+                public String extraMessage() {
                     return "gogogo";
                 }
             });
@@ -96,10 +102,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void testWorker(){
-        ExposedServiceManager.newInstance()
-                .repository("https://www.baidu.com/xxx/")
-                .commit()
+        new InternalPerformer(ExposedServiceManager.newInstance()
+                .get("https://www.baidu.com/xxx/"))
                 .performByWorkerRequest(new IPerformer.IWorkerDispatcher() {
+                    @RequiresApi(api = Build.VERSION_CODES.M)
                     @Override
                     public void onWorkerDispatched(WorkManager manager, LinkedHashMap<String, WorkRequest> requestGroup) {
                         List<OneTimeWorkRequest> requests=new ArrayList<>();
@@ -129,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void testWorker2(){
         OneTimeWorkRequest request1 = new OneTimeWorkRequest.Builder(TestWorker.class)
                 .setConstraints( getDefaultConstraints() )
@@ -172,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private Constraints getDefaultConstraints(){
         // 设置限定条件
         Constraints constraints = new Constraints.Builder()

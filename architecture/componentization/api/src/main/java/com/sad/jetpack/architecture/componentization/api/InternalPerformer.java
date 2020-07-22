@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 public class InternalPerformer implements IPerformer {
     private IExposedServiceGroupRepository repository;
     private IWorkerRequestFactory requestFactory;
+    private Constraints constraints;
     public InternalPerformer(IExposedServiceGroupRepository repository){
         this.repository=repository;
     }
@@ -30,7 +31,8 @@ public class InternalPerformer implements IPerformer {
 
     @Override
     public IPerformer constraints(Constraints constraints) {
-        return null;
+        this.constraints=constraints;
+        return this;
     }
 
     @Override
@@ -64,16 +66,19 @@ public class InternalPerformer implements IPerformer {
         }
     }
 
-    private Constraints constraints;
     private Constraints getDefaultConstraints(){
         // 设置限定条件
-        Constraints constraints = new Constraints.Builder()
+        Constraints.Builder constraintsBuilder = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.NOT_REQUIRED)  // 网络状态
                 .setRequiresBatteryNotLow(false)                 // 可在电量不足时执行
                 .setRequiresCharging(false)                      // 可在不充电时执行
                 .setRequiresStorageNotLow(false)                 // 可在存储容量不足时执行
-                .setRequiresDeviceIdle(false)                    // 在待机状态下执行
-                .build();
+
+                ;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M){
+            constraintsBuilder.setRequiresDeviceIdle(false);// 在待机状态下执行
+        }
+        Constraints constraints=constraintsBuilder.build();
         return constraints;
     }
 }

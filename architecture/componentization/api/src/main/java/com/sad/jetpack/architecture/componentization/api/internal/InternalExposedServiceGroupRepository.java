@@ -122,11 +122,4 @@ public class InternalExposedServiceGroupRepository implements IExposedServiceGro
     }
 
 
-
-
-    @Override
-    public IPerformer commit() {
-        return new InternalPerformer(this);
-    }
-
 }

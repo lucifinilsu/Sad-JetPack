@@ -2,10 +2,12 @@ package com.sad.jetpack.architecture.componentization.api;
 
 public interface IPCMessenger {
 
-    boolean reply(Object d);
+    default boolean reply(Object d){return reply(d,null);}
 
-    String messengerId();
+    default boolean reply(Object d,IPCSession session){return false;};
 
-    <T> T getMessage();
+    default String messengerId(){return hashCode()+"";};
+
+    default <T> T extraMessage(){return null;};
 
 }

@@ -29,4 +29,10 @@ public interface IPerformer {
 
     }
 
+    interface IServiceInstanceDisPatcher{
+
+        void onServiceInstanceDisPatched(LinkedHashMap<String,IExposedServiceInstanceConstructor> instanceConstructors);
+
+    }
+
 }

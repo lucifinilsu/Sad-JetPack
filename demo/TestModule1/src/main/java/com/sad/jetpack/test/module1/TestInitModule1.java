@@ -17,7 +17,7 @@ import com.sad.jetpack.architecture.componentization.api.IExposedService;
 import static com.sad.jetpack.test.module1.TestInitModule1.path;
 
 @ExposedService(url =path)
-public class TestInitModule1 implements IApplicationLifecyclesObserver, IExposedService {
+public class TestInitModule1 implements IApplicationLifecyclesObserver, IExposedService,IPCSession {
     protected static final String path="xxx://ssss.php.cn/java/base7/index?dww=cs";
     @ApplicationLifeCycleAction(priority = 1561)
     @Override
@@ -33,7 +33,7 @@ public class TestInitModule1 implements IApplicationLifecyclesObserver, IExposed
     @Override
     public <T> T action(IPCMessenger messenger) {
         Toast.makeText(AppGo.get().getContext(),"服务调用",Toast.LENGTH_LONG).show();
-        messenger.reply("老大，我的工作做完了");
+        messenger.reply("老大，我的工作做完了", this);
 
        /* session.openChat(new IPCMessenger() {
             @Override
@@ -52,6 +52,11 @@ public class TestInitModule1 implements IApplicationLifecyclesObserver, IExposed
             }
         }, "模块下服务被调用");*/
         return null;
+    }
+
+    @Override
+    public boolean componentChat(Object o,IPCMessenger messenger) {
+        return false;
     }
 
     //keytool -genkey -alias demoapp -keypass 123456 -keyalg RSA -keysize 2048 -validity 36500 -keystore D:\workspace\project\SAD\SAD-PROJECT\sad-JetPack\app\appkey.jks -storepass 123456
