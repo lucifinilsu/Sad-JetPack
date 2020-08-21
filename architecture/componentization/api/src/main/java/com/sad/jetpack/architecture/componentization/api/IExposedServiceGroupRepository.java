@@ -10,15 +10,8 @@ public interface IExposedServiceGroupRepository {
 
     LinkedHashMap<String, ExposedServiceRelationMappingEntity> entityGroup();
 
-    LinkedHashMap<String,Class> serviceClassList();
-
-    IExposedServiceInstanceConstructor serviceInstance(String ermPath) throws Exception;
-
-    IExposedServiceInstanceConstructor serviceInstanceFirst() throws Exception;
-
     LinkedHashMap<String, Class<ListenableWorker>> workerClassGroup();
 
-
-
+    String orgUrl();
 
 }

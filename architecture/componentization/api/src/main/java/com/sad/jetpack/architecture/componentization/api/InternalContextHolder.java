@@ -4,12 +4,13 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 
+import java.util.LinkedHashMap;
+
 final class InternalContextHolder {
 
     @SuppressLint("StaticFieldLeak")
     private static volatile InternalContextHolder instance;
     private Context mContext;
-
     private InternalContextHolder(Context context) {
         mContext = context;
     }

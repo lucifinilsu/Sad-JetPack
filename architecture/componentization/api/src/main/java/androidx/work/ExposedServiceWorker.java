@@ -8,9 +8,12 @@ import androidx.annotation.NonNull;
 import androidx.work.impl.utils.futures.SettableFuture;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.sad.jetpack.architecture.componentization.api.DataState;
+import com.sad.jetpack.architecture.componentization.api.IDataCarrier;
 import com.sad.jetpack.architecture.componentization.api.IPCMessenger;
-import com.sad.jetpack.architecture.componentization.api.IPCSession;
 import com.sad.jetpack.architecture.componentization.api.IExposedWorkerService;
+import com.sad.jetpack.architecture.componentization.api.impl.DataCarrierImpl;
+import com.sad.jetpack.security.SecurityImpl;
 
 public abstract class ExposedServiceWorker extends ListenableWorker {
     private IExposedWorkerService service;
@@ -44,8 +47,8 @@ public abstract class ExposedServiceWorker extends ListenableWorker {
                 }, this);*/
                 service.actionForWorker(new IPCMessenger() {
                     @Override
-                    public boolean reply(Object d) {
-                        mFuture.set((Result) d);
+                    public boolean reply(IDataCarrier d) {
+                        mFuture.set(d.data());
                         return false;
                     }
 
@@ -55,15 +58,19 @@ public abstract class ExposedServiceWorker extends ListenableWorker {
                     }
 
                     @Override
-                    public ListenableWorker extraMessage() {
-                        return ExposedServiceWorker.this;
+                    public IDataCarrier extraMessage() {
+                        return DataCarrierImpl.newInstanceCreator()
+                                .data(ExposedServiceWorker.this)
+                                .state(DataState.DONE)
+                                .create()
+                                ;
                     }
                 });
 
             } else {
                 Result result = service.actionForWorker(new IPCMessenger() {
                     @Override
-                    public boolean reply(Object d) {
+                    public boolean reply(IDataCarrier d) {
                         return false;
                     }
 
@@ -73,8 +80,13 @@ public abstract class ExposedServiceWorker extends ListenableWorker {
                     }
 
                     @Override
-                    public ListenableWorker extraMessage() {
-                        return ExposedServiceWorker.this;
+                    public IDataCarrier extraMessage() {
+                        return
+                                DataCarrierImpl.newInstanceCreator()
+                                        .data(ExposedServiceWorker.this)
+                                        .state(DataState.DONE)
+                                        .create()
+                                ;
                     }
                 });
                 mFuture.set(result);

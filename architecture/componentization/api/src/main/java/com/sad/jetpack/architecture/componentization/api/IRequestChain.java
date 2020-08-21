@@ -1,9 +1,9 @@
 package com.sad.jetpack.architecture.componentization.api;
 
 import java.io.Serializable;
-
+@Deprecated
 public interface IRequestChain extends Serializable {
 
-    void proceedRequest(IComponentRequest request)  throws Exception;
+    void proceedRequest(IPCMessenger messenger)  throws Exception;
 
 }

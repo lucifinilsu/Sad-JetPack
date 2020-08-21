@@ -1,38 +1,118 @@
 package com.sad.jetpack.architecture.componentization.api;
 
-import android.util.Log;
+import android.text.TextUtils;
 
-import com.sad.jetpack.architecture.componentization.api.impl.DefaultExposedServiceClassFactory;
+import com.sad.core.async.ISADTaskProccessListener;
+import com.sad.core.async.SADTaskRunnable;
+import com.sad.core.async.SADTaskSchedulerClient;
+import com.sad.jetpack.architecture.componentization.annotation.Utils;
 import com.sad.jetpack.architecture.componentization.api.impl.DefaultExposedServiceEntityGroupFactory;
+import com.sad.jetpack.architecture.componentization.api.internal.InternalCluster;
 import com.sad.jetpack.architecture.componentization.api.internal.InternalExposedServiceGroupRepository;
+import com.sad.jetpack.architecture.componentization.api.internal.InternalExposedServiceInstanceConstructor;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 
-public class ExposedServiceManager {
+public final class ExposedServiceManager implements IExposedServiceManager,IExposedServiceManagerAsync{
 
     private ExposedServiceManager(){}
 
-    public static ExposedServiceManager newInstance(){
+    public static IExposedServiceManager newInstance(){
         return new ExposedServiceManager();
     }
 
     private IExposedServiceEntityGroupFactory entityGroupFactory;
-    private IExposedServiceClassFactory serviceClassFactory;
-    private List<Interceptor> commonInterceptors=new ArrayList<>();
+    private IExposedServiceEntityGroupFactory.OnExposedServiceRelationMappingEntityFoundListener onExposedServiceRelationMappingEntityFoundListener;
 
+    @Override
+    public ICluster cluster(String url){
+        IExposedServiceGroupRepository repository=repository(url);
+        return new InternalCluster(repository);
+    }
+
+    @Override
+    public ExposedServiceManager asyncScanERM() {
+        return this;
+    }
+    @Override
     public ExposedServiceManager entityGroupFactory(IExposedServiceEntityGroupFactory entityGroupFactory){
         this.entityGroupFactory=entityGroupFactory;
         return this;
     }
-    public ExposedServiceManager serviceClassFactory(IExposedServiceClassFactory serviceClassFactory){
-        this.serviceClassFactory=serviceClassFactory;
+    @Override
+    public ExposedServiceManager entityFoundListener(IExposedServiceEntityGroupFactory.OnExposedServiceRelationMappingEntityFoundListener onExposedServiceRelationMappingEntityFoundListener){
+        this.onExposedServiceRelationMappingEntityFoundListener=onExposedServiceRelationMappingEntityFoundListener;
         return this;
     }
 
+    @Override
+    public void repository(String url, OnExposedServiceGroupRepositoryFoundListener repositoryFoundListener) {
+        if (entityGroupFactory==null){
+            entityGroupFactory=new DefaultExposedServiceEntityGroupFactory(InternalContextHolder.get().getContext());
+        }
+        SADTaskSchedulerClient.newInstance().execute(new SADTaskRunnable<IExposedServiceGroupRepository>("GET_IExposedServiceGroupRepository", new ISADTaskProccessListener<IExposedServiceGroupRepository>() {
+            @Override
+            public void onSuccess(IExposedServiceGroupRepository result) {
+                if (repositoryFoundListener!=null){
+                    repositoryFoundListener.onExposedServiceGroupRepositoryFoundSuccess(new InternalCluster(result));
+                }
+            }
 
-    public IExposedServiceGroupRepository get(String url){
+            @Override
+            public void onFail(Throwable throwable) {
+                if (repositoryFoundListener!=null){
+                    repositoryFoundListener.onExposedServiceGroupRepositoryFoundFailure(throwable);
+                }
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        }) {
+            @Override
+            public IExposedServiceGroupRepository doInBackground() throws Exception {
+                return new InternalExposedServiceGroupRepository(InternalContextHolder.get().getContext(),url,entityGroupFactory.getEntityGroupByUrl(url,onExposedServiceRelationMappingEntityFoundListener));
+            }
+
+        });
+    }
+
+
+
+    private IExposedServiceGroupRepository repository(String url) {
+        if (entityGroupFactory==null){
+            entityGroupFactory=new DefaultExposedServiceEntityGroupFactory(InternalContextHolder.get().getContext());
+        }
+        return new InternalExposedServiceGroupRepository(InternalContextHolder.get().getContext(),url,entityGroupFactory.getEntityGroupByUrl(url,this.onExposedServiceRelationMappingEntityFoundListener));
+    }
+    @Override
+    public ExposedServiceRelationMappingEntity getFirstEntity(String url) throws Exception{
+        if (TextUtils.isEmpty(url)){
+            throw new Exception("url is null !!!");
+        }
+        if (url.indexOf("?")!=-1){
+            url= Utils.getURL(url);
+        }
+        IExposedServiceGroupRepository repository=repository(url);
+        LinkedHashMap<String,ExposedServiceRelationMappingEntity> entityLinkedHashMap=repository.entityGroup();
+        String[] keys=entityLinkedHashMap.keySet().toArray(new String[]{});
+        if (keys.length<1){
+            throw new Exception("the Entity whose url is '"+url+"' is not exist,may be it is not registered in ERM ,please check the url or exposedService's annotation!!!");
+        }
+        String key=keys[1];
+        ExposedServiceRelationMappingEntity entity=entityLinkedHashMap.get(key);
+        return entity;
+    }
+    @Override
+    public IExposedServiceInstanceConstructor getFirst(String url)throws Exception{
+        ExposedServiceRelationMappingEntity entity=getFirstEntity(url);
+        String className=entity.getElement().getClassName();
+        Class cls=Class.forName(className);
+        return new InternalExposedServiceInstanceConstructor(cls);
+    }
+
+    /*public IExposedServiceGroupRepository get(String url){
         if (entityGroupFactory==null){
             entityGroupFactory=new DefaultExposedServiceEntityGroupFactory(InternalContextHolder.get().getContext());
         }
@@ -48,10 +128,5 @@ public class ExposedServiceManager {
         return ExposedServiceManager.newInstance()
                 .get(url)
                 .serviceInstanceFirst();
-    }
-
-    /**
-     * 爱尔 长春 凯莱英 恒瑞 。普利 药明康德 迈瑞 。泰格 。我武 。华海
-     */
-
+    }*/
 }

@@ -6,13 +6,12 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class TraverseUtils {
+public class MapTraverseUtils {
 
     public static interface ITraverseAction<K,V>{
-        <VE> VE getVE(K k,V v);
-        void action(K k,Object v);
+        void onTraversed(K k, V v);
     }
-    public static  <K,V,VE> void traverseGroup(LinkedHashMap<K,V> map, ITraverseAction<K,V>... actions){
+    public static  <K,V> void traverseGroup(LinkedHashMap<K,V> map, ITraverseAction<K,V>... actions){
         if (!ObjectUtils.isEmpty(map)){
             Iterator<Map.Entry<K, V>> iterator=map.entrySet().iterator();
             while (iterator.hasNext()){
@@ -23,8 +22,7 @@ public class TraverseUtils {
                     if (ObjectUtils.isNotEmpty(actions)){
                         for (ITraverseAction<K,V> action:actions
                         ) {
-                            VE ve=action.getVE(k,v);
-                            action.action(k,ve);
+                            action.onTraversed(k,v);
                         }
                     }
 

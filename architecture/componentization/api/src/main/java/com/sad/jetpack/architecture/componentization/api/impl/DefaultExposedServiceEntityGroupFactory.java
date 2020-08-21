@@ -19,23 +19,25 @@ import java.util.List;
 
 public class DefaultExposedServiceEntityGroupFactory implements IExposedServiceEntityGroupFactory {
     private Context context;
+    private int idx=-1;
     public DefaultExposedServiceEntityGroupFactory(Context context){
         this.context=context;
     }
     @Override
-    public LinkedHashMap<String, ExposedServiceRelationMappingEntity> getEntityGroup(String url){
+    public LinkedHashMap<String, ExposedServiceRelationMappingEntity> getEntityGroupByUrl(String url,OnExposedServiceRelationMappingEntityFoundListener entityFoundListener){
+        idx=-1;
         if (Utils.isURL(url)){
             if (url.endsWith("/")){
                 url=url.substring(0,url.length()-1);
             }
-            return doGetEntityGroup(url);
+            return doGetEntityGroup(url,entityFoundListener);
         }
         return new LinkedHashMap<>();
 
     }
 
 
-    private LinkedHashMap<String, ExposedServiceRelationMappingEntity> doGetEntityGroup(String url) {
+    private LinkedHashMap<String, ExposedServiceRelationMappingEntity> doGetEntityGroup(String url,OnExposedServiceRelationMappingEntityFoundListener entityFoundListener) {
         LinkedHashMap<String, ExposedServiceRelationMappingEntity> map=new LinkedHashMap<>();
         if (ObjectUtils.isEmpty(url) || !Utils.isURL(url)){
             return map;
@@ -44,7 +46,7 @@ public class DefaultExposedServiceEntityGroupFactory implements IExposedServiceE
         for (String ermPath:ermPaths
              ) {
             try {
-                traverse(map,context,ermPath);
+                traverse(map,context,ermPath,entityFoundListener);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -53,10 +55,11 @@ public class DefaultExposedServiceEntityGroupFactory implements IExposedServiceE
         return map;
     }
 
-    private void traverse(LinkedHashMap<String, ExposedServiceRelationMappingEntity> map, Context context, String path) throws Exception{
+    private void traverse(LinkedHashMap<String, ExposedServiceRelationMappingEntity> map, Context context, String path,OnExposedServiceRelationMappingEntityFoundListener entityFoundListener) throws Exception{
         String s=readStringFrom(context,path);
         if (!TextUtils.isEmpty(s)){
             try {
+                idx++;
                 JSONObject jsonObject=new JSONObject(s);
                 ExposedServiceRelationMappingEntity entity=new ExposedServiceRelationMappingEntity();
                 entity.setPath(path);
@@ -64,9 +67,12 @@ public class DefaultExposedServiceEntityGroupFactory implements IExposedServiceE
                 JSONObject jo_e=jsonObject.optJSONObject("element");
                 element.setClassName(jo_e.optString("class"));
                 element.setDecription(jo_e.optString("description"));
-                element.setUrl(jo_e.optString("url"));
+                String url=jo_e.optString("url");
+                element.setUrl(url);
                 entity.setElement(element);
-                map.put(path,entity);
+                if (entityFoundListener==null || (entityFoundListener!=null && !entityFoundListener.onEntityFound(entity,idx==0))){
+                    map.put(url,entity);
+                }
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -76,7 +82,7 @@ public class DefaultExposedServiceEntityGroupFactory implements IExposedServiceE
                 String[] nextPlist=context.getAssets().list(path);
                 for (String nextPath:nextPlist
                 ) {
-                    traverse(map,context,path+File.separator+nextPath);
+                    traverse(map,context,path+File.separator+nextPath,entityFoundListener);
                 }
 
             }

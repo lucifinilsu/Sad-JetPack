@@ -254,7 +254,7 @@ public class ExposedServiceFactoryProcessor extends AbsProcessor{
                         )
                         .addParameter(ClassName.bestGuess("androidx.work.WorkerParameters"),"workerParams")
                         .beginControlFlow("try")
-                        .addStatement("$T exposedService= $T.exposedServiceFirst($S).instance()"
+                        .addStatement("$T exposedService= $T.newInstance().getFirst($S).instance()"
                                 ,ClassName.bestGuess("com.sad.jetpack.architecture.componentization.api.IExposedWorkerService")
                                 ,ClassName.bestGuess("com.sad.jetpack.architecture.componentization.api.ExposedServiceManager")
                                 ,url

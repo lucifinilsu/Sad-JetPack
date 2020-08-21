@@ -4,13 +4,15 @@ import com.sad.jetpack.architecture.componentization.annotation.ExposedService;
 
 import java.lang.annotation.Annotation;
 
-public interface IExposedService {
+public interface IExposedService extends Comparable<IExposedService>{
 
     <T> T action(IPCMessenger messenger);
 
     default <T> T action(){
         return action(null);
     };
+
+    default int priority(){return 0;};
 
     default String[] url(){
         ExposedService exposedService=info();
@@ -47,5 +49,8 @@ public interface IExposedService {
         }
     }
 
-
+    @Override
+    default int compareTo(IExposedService o){
+        return o.priority()-this.priority();
+    }
 }

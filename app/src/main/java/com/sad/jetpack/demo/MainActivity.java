@@ -13,18 +13,21 @@ import androidx.work.NetworkType;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
 
 import com.sad.jetpack.architecture.appgo.api.AppGo;
 import com.sad.jetpack.architecture.componentization.api.ExposedServiceManager;
+import com.sad.jetpack.architecture.componentization.api.ICallerListener;
+import com.sad.jetpack.architecture.componentization.api.ICluster;
+import com.sad.jetpack.architecture.componentization.api.IDataCarrier;
+import com.sad.jetpack.architecture.componentization.api.IExposedServiceGroupRepository;
+import com.sad.jetpack.architecture.componentization.api.IExposedServiceManagerAsync;
 import com.sad.jetpack.architecture.componentization.api.IPCMessenger;
 import com.sad.jetpack.architecture.componentization.api.IPCSession;
 import com.sad.jetpack.architecture.componentization.api.IExposedService;
-import com.sad.jetpack.architecture.componentization.api.IPerformer;
-import com.sad.jetpack.architecture.componentization.api.InternalPerformer;
+import com.sad.jetpack.architecture.componentization.api.SCore;
+import com.sad.jetpack.architecture.componentization.api.impl.DataCarrierImpl;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -73,14 +76,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void test9(){
         try {
-            IExposedService exposedService=ExposedServiceManager.getFirst("xxx://ssss.php.cn/java/base7/")
+            IExposedService exposedService=ExposedServiceManager.newInstance().getFirst("xxx://ssss.php.cn/java/base7/")
                     .instance();
             exposedService.action(new IPCMessenger() {
                 @Override
-                public boolean reply(Object d,IPCSession session) {
+                public boolean reply(IDataCarrier d, IPCSession session) {
                     Log.e("sad-jetpack","------------->模块回复:"+d);
                     if (session!=null){
-                        session.componentChat("干的很好，给你加鸡腿！",this);
+                        session.componentChat(DataCarrierImpl.newInstanceCreator().data("干的很好，给你加鸡腿！").create(),this);
                     }
                     return false;
                 }
@@ -91,18 +94,44 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public String extraMessage() {
-                    return "gogogo";
+                public IDataCarrier extraMessage() {
+                    return DataCarrierImpl.newInstanceCreator().data("go go go go").create();
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    private void testSequence(){
+        SCore.getManager()
+                .asyncScanERM()
+                .repository("https://www.baidu.com/yyy/", new IExposedServiceManagerAsync.OnExposedServiceGroupRepositoryFoundListener() {
+                    @Override
+                    public void onExposedServiceGroupRepositoryFoundSuccess(ICluster cluster) {
+                        cluster
+                                .call(ICluster.CALL_MODE_SEQUENCE)
+                                .timeout(9000)
+                                .listener(new ICallerListener() {
+                                    @Override
+                                    public void onEndExposedServiceGroup(IDataCarrier outputData) {
+
+                                    }
+                                })
+                                .submit()
+                                .start(DataCarrierImpl.newInstanceCreator().data("输入数据").create());
+                        ;
+                    }
+
+                    @Override
+                    public void onExposedServiceGroupRepositoryFoundFailure(Throwable throwable) {
+
+                    }
+                });
     }
 
     public void testWorker(){
-        new InternalPerformer(ExposedServiceManager.newInstance()
+        /*new InternalPerformer(ExposedServiceManager.newInstance()
                 .get("https://www.baidu.com/xxx/"))
                 .performByWorkerRequest(new IPerformer.IWorkerDispatcher() {
                     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -132,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 });
                     }
-                });
+                });*/
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)

@@ -4,15 +4,12 @@ import androidx.work.BackoffPolicy;
 import androidx.work.Constraints;
 import androidx.work.ListenableWorker;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkRequest;
-
-import com.sad.jetpack.architecture.componentization.api.IPerformer;
 
 import java.util.concurrent.TimeUnit;
 
-public class DefaultWorkRequestFactory implements IPerformer.IWorkerRequestFactory {
-    @Override
+public class DefaultWorkRequestFactory /*implements IPerformer.IWorkerRequestFactory*/ {
+
     public WorkRequest workerRequest(String ermPath,Class<ListenableWorker> workerClass, Constraints defaultConstraints) {
         //单次任务
         OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(workerClass)

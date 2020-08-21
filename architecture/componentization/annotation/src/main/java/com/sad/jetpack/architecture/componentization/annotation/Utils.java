@@ -43,4 +43,26 @@ public class Utils {
     public static String creatExposedWorkerClassName(String exposedServiceCN,String url){
         return "ExposedServiceWorker$$"+exposedServiceCN+"$$"+ ValidUtils.encryptMD5ToString(url);
     }
+
+    public static String getURL(String strURL)
+    {
+        String strPage=null;
+        String[] arrSplit=null;
+
+        strURL=strURL.trim().toLowerCase();
+
+        arrSplit=strURL.split("[?]");
+        if(strURL.length()>0)
+        {
+            if(arrSplit.length>1)
+            {
+                if(arrSplit[0]!=null)
+                {
+                    strPage=arrSplit[0];
+                }
+            }
+        }
+
+        return strPage;
+    }
 }

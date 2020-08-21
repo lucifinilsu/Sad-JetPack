@@ -10,9 +10,13 @@ import com.sad.jetpack.architecture.appgo.annotation.ApplicationLifeCycleAction;
 import com.sad.jetpack.architecture.appgo.api.AppGo;
 import com.sad.jetpack.architecture.appgo.api.IApplicationLifecyclesObserver;
 import com.sad.jetpack.architecture.componentization.annotation.ExposedService;
+import com.sad.jetpack.architecture.componentization.api.DataState;
+import com.sad.jetpack.architecture.componentization.api.IDataCarrier;
 import com.sad.jetpack.architecture.componentization.api.IPCMessenger;
 import com.sad.jetpack.architecture.componentization.api.IPCSession;
 import com.sad.jetpack.architecture.componentization.api.IExposedService;
+import com.sad.jetpack.architecture.componentization.api.IPerformer;
+import com.sad.jetpack.architecture.componentization.api.impl.DataCarrierImpl;
 
 import static com.sad.jetpack.test.module1.TestInitModule1.path;
 
@@ -33,7 +37,7 @@ public class TestInitModule1 implements IApplicationLifecyclesObserver, IExposed
     @Override
     public <T> T action(IPCMessenger messenger) {
         Toast.makeText(AppGo.get().getContext(),"服务调用",Toast.LENGTH_LONG).show();
-        messenger.reply("老大，我的工作做完了", this);
+        messenger.reply(DataCarrierImpl.newInstanceCreator().data("老大，我的工作做完了").state(DataState.DONE).create(), this);
 
        /* session.openChat(new IPCMessenger() {
             @Override
@@ -55,9 +59,10 @@ public class TestInitModule1 implements IApplicationLifecyclesObserver, IExposed
     }
 
     @Override
-    public boolean componentChat(Object o,IPCMessenger messenger) {
+    public boolean componentChat(IDataCarrier o, IPCMessenger messenger) {
         return false;
     }
+
 
     //keytool -genkey -alias demoapp -keypass 123456 -keyalg RSA -keysize 2048 -validity 36500 -keystore D:\workspace\project\SAD\SAD-PROJECT\sad-JetPack\app\appkey.jks -storepass 123456
 }

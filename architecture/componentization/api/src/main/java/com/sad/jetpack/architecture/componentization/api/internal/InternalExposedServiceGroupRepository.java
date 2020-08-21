@@ -1,66 +1,60 @@
 package com.sad.jetpack.architecture.componentization.api.internal;
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.work.Constraints;
 import androidx.work.ListenableWorker;
-import androidx.work.NetworkType;
-import androidx.work.WorkRequest;
 
 import com.sad.jetpack.architecture.componentization.annotation.Utils;
 import com.sad.jetpack.architecture.componentization.api.ExposedServiceRelationMappingElement;
 import com.sad.jetpack.architecture.componentization.api.ExposedServiceRelationMappingEntity;
-import com.sad.jetpack.architecture.componentization.api.IExposedServiceClassFactory;
 import com.sad.jetpack.architecture.componentization.api.IExposedServiceGroupRepository;
-import com.sad.jetpack.architecture.componentization.api.IExposedServiceInstanceConstructor;
-import com.sad.jetpack.architecture.componentization.api.IPerformer;
-import com.sad.jetpack.architecture.componentization.api.InternalPerformer;
-import com.sad.jetpack.architecture.componentization.api.TraverseUtils;
-import com.sad.jetpack.architecture.componentization.api.impl.DefaultExposedServiceClassFactory;
+import com.sad.jetpack.architecture.componentization.api.IExposedWorkerService;
+import com.sad.jetpack.architecture.componentization.api.MapTraverseUtils;
 
-import org.apache.commons.lang3.ObjectUtils;
-
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class InternalExposedServiceGroupRepository implements IExposedServiceGroupRepository{
     private LinkedHashMap<String, ExposedServiceRelationMappingEntity> entityGroup;
     private Context context;
-    private LinkedHashMap<String,Class> serviceClassGroup=new LinkedHashMap<>();
     private LinkedHashMap<String,Class<ListenableWorker>> workerClassGroup=new LinkedHashMap<>();
-    public InternalExposedServiceGroupRepository(Context context,IExposedServiceClassFactory serviceClassFactory,LinkedHashMap<String, ExposedServiceRelationMappingEntity> entityGroup){
+    private String orgUrl="";
+    public InternalExposedServiceGroupRepository(Context context,String orgUrl,LinkedHashMap<String, ExposedServiceRelationMappingEntity> entityGroup){
         this.entityGroup=entityGroup;
         this.context=context;
-        this.serviceClassFactory=serviceClassFactory;
+        this.orgUrl=orgUrl;
+        traverse();
+    }
+
+    private void traverse(){
         Log.e("sad-jetpack",">>>>要遍历的实体组："+entityGroup);
-        TraverseUtils.traverseGroup(entityGroup,
-                new TraverseUtils.ITraverseAction<String, ExposedServiceRelationMappingEntity>() {
-                    @Override
-                    public ExposedServiceRelationMappingElement getVE(String ermPath,ExposedServiceRelationMappingEntity exposedServiceRelationMappingEntity) {
-                        if (exposedServiceRelationMappingEntity!=null){
-                            return exposedServiceRelationMappingEntity.getElement();
-                        }
-                        return null;
-                    }
+        MapTraverseUtils.traverseGroup(entityGroup,
+                new MapTraverseUtils.ITraverseAction<String, ExposedServiceRelationMappingEntity>() {
 
                     @Override
-                    public void action(String ermPath, Object v) {
-                        if (v!=null){
-                            ExposedServiceRelationMappingElement element= (ExposedServiceRelationMappingElement) v;
-                            if (InternalExposedServiceGroupRepository.this.serviceClassFactory==null){
-                                InternalExposedServiceGroupRepository.this.serviceClassFactory=new DefaultExposedServiceClassFactory();
-                            }
-                            Class cls=InternalExposedServiceGroupRepository.this.serviceClassFactory.getServiceClass(element);
-                            if (cls!=null){
-                                serviceClassGroup.put(ermPath,cls);
+                    public void onTraversed(String ermPath, ExposedServiceRelationMappingEntity entity) {
+                        if (entity!=null){
+                            ExposedServiceRelationMappingElement element=entity.getElement();
+                            if (element!=null){
                                 try {
-                                    String p="androidx.work";
-                                    String wcn= Utils.creatExposedWorkerClassName(cls.getSimpleName(),ermPath);//"ExposedServiceWorker$$"+cls.getSimpleName()+"$$"+ValidUtils.element.getUrl();
-                                    String w=p+"."+wcn;
-                                    Log.e("sad-jetpack",">>>>查询工作类："+w);
-                                    Class wc=Class.forName(w);
-                                    workerClassGroup.put(ermPath,wc);
+                                    String cn=element.getClassName();
+                                    Class cls=null;
+                                    if (!TextUtils.isEmpty(cn)){
+                                        Thread.currentThread().setContextClassLoader(element.getClass().getClassLoader());
+                                        cls=Class.forName(cn,true,element.getClass().getClassLoader());
+                                    }
+                                    else {
+                                        throw new Exception("the name of the ExposedServiceRelationMappingElement of the exposedService whose ermPath is '"+ermPath+"'is empty!!!");
+                                    }
+                                    if (IExposedWorkerService.class.isAssignableFrom(cls)){
+                                        String p="androidx.work";
+                                        String wcn= Utils.creatExposedWorkerClassName(cls.getSimpleName(),ermPath);//"ExposedServiceWorker$$"+cls.getSimpleName()+"$$"+ValidUtils.element.getUrl();
+                                        String w=p+"."+wcn;
+                                        Log.e("sad-jetpack",">>>>查询工作类："+w);
+                                        Class wc=Class.forName(w);
+                                        workerClassGroup.put(entity.getElement().getUrl(),wc);
+                                    }
+
                                 }catch (Exception e){
                                     e.printStackTrace();
                                 }
@@ -68,11 +62,8 @@ public class InternalExposedServiceGroupRepository implements IExposedServiceGro
                         }
                     }
                 }
-
         );
-
     }
-    private IExposedServiceClassFactory serviceClassFactory;
 
     @Override
     public LinkedHashMap<String, ExposedServiceRelationMappingEntity> entityGroup() {
@@ -80,14 +71,7 @@ public class InternalExposedServiceGroupRepository implements IExposedServiceGro
     }
 
 
-
-
-    @Override
-    public LinkedHashMap<String, Class> serviceClassList() {
-        return serviceClassGroup;
-    }
-
-    @Override
+    /*@Override
     public IExposedServiceInstanceConstructor serviceInstance(String ermPath) throws Exception{
         Class cls=serviceClassList().get(ermPath);
         if (cls!=null){
@@ -114,11 +98,16 @@ public class InternalExposedServiceGroupRepository implements IExposedServiceGro
         else {
             throw new Exception("serviceClassList is empty !!!");
         }
-    }
+    }*/
 
     @Override
     public LinkedHashMap<String, Class<ListenableWorker>> workerClassGroup() {
        return workerClassGroup;
+    }
+
+    @Override
+    public String orgUrl() {
+        return this.orgUrl;
     }
 
 

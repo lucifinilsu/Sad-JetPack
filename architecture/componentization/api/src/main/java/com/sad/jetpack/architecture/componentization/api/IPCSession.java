@@ -6,6 +6,7 @@ public interface IPCSession {
 
     default String sessionId(){return hashCode()+"";};
 
-    boolean componentChat(Object o,IPCMessenger messenger);
+    boolean componentChat(IDataCarrier o,IPCMessenger messenger);
+
 
 }

@@ -4,8 +4,12 @@ import java.util.LinkedHashMap;
 
 public interface IExposedServiceEntityGroupFactory {
 
-    LinkedHashMap<String, ExposedServiceRelationMappingEntity> getEntityGroup(String url);
+    LinkedHashMap<String, ExposedServiceRelationMappingEntity> getEntityGroupByUrl(String url,OnExposedServiceRelationMappingEntityFoundListener entityFoundListener);
 
+    interface OnExposedServiceRelationMappingEntityFoundListener{
 
+        boolean onEntityFound(ExposedServiceRelationMappingEntity entity,boolean isFirst);
+
+    }
 
 }
