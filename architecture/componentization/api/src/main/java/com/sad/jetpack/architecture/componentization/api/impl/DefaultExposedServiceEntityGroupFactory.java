@@ -26,11 +26,14 @@ public class DefaultExposedServiceEntityGroupFactory implements IExposedServiceE
     @Override
     public LinkedHashMap<String, ExposedServiceRelationMappingEntity> getEntityGroupByUrl(String url,OnExposedServiceRelationMappingEntityFoundListener entityFoundListener){
         idx=-1;
-        if (Utils.isURL(url)){
+        try {
             if (url.endsWith("/")){
                 url=url.substring(0,url.length()-1);
             }
+            Log.e("sad-jetpack",">>>>要扫描："+url);
             return doGetEntityGroup(url,entityFoundListener);
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return new LinkedHashMap<>();
 

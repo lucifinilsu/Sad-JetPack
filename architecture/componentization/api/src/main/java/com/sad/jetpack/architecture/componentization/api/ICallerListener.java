@@ -11,11 +11,9 @@ public interface ICallerListener {
     default void onEndExposedServiceGroup(IDataCarrier outputData){
 
     };
+    default void onFailureExposedServiceGroup(IDataCarrier currDataCarrier,Throwable throwable){}
     default void onIntercepted(IPerformer performer,IExposedService lastExposedService,IDataCarrier outputData){
 
     };
-    default Class onCatchAndFixClassException(Throwable e,String className){
-        return null;
-    }
 
 }

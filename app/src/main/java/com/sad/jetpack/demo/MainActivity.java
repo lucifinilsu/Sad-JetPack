@@ -24,6 +24,7 @@ import com.sad.jetpack.architecture.componentization.api.IExposedServiceManagerA
 import com.sad.jetpack.architecture.componentization.api.IPCMessenger;
 import com.sad.jetpack.architecture.componentization.api.IPCSession;
 import com.sad.jetpack.architecture.componentization.api.IExposedService;
+import com.sad.jetpack.architecture.componentization.api.IPerformer;
 import com.sad.jetpack.architecture.componentization.api.SCore;
 import com.sad.jetpack.architecture.componentization.api.impl.DataCarrierImpl;
 
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                     .repository("https://www.baidu.com/xxx/")
                     .workerClassGroup();
             Log.e("sad-jetpack","WorkerClass列表："+mw);*/
-            test9();
+            testConcurrency();
             //测试
             //scascs
             //scscsc sss
@@ -76,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void test9(){
         try {
-            IExposedService exposedService=ExposedServiceManager.newInstance().getFirst("xxx://ssss.php.cn/java/base7/")
+            IExposedService exposedService=ExposedServiceManager.newInstance().getFirst("test://s/")
                     .instance();
             exposedService.action(new IPCMessenger() {
                 @Override
@@ -106,16 +107,27 @@ public class MainActivity extends AppCompatActivity {
     private void testSequence(){
         SCore.getManager()
                 .asyncScanERM()
-                .repository("https://www.baidu.com/yyy/", new IExposedServiceManagerAsync.OnExposedServiceGroupRepositoryFoundListener() {
+                .repository("test://group/s/", new IExposedServiceManagerAsync.OnExposedServiceGroupRepositoryFoundListener() {
                     @Override
                     public void onExposedServiceGroupRepositoryFoundSuccess(ICluster cluster) {
                         cluster
                                 .call(ICluster.CALL_MODE_SEQUENCE)
-                                .timeout(9000)
+                                .timeout(3)
                                 .listener(new ICallerListener() {
                                     @Override
                                     public void onEndExposedServiceGroup(IDataCarrier outputData) {
+                                        Log.e("sad-jetpack","------------->串行任务执行完毕:"+outputData.data());
+                                    }
 
+                                    @Override
+                                    public boolean onProceedExposedService(IPerformer performer, IDataCarrier data, IPCSession session, String messengerProxyId) {
+                                        return false;
+                                    }
+
+                                    @Override
+                                    public void onFailureExposedServiceGroup(IDataCarrier dataCarrier,Throwable throwable) {
+                                        Log.e("sad-jetpack","------------->串行任务执行异常:"+throwable.getMessage());
+                                        throwable.printStackTrace();
                                     }
                                 })
                                 .submit()
@@ -128,6 +140,26 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 });
+    }
+
+    private void testConcurrency(){
+        SCore.getManager()
+                .cluster("test://group/c/")
+                .call(ICluster.CALL_MODE_CONCURRENCY)
+                .timeout(1)
+                .listener(new ICallerListener() {
+                    @Override
+                    public void onEndExposedServiceGroup(IDataCarrier outputData) {
+                        Log.e("sad-jetpack","------------->并行任务执行完毕:"+outputData.data());
+                    }
+
+                    @Override
+                    public void onFailureExposedServiceGroup(IDataCarrier currDataCarrier, Throwable throwable) {
+                        Log.e("sad-jetpack","------------->并行任务执行异常:"+throwable.getMessage());
+                    }
+                })
+                .submit()
+                .start(DataCarrierImpl.newInstanceCreator().data("并行输入").create());
     }
 
     public void testWorker(){

@@ -1,6 +1,7 @@
 package com.sad.jetpack.architecture.componentization.api.internal;
 
 import com.sad.core.async.SADHandlerAssistant;
+import com.sad.core.async.SADTaskSchedulerClient;
 import com.sad.jetpack.architecture.componentization.api.DataState;
 import com.sad.jetpack.architecture.componentization.api.ICallerListener;
 import com.sad.jetpack.architecture.componentization.api.IDataCarrier;
@@ -13,11 +14,16 @@ import com.sad.jetpack.architecture.componentization.api.impl.DataCarrierImpl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class InternalSequencePerformer implements IPerformer {
     private List<IExposedService> exposedServices=new ArrayList<>();
     private ICallerListener callerListener;
     private long timeout=-1;
+    private ScheduledFuture scheduledFuture;
     public InternalSequencePerformer(List<IExposedService> exposedServices) {
         this.exposedServices = exposedServices;
     }
@@ -34,15 +40,41 @@ public class InternalSequencePerformer implements IPerformer {
         if (callerListener!=null){
             inputData=callerListener.onStartToProceedExposedServiceGroup(inputData);
         }
+        startTimeout(timeout);
         proceed(inputData);
+    }
+    private AtomicBoolean isTimeout;
+    private void startTimeout(long timeout){
+        isTimeout=new AtomicBoolean(false);
+        if (timeout!=-1){
+            scheduledFuture=SADTaskSchedulerClient.executeScheduledTask(new Callable<Object>() {
+                @Override
+                public Object call() throws Exception {
+                    isTimeout.getAndSet(true);
+                    return null;
+                }
+            },timeout);
+        }
+    }
+
+    private void finishTimeout(){
+        if (scheduledFuture!=null && !scheduledFuture.isCancelled() && !scheduledFuture.isDone()){
+            scheduledFuture.cancel(true);
+        }
     }
 
     private int index=-1;
-
     private void proceed(IDataCarrier data){
+        if (isTimeout.get()){
+            if (callerListener!=null){
+                callerListener.onFailureExposedServiceGroup(data,new TimeoutException("InternalSequencePerformer's task timeout !!!"));
+            }
+            return;
+        }
         if (index==exposedServices.size()){
             //已执行完最后一个，调用回调结束
             if (callerListener!=null){
+                finishTimeout();
                 callerListener.onEndExposedServiceGroup(data);
             }
             return;
@@ -62,6 +94,7 @@ public class InternalSequencePerformer implements IPerformer {
                 else {
                     //外部要求中止串行，调用回调
                     if (callerListener!=null){
+                        finishTimeout();
                         d.creator().state(DataState.INTERCEPTED);
                         callerListener.onIntercepted(InternalSequencePerformer.this,exposedService,d);
                     }
@@ -71,12 +104,7 @@ public class InternalSequencePerformer implements IPerformer {
 
             @Override
             public IDataCarrier extraMessage() {
-                IDataCarrier dataCarrier=DataCarrierImpl.newInstanceCreator()
-                        .data(data)
-                        .state(DataState.UNWORKED)
-                        .create()
-                        ;
-                return dataCarrier;
+                return data.creator().state(DataState.UNWORKED).create();
             }
         };
         exposedService.action(messengerProxy);

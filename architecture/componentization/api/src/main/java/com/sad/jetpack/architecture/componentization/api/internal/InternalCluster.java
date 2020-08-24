@@ -32,6 +32,11 @@ public class InternalCluster implements ICluster {
     }
 
     @Override
+    public IExposedServiceGroupRepository repository() {
+        return this.repository;
+    }
+
+    @Override
     public ICluster addInstanceConstructorParameters(@NonNull String e_url, @NonNull IExposedServiceInstanceConstructorParameters parameters){
         if (!TextUtils.isEmpty(e_url) && parameters!=null){
             List<IExposedServiceInstanceConstructorParameters> p=constructorParameters.get(e_url);

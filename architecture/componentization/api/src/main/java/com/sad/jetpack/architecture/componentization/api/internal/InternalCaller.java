@@ -1,5 +1,7 @@
 package com.sad.jetpack.architecture.componentization.api.internal;
 
+import androidx.annotation.NonNull;
+
 import com.sad.jetpack.architecture.componentization.api.ICallerListener;
 import com.sad.jetpack.architecture.componentization.api.ICluster;
 import com.sad.jetpack.architecture.componentization.api.IExposedService;
@@ -53,7 +55,7 @@ public class InternalCaller implements ICaller {
     }
 
     @Override
-    public IPerformer submit() {
+    public @NonNull IPerformer submit() {
         if (callMode== ICluster.CALL_MODE_SEQUENCE){
             InternalSequencePerformer performer= new InternalSequencePerformer(exposedServices);
             performer.setCallerListener(callerListener);
@@ -61,7 +63,10 @@ public class InternalCaller implements ICaller {
             return performer;
         }
         else if (callMode==ICluster.CALL_MODE_CONCURRENCY){
-
+            InternalConcurrencyPerformer performer=new InternalConcurrencyPerformer(exposedServices);
+            performer.setCallerListener(callerListener);
+            performer.setTimeout(timeout);
+            return performer;
         }
         return null;
     }

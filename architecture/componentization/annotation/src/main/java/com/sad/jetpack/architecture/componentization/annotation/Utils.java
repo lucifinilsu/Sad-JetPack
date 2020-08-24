@@ -9,7 +9,8 @@ import java.util.List;
 
 public class Utils {
     public static boolean isURL(String str){
-        if (ObjectUtils.isEmpty(str)){
+        return true;
+        /*if (ObjectUtils.isEmpty(str)){
             return false;
         }
         str = str.toLowerCase();
@@ -23,7 +24,7 @@ public class Utils {
                 + "(:[0-9]{1,4})?" // 端口- :80
                 + "((/?)|" // a slash isn't required if there is no file name
                 + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
-        return str.matches(regex);
+        return str.matches(regex);*/
     }
 
     public static List<String> ermPaths(String url){
