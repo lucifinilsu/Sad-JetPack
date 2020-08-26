@@ -25,7 +25,7 @@ public class InternalCluster implements ICluster {
     private IExposedServiceGroupRepository repository=null;
     private Map<String, List<IExposedServiceInstanceConstructorParameters>> constructorParameters=new LinkedHashMap<>();
     private List<String> excludeUrls=new ArrayList<>();
-    private List<IExposedService> extraExposedService=new ArrayList<>();
+    private LinkedHashMap<IExposedService,String> extraExposedService=new LinkedHashMap<>();
     private int processMode=ICluster.CALL_MODE_SEQUENCE;
 
     public InternalCluster(IExposedServiceGroupRepository repository) {
@@ -38,14 +38,14 @@ public class InternalCluster implements ICluster {
     }
 
     @Override
-    public ICluster addInstanceConstructorParameters(@NonNull String e_url, @NonNull IExposedServiceInstanceConstructorParameters parameters){
-        if (!TextUtils.isEmpty(e_url) && parameters!=null){
-            List<IExposedServiceInstanceConstructorParameters> p=constructorParameters.get(e_url);
+    public ICluster addInstanceConstructorParameters(@NonNull String orgUrl, @NonNull IExposedServiceInstanceConstructorParameters parameters){
+        if (!TextUtils.isEmpty(orgUrl) && parameters!=null){
+            List<IExposedServiceInstanceConstructorParameters> p=constructorParameters.get(orgUrl);
             if (p==null){
                 p=new ArrayList<>();
             }
             p.add(parameters);
-            constructorParameters.put(e_url,p);
+            constructorParameters.put(orgUrl,p);
         }
         return this;
     }
@@ -70,8 +70,8 @@ public class InternalCluster implements ICluster {
         excludeUrls.addAll(Arrays.asList(e_url));
         return this;
     }
-    public ICluster addExtraExposedServiceInstance(IExposedService exposedService){
-        extraExposedService.add(exposedService);
+    public ICluster addExtraExposedServiceInstance(IExposedService exposedService,String orgUrl){
+        extraExposedService.put(exposedService,orgUrl);
         return this;
     }
 
@@ -80,8 +80,12 @@ public class InternalCluster implements ICluster {
         InternalProcessor processor=new InternalProcessor(processMode);
         //首先遍历生成实例并排序
         LinkedHashMap<String, ExposedServiceRelationMappingEntity> e_map=repository.entityGroup();
-        ArrayList<IExposedService> exposedServices=new ArrayList<>();
-        ArrayList extraObjectInstances=new ArrayList();
+        List<IExposedService> exposedServices=new ArrayList<>();
+        List extraObjectInstances=new ArrayList();
+        List<String> e_urls=new ArrayList<>();
+        List<String> o_urls=new ArrayList<>();
+        LinkedHashMap<IExposedService,String> es=new LinkedHashMap<>();
+        LinkedHashMap<Object,String> os=new LinkedHashMap<>();
         MapTraverseUtils.traverseGroup(e_map, new MapTraverseUtils.ITraverseAction<String, ExposedServiceRelationMappingEntity>() {
             @Override
             public void onTraversed(String s, ExposedServiceRelationMappingEntity entity) {
@@ -105,9 +109,11 @@ public class InternalCluster implements ICluster {
                                 if (o!=null){
                                     if (o instanceof IExposedService){
                                         exposedServices.add((IExposedService) o);
+                                        e_urls.add(s);
                                     }
                                     else {
                                         extraObjectInstances.add(o);
+                                        o_urls.add(s);
                                     }
                                 }
 
@@ -118,9 +124,11 @@ public class InternalCluster implements ICluster {
                             if (o!=null){
                                 if (o instanceof IExposedService){
                                     exposedServices.add((IExposedService) o);
+                                    e_urls.add(s);
                                 }
                                 else {
                                     extraObjectInstances.add(o);
+                                    o_urls.add(s);
                                 }
                             }
                         }
@@ -128,24 +136,44 @@ public class InternalCluster implements ICluster {
                 }
             }
         });
-        exposedServices.addAll(extraExposedService);
-        if (!exposedServices.isEmpty()){
-            Collections.sort(exposedServices);
+        exposedServices.addAll(extraExposedService.keySet());
+        e_urls.addAll(extraExposedService.values());
+        List<IExposedService> temp=new ArrayList<>(exposedServices);
+        if (!temp.isEmpty()){
+            Collections.sort(temp);
         }
-        processor.setExposedServices(exposedServices);
-        processor.setExtraObjects(extraObjectInstances);
+        for (IExposedService e:temp
+             ) {
+            es.put(e,e_urls.get(exposedServices.indexOf(e)));
+        }
+        for (Object o:extraObjectInstances){
+            os.put(o,o_urls.get(extraObjectInstances.indexOf(o)));
+        }
+        processor.setExposedServices(es);
+        processor.setExtraObjects(os);
         return processor;
     }
 
     @Override
     public IProcessor post() {
         InternalProcessor processor=new InternalProcessor(processMode);
-        List<IExposedService> exposedServices= ExposedServiceInstanceStorageManager.getExposedServices(repository.orgUrl(),excludeUrls.toArray(new String[excludeUrls.size()]));
-        exposedServices.addAll(extraExposedService);
-        if (!exposedServices.isEmpty()){
-            Collections.sort(exposedServices);
+        LinkedHashMap<IExposedService,String> esNoSort= ExposedServiceInstanceStorageManager.getExposedServices(repository.orgUrl(),excludeUrls.toArray(new String[excludeUrls.size()]));
+        LinkedHashMap<IExposedService,String> es=new LinkedHashMap<>();
+        List<IExposedService> eList=new ArrayList<>(esNoSort.keySet());
+        List<String> uList=new ArrayList<>(esNoSort.values());
+        eList.addAll(extraExposedService.keySet());
+        uList.addAll(extraExposedService.values());
+        List<IExposedService> temp=new ArrayList<>(eList);
+        if (!temp.isEmpty()){
+            Collections.sort(temp);
         }
-        processor.setExposedServices(exposedServices);
+        for (IExposedService ee:temp
+             ) {
+            int index=eList.indexOf(ee);
+            String orgUrl=uList.get(index);
+            es.put(ee,orgUrl);
+        }
+        processor.setExposedServices(es);
         return processor;
     }
 

@@ -28,21 +28,43 @@ import com.sad.jetpack.architecture.componentization.api.IExposedService;
 import com.sad.jetpack.architecture.componentization.api.IPerformer;
 import com.sad.jetpack.architecture.componentization.api.SCore;
 import com.sad.jetpack.architecture.componentization.api.impl.DataCarrierImpl;
+import com.sad.jetpack.architecture.componentization.api.impl.DefaultDataContainer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
-    @IPCChat(url = {"test://ipc/chat/ttt","test://ipc/chat/sss"})
+    @IPCChat(url = {"test://ipc/chat/ttt","test://ipc/chat/sss"},priority = 996)
     public void onTestIPCChat(IPCMessenger messenger){
         Log.e("sad-jetpack","------------->onTestIPCChat收到信息:"+messenger.extraMessage().data());
-        messenger.reply(messenger.extraMessage().creator().data("onTestIPCChat运行完毕").create());
+        new Thread(){
+            @Override
+            public void run() {
+                IDataCarrier dataCarrier=messenger.extraMessage();
+                dataCarrier.creator().data("onTestIPCChat运行完毕").create();
+                /*DefaultDataContainer dataContainer=dataCarrier.data();
+                dataContainer.add(messenger.messengerId(),"onTestIPCChat运行完毕");
+                dataCarrier.creator().data(dataContainer).create();*/
+                messenger.reply(dataCarrier);
+            }
+        }.start();
+
     }
-    @IPCChat(url = "test://ipc/chat/ttt_r")
+    @IPCChat(url = "test://ipc/chat/ttt_r",priority = 999)
     public String onTestIPCChatWithReturnData(IPCMessenger messenger){
         Log.e("sad-jetpack","------------->onTestIPCChatWithReturnData收到信息:"+messenger.extraMessage().data());
-        messenger.reply(messenger.extraMessage().creator().data("onTestIPCChatWithReturnData运行完毕").create());
+        new Thread(){
+            @Override
+            public void run() {
+                IDataCarrier dataCarrier=messenger.extraMessage();
+                dataCarrier.creator().data("onTestIPCChatWithReturnData运行完毕").create();
+               /* DefaultDataContainer dataContainer=dataCarrier.data();
+                dataContainer.add(messenger.messengerId(),"onTestIPCChatWithReturnData运行完毕");
+                dataCarrier.creator().data(dataContainer).create();*/
+                messenger.reply(dataCarrier);
+            }
+        }.start();
         return "ssss";
     }
     @Override
@@ -78,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                     .repository("https://www.baidu.com/xxx/")
                     .workerClassGroup();
             Log.e("sad-jetpack","WorkerClass列表："+mw);*/
-            testPostConcurrency();
+            testConcurrency();
             //测试
             //scascs
             //scscsc sss
@@ -119,13 +141,13 @@ public class MainActivity extends AppCompatActivity {
     private void testSequence(){
         SCore.getManager()
                 .asyncScanERM()
-                .repository("test://ipc/chat", new IExposedServiceManagerAsync.OnExposedServiceGroupRepositoryFoundListener() {
+                .repository("test://group/s/", new IExposedServiceManagerAsync.OnExposedServiceGroupRepositoryFoundListener() {
                     @Override
                     public void onExposedServiceGroupRepositoryFoundSuccess(ICluster cluster) {
                         cluster
                                 .processMode(ICluster.CALL_MODE_SEQUENCE)
                                 .call()
-                                .timeout(3)
+                                .timeout(15)
                                 .listener(new ICallerListener() {
                                     @Override
                                     public void onEndExposedServiceGroup(IDataCarrier outputData) {
@@ -160,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
                 .cluster("test://group/c/")
                 .processMode(ICluster.CALL_MODE_CONCURRENCY)
                 .call()
-                .timeout(1)
+                .timeout(15)
                 .listener(new ICallerListener() {
                     @Override
                     public void onEndExposedServiceGroup(IDataCarrier outputData) {
@@ -184,6 +206,12 @@ public class MainActivity extends AppCompatActivity {
                 .timeout(9)
                 .listener(new ICallerListener() {
                     @Override
+                    public boolean onProceedExposedService(IPerformer performer, IDataCarrier data, IPCSession session, String messengerProxyId) {
+
+                        return false;
+                    }
+
+                    @Override
                     public void onEndExposedServiceGroup(IDataCarrier outputData) {
                         Log.e("sad-jetpack","------------->并行任务执行完毕:"+outputData.data());
                     }
@@ -196,7 +224,32 @@ public class MainActivity extends AppCompatActivity {
                 .submit()
                 .start(DataCarrierImpl.newInstanceCreator().data("并行输入").create());
     }
+    private void testPostSequence(){
+        SCore.getManager()
+                .cluster("test://ipc/chat")
+                .processMode(ICluster.CALL_MODE_SEQUENCE)
+                .post()
+                .timeout(9)
+                .listener(new ICallerListener() {
+                    @Override
+                    public boolean onProceedExposedService(IPerformer performer, IDataCarrier data, IPCSession session, String messengerProxyId) {
+                        Log.e("sad-jetpack","------------->路过串行任务:"+messengerProxyId);
+                        return false;
+                    }
 
+                    @Override
+                    public void onEndExposedServiceGroup(IDataCarrier outputData) {
+                        Log.e("sad-jetpack","------------->串行任务执行完毕:"+outputData.data());
+                    }
+
+                    @Override
+                    public void onFailureExposedServiceGroup(IDataCarrier currDataCarrier, Throwable throwable) {
+                        Log.e("sad-jetpack","------------->串行任务执行异常:"+throwable.getMessage());
+                    }
+                })
+                .submit()
+                .start(DataCarrierImpl.newInstanceCreator().data("串行输入").create());
+    }
     public void testWorker(){
         /*new InternalPerformer(ExposedServiceManager.newInstance()
                 .get("https://www.baidu.com/xxx/"))

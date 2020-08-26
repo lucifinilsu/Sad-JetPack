@@ -1,6 +1,7 @@
 package com.sad.jetpack.architecture.componentization.api.internal;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.HasDefaultViewModelProviderFactory;
 
 import com.sad.jetpack.architecture.componentization.api.ICallerListener;
 import com.sad.jetpack.architecture.componentization.api.ICluster;
@@ -9,19 +10,20 @@ import com.sad.jetpack.architecture.componentization.api.IProcessor;
 import com.sad.jetpack.architecture.componentization.api.IPerformer;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class InternalProcessor implements IProcessor {
 
-    private List extraObjects=new ArrayList();
-    private List<IExposedService> exposedServices=new ArrayList<>();
+    private LinkedHashMap<Object,String> extraObjects=new LinkedHashMap<>();
+    private LinkedHashMap<IExposedService,String> exposedServices=new LinkedHashMap<>();
     private int processMode = ICluster.CALL_MODE_SEQUENCE;
     private long timeout=-1;
     private ICallerListener callerListener;
     public InternalProcessor(int processMode) {
         this.processMode = processMode;
     }
-    public InternalProcessor(int processMode, List extraObjects, List<IExposedService> exposedServices) {
+    public InternalProcessor(int processMode, LinkedHashMap<Object,String> extraObjects, LinkedHashMap<IExposedService,String> exposedServices) {
         this.extraObjects = extraObjects;
         this.exposedServices = exposedServices;
         this.processMode = processMode;
@@ -31,20 +33,20 @@ public class InternalProcessor implements IProcessor {
         this.processMode = processMode;
     }
 
-    public void setExposedServices(List<IExposedService> exposedServices) {
+    public void setExposedServices(LinkedHashMap<IExposedService,String> exposedServices) {
         this.exposedServices = exposedServices;
     }
 
-    public void setExtraObjects(List extraObjects) {
+    public void setExtraObjects( LinkedHashMap<Object,String> extraObjects) {
         this.extraObjects = extraObjects;
     }
     @Override
-    public List extraObjectInstances() {
+    public  LinkedHashMap<Object,String> extraObjectInstances() {
         return extraObjects;
     }
 
     @Override
-    public List<IExposedService> exposedServiceInstance() {
+    public LinkedHashMap<IExposedService,String> exposedServiceInstance() {
         return exposedServices;
     }
 

@@ -1,10 +1,11 @@
 package com.sad.jetpack.architecture.componentization.api;
+import java.util.LinkedHashMap;
 import java.util.List;
 public interface IProcessor {
 
-    List extraObjectInstances();
+    LinkedHashMap<Object,String> extraObjectInstances();
 
-    List<IExposedService> exposedServiceInstance();
+    LinkedHashMap<IExposedService,String> exposedServiceInstance();
 
     IProcessor timeout(long timeout);
 

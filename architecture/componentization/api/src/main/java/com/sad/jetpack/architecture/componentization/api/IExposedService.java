@@ -14,7 +14,7 @@ public interface IExposedService extends Comparable<IExposedService>{
 
     default int priority(){return 0;};
 
-    default String[] url(){
+    default String[] urls(){
         ExposedService exposedService=info();
         if (exposedService!=null){
             return exposedService.url();
@@ -53,4 +53,6 @@ public interface IExposedService extends Comparable<IExposedService>{
     default int compareTo(IExposedService o){
         return o.priority()-this.priority();
     }
+
+    default String instanceOrgUrl(){return "";};
 }

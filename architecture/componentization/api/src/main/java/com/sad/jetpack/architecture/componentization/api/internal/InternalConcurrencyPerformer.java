@@ -13,8 +13,10 @@ import com.sad.jetpack.architecture.componentization.api.IExposedService;
 import com.sad.jetpack.architecture.componentization.api.IPCSession;
 import com.sad.jetpack.architecture.componentization.api.IPerformer;
 import com.sad.jetpack.architecture.componentization.api.impl.AbsIPCMessenger;
+import com.sad.jetpack.architecture.componentization.api.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -24,11 +26,11 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class InternalConcurrencyPerformer implements IPerformer {
-    private List<IExposedService> exposedServices=new ArrayList<>();
+    private LinkedHashMap<IExposedService,String> exposedServices=new LinkedHashMap<>();
     private ICallerListener callerListener;
     private long timeout=-1;
     private ScheduledFuture scheduledFuture;
-    public InternalConcurrencyPerformer(List<IExposedService> exposedServices) {
+    public InternalConcurrencyPerformer(LinkedHashMap<IExposedService,String> exposedServices) {
         this.exposedServices = exposedServices;
     }
 
@@ -58,9 +60,13 @@ public class InternalConcurrencyPerformer implements IPerformer {
     private CountDownLatch countDownLatch;
     private void proceed(IDataCarrier inputData){
         countDownLatch=new CountDownLatch(exposedServices.size());
-        for (IExposedService exposedService:exposedServices
+        List<IExposedService> es=new ArrayList<>(exposedServices.keySet());
+        List<String> us=new ArrayList<>(exposedServices.values());
+        for (IExposedService exposedService:es
         ) {
-            exposedService.action(new AbsIPCMessenger(exposedServices.indexOf(exposedService)+"") {
+            int index=es.indexOf(exposedService);
+            String orgUrl=us.get(index);
+            exposedService.action(new AbsIPCMessenger(Utils.encodeMessengerId(orgUrl,""+index)) {
                 @Override
                 public boolean reply(IDataCarrier d, IPCSession session) {
                     inputData.creator().data(d.data()).state(DataState.RUNNING);

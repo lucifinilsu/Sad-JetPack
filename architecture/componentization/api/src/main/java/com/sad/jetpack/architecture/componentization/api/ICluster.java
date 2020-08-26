@@ -33,7 +33,7 @@ public interface ICluster {
 
     ICluster exclude(String... e_url);
 
-    ICluster addExtraExposedServiceInstance(IExposedService exposedService);
+    ICluster addExtraExposedServiceInstance(IExposedService exposedService,String orgUrl);
 
     IProcessor call();
 

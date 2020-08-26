@@ -9,6 +9,7 @@ import com.sad.jetpack.architecture.componentization.annotation.ValidUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,10 +20,10 @@ public final class ExposedServiceInstanceStorageManager {
     protected static final ConcurrentMap<String,List<IExposedService>> EXPOSEDSERVICE_INSTANCE_MAP = new ConcurrentHashMap<>();
     protected static final String PATH_KEY_SEPARATOR="sca#bas%Scbkabf@_sad_@&";
 
-    public static List<IExposedService> getExposedServices(String url,String... exclude){
+    public static LinkedHashMap<IExposedService,String> getExposedServices(String url, String... exclude){
         List<String> ex=new ArrayList<String>(Arrays.asList(exclude));
         String name= url;//ValidUtils.encryptMD5ToString(url);
-        List<IExposedService> list=new ArrayList<>();
+        LinkedHashMap<IExposedService,String> list=new LinkedHashMap<>();
         Iterator<Map.Entry<String,List<IExposedService>>> iterator=EXPOSEDSERVICE_INSTANCE_MAP.entrySet().iterator();
         Log.e("sad-jetpack","------------------->开始遍历组件名");
         while (iterator.hasNext()){
@@ -36,7 +37,10 @@ public final class ExposedServiceInstanceStorageManager {
                 if (ns.startsWith(name) && ex.indexOf(ns)==-1){
                     Log.e("sad-jetpack","------------------->动态组件"+k+"符合需求，添加到结果集");
                     List<IExposedService> es=entry.getValue();
-                    list.addAll(es);
+                    for (IExposedService ee:es
+                         ) {
+                        list.put(ee,ns);
+                    }
                 }
             }
         }

@@ -11,8 +11,10 @@ import com.sad.jetpack.architecture.componentization.api.IPCSession;
 import com.sad.jetpack.architecture.componentization.api.IPerformer;
 import com.sad.jetpack.architecture.componentization.api.impl.AbsIPCMessenger;
 import com.sad.jetpack.architecture.componentization.api.impl.DataCarrierImpl;
+import com.sad.jetpack.architecture.componentization.api.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
@@ -20,11 +22,11 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class InternalSequencePerformer implements IPerformer {
-    private List<IExposedService> exposedServices=new ArrayList<>();
+    private LinkedHashMap<IExposedService,String> exposedServices=new LinkedHashMap<>();
     private ICallerListener callerListener;
     private long timeout=-1;
     private ScheduledFuture scheduledFuture;
-    public InternalSequencePerformer(List<IExposedService> exposedServices) {
+    public InternalSequencePerformer(LinkedHashMap<IExposedService,String> exposedServices) {
         this.exposedServices = exposedServices;
     }
 
@@ -79,8 +81,11 @@ public class InternalSequencePerformer implements IPerformer {
             }
             return;
         }
-        IExposedService exposedService=exposedServices.get(index);
-        IPCMessenger messengerProxy=new AbsIPCMessenger(index+"") {
+        List<IExposedService> es=new ArrayList<>(exposedServices.keySet());
+        List<String> us=new ArrayList<>(exposedServices.values());
+        IExposedService exposedService=es.get(index);
+        String orgUrl=us.get(index);
+        IPCMessenger messengerProxy=new AbsIPCMessenger(Utils.encodeMessengerId(orgUrl,""+index)) {
             @Override
             public boolean reply(IDataCarrier d, IPCSession session) {
                 d.creator().state(DataState.RUNNING);
@@ -106,6 +111,7 @@ public class InternalSequencePerformer implements IPerformer {
             public IDataCarrier extraMessage() {
                 return data.creator().state(DataState.UNWORKED).create();
             }
+
         };
         exposedService.action(messengerProxy);
     }
