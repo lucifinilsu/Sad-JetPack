@@ -5,30 +5,30 @@ import androidx.annotation.NonNull;
 import com.sad.jetpack.architecture.componentization.api.ICallerListener;
 import com.sad.jetpack.architecture.componentization.api.ICluster;
 import com.sad.jetpack.architecture.componentization.api.IExposedService;
-import com.sad.jetpack.architecture.componentization.api.ICaller;
+import com.sad.jetpack.architecture.componentization.api.IProcessor;
 import com.sad.jetpack.architecture.componentization.api.IPerformer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class InternalCaller implements ICaller {
+public class InternalProcessor implements IProcessor {
 
     private List extraObjects=new ArrayList();
     private List<IExposedService> exposedServices=new ArrayList<>();
-    private int callMode= ICluster.CALL_MODE_SEQUENCE;
+    private int processMode = ICluster.CALL_MODE_SEQUENCE;
     private long timeout=-1;
     private ICallerListener callerListener;
-    public InternalCaller(int callMode) {
-        this.callMode=callMode;
+    public InternalProcessor(int processMode) {
+        this.processMode = processMode;
     }
-    public InternalCaller(int callMode,List extraObjects, List<IExposedService> exposedServices) {
+    public InternalProcessor(int processMode, List extraObjects, List<IExposedService> exposedServices) {
         this.extraObjects = extraObjects;
         this.exposedServices = exposedServices;
-        this.callMode=callMode;
+        this.processMode = processMode;
     }
 
-    public void setCallMode(int callMode) {
-        this.callMode = callMode;
+    public void setProcessMode(int processMode) {
+        this.processMode = processMode;
     }
 
     public void setExposedServices(List<IExposedService> exposedServices) {
@@ -49,20 +49,20 @@ public class InternalCaller implements ICaller {
     }
 
     @Override
-    public ICaller timeout(long timeout) {
+    public IProcessor timeout(long timeout) {
         this.timeout=timeout;
         return this;
     }
 
     @Override
     public @NonNull IPerformer submit() {
-        if (callMode== ICluster.CALL_MODE_SEQUENCE){
+        if (processMode == ICluster.CALL_MODE_SEQUENCE){
             InternalSequencePerformer performer= new InternalSequencePerformer(exposedServices);
             performer.setCallerListener(callerListener);
             performer.setTimeout(timeout);
             return performer;
         }
-        else if (callMode==ICluster.CALL_MODE_CONCURRENCY){
+        else if (processMode ==ICluster.CALL_MODE_CONCURRENCY){
             InternalConcurrencyPerformer performer=new InternalConcurrencyPerformer(exposedServices);
             performer.setCallerListener(callerListener);
             performer.setTimeout(timeout);
@@ -72,7 +72,7 @@ public class InternalCaller implements ICaller {
     }
 
     @Override
-    public ICaller listener(ICallerListener callerListener) {
+    public IProcessor listener(ICallerListener callerListener) {
         this.callerListener=callerListener;
         return this;
     }

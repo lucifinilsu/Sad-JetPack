@@ -63,10 +63,10 @@ public class InternalConcurrencyPerformer implements IPerformer {
             exposedService.action(new AbsIPCMessenger(exposedServices.indexOf(exposedService)+"") {
                 @Override
                 public boolean reply(IDataCarrier d, IPCSession session) {
-                    d.creator().state(DataState.RUNNING).create();
+                    inputData.creator().data(d.data()).state(DataState.RUNNING);
                     countDownLatch.countDown();
                     if (callerListener!=null){
-                        callerListener.onProceedExposedService(InternalConcurrencyPerformer.this,d,session,messengerId());
+                        callerListener.onProceedExposedService(InternalConcurrencyPerformer.this,inputData,session,messengerId());
                     }
                     return false;
                 }

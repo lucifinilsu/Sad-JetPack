@@ -15,6 +15,7 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import com.sad.jetpack.architecture.appgo.api.AppGo;
+import com.sad.jetpack.architecture.componentization.annotation.IPCChat;
 import com.sad.jetpack.architecture.componentization.api.ExposedServiceManager;
 import com.sad.jetpack.architecture.componentization.api.ICallerListener;
 import com.sad.jetpack.architecture.componentization.api.ICluster;
@@ -33,11 +34,22 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
-
+    @IPCChat(url = {"test://ipc/chat/ttt","test://ipc/chat/sss"})
+    public void onTestIPCChat(IPCMessenger messenger){
+        Log.e("sad-jetpack","------------->onTestIPCChat收到信息:"+messenger.extraMessage().data());
+        messenger.reply(messenger.extraMessage().creator().data("onTestIPCChat运行完毕").create());
+    }
+    @IPCChat(url = "test://ipc/chat/ttt_r")
+    public String onTestIPCChatWithReturnData(IPCMessenger messenger){
+        Log.e("sad-jetpack","------------->onTestIPCChatWithReturnData收到信息:"+messenger.extraMessage().data());
+        messenger.reply(messenger.extraMessage().creator().data("onTestIPCChatWithReturnData运行完毕").create());
+        return "ssss";
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SCore.registerIPCHost(this);
         String s="";
         AppGo.get().getApplication();
         //华安生态 宝盈互联网 鹏华混合 融通新能源、景气AB 国投新能源 广发新经济
@@ -66,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                     .repository("https://www.baidu.com/xxx/")
                     .workerClassGroup();
             Log.e("sad-jetpack","WorkerClass列表："+mw);*/
-            testConcurrency();
+            testPostConcurrency();
             //测试
             //scascs
             //scscsc sss
@@ -107,11 +119,12 @@ public class MainActivity extends AppCompatActivity {
     private void testSequence(){
         SCore.getManager()
                 .asyncScanERM()
-                .repository("test://group/s/", new IExposedServiceManagerAsync.OnExposedServiceGroupRepositoryFoundListener() {
+                .repository("test://ipc/chat", new IExposedServiceManagerAsync.OnExposedServiceGroupRepositoryFoundListener() {
                     @Override
                     public void onExposedServiceGroupRepositoryFoundSuccess(ICluster cluster) {
                         cluster
-                                .call(ICluster.CALL_MODE_SEQUENCE)
+                                .processMode(ICluster.CALL_MODE_SEQUENCE)
+                                .call()
                                 .timeout(3)
                                 .listener(new ICallerListener() {
                                     @Override
@@ -145,8 +158,30 @@ public class MainActivity extends AppCompatActivity {
     private void testConcurrency(){
         SCore.getManager()
                 .cluster("test://group/c/")
-                .call(ICluster.CALL_MODE_CONCURRENCY)
+                .processMode(ICluster.CALL_MODE_CONCURRENCY)
+                .call()
                 .timeout(1)
+                .listener(new ICallerListener() {
+                    @Override
+                    public void onEndExposedServiceGroup(IDataCarrier outputData) {
+                        Log.e("sad-jetpack","------------->并行任务执行完毕:"+outputData.data());
+                    }
+
+                    @Override
+                    public void onFailureExposedServiceGroup(IDataCarrier currDataCarrier, Throwable throwable) {
+                        Log.e("sad-jetpack","------------->并行任务执行异常:"+throwable.getMessage());
+                    }
+                })
+                .submit()
+                .start(DataCarrierImpl.newInstanceCreator().data("并行输入").create());
+    }
+
+    private void testPostConcurrency(){
+        SCore.getManager()
+                .cluster("test://ipc/chat")
+                .processMode(ICluster.CALL_MODE_CONCURRENCY)
+                .post()
+                .timeout(9)
                 .listener(new ICallerListener() {
                     @Override
                     public void onEndExposedServiceGroup(IDataCarrier outputData) {
@@ -253,4 +288,9 @@ public class MainActivity extends AppCompatActivity {
         return constraints;
     }
 
+    @Override
+    protected void onDestroy() {
+        SCore.unregisterIPCHost(this);
+        super.onDestroy();
+    }
 }

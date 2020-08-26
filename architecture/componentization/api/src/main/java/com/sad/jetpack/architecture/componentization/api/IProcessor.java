@@ -1,14 +1,14 @@
 package com.sad.jetpack.architecture.componentization.api;
 import java.util.List;
-public interface ICaller {
+public interface IProcessor {
 
     List extraObjectInstances();
 
     List<IExposedService> exposedServiceInstance();
 
-    ICaller timeout(long timeout);
+    IProcessor timeout(long timeout);
 
     IPerformer submit();
 
-    ICaller listener(ICallerListener callerListener);
+    IProcessor listener(ICallerListener callerListener);
 }

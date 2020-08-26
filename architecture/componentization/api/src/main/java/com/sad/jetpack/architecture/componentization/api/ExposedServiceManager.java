@@ -72,7 +72,8 @@ public final class ExposedServiceManager implements IExposedServiceManager,IExpo
         }) {
             @Override
             public IExposedServiceGroupRepository doInBackground() throws Exception {
-                return new InternalExposedServiceGroupRepository(InternalContextHolder.get().getContext(),url,entityGroupFactory.getEntityGroupByUrl(url,onExposedServiceRelationMappingEntityFoundListener));
+                return repository(url);
+                //return new InternalExposedServiceGroupRepository(InternalContextHolder.get().getContext(),url,entityGroupFactory.getEntityGroupByUrl(url,onExposedServiceRelationMappingEntityFoundListener));
             }
 
         });

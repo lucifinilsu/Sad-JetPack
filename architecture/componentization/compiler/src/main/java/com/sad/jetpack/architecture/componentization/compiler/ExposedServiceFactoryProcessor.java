@@ -6,9 +6,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.sad.jetpack.architecture.componentization.annotation.ExposedService;
 import com.sad.jetpack.architecture.componentization.annotation.Utils;
-import com.sad.jetpack.architecture.componentization.annotation.ValidUtils;
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
@@ -16,13 +14,9 @@ import com.squareup.javapoet.TypeSpec;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +41,7 @@ import javax.tools.StandardLocation;
 @SupportedSourceVersion(value = SourceVersion.RELEASE_8)
 @SupportedOptions({"log"})
 @SupportedAnnotationTypes({
-        Constant.PACKAGE__ANNOTATION +".ExposedService"
+        Constant.PACKAGE_ANNOTATION +".ExposedService"
 })
 public class ExposedServiceFactoryProcessor extends AbsProcessor{
 

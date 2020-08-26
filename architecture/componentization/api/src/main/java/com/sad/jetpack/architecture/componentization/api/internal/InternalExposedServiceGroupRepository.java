@@ -27,7 +27,7 @@ public class InternalExposedServiceGroupRepository implements IExposedServiceGro
     }
 
     private void traverse(){
-        Log.e("sad-jetpack",">>>>要遍历的实体组："+entityGroup);
+        //Log.e("sad-jetpack",">>>>要遍历的实体组："+entityGroup);
         MapTraverseUtils.traverseGroup(entityGroup,
                 new MapTraverseUtils.ITraverseAction<String, ExposedServiceRelationMappingEntity>() {
 

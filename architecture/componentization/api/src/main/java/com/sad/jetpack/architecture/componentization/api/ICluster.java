@@ -35,6 +35,10 @@ public interface ICluster {
 
     ICluster addExtraExposedServiceInstance(IExposedService exposedService);
 
-    ICaller call(@CallMode int callMode);
+    IProcessor call();
+
+    IProcessor post();
+
+    ICluster processMode(@CallMode int processMode);
 
 }

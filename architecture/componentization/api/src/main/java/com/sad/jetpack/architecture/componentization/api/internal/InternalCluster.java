@@ -4,12 +4,13 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
+import com.sad.jetpack.architecture.componentization.api.ExposedServiceInstanceStorageManager;
 import com.sad.jetpack.architecture.componentization.api.ExposedServiceRelationMappingEntity;
 import com.sad.jetpack.architecture.componentization.api.ICluster;
 import com.sad.jetpack.architecture.componentization.api.IExposedService;
 import com.sad.jetpack.architecture.componentization.api.IExposedServiceGroupRepository;
 import com.sad.jetpack.architecture.componentization.api.IExposedServiceInstanceConstructorParameters;
-import com.sad.jetpack.architecture.componentization.api.ICaller;
+import com.sad.jetpack.architecture.componentization.api.IProcessor;
 import com.sad.jetpack.architecture.componentization.api.MapTraverseUtils;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class InternalCluster implements ICluster {
     private Map<String, List<IExposedServiceInstanceConstructorParameters>> constructorParameters=new LinkedHashMap<>();
     private List<String> excludeUrls=new ArrayList<>();
     private List<IExposedService> extraExposedService=new ArrayList<>();
-
+    private int processMode=ICluster.CALL_MODE_SEQUENCE;
 
     public InternalCluster(IExposedServiceGroupRepository repository) {
         this.repository = repository;
@@ -75,8 +76,8 @@ public class InternalCluster implements ICluster {
     }
 
     @Override
-    public ICaller call(int callMode) {
-        InternalCaller caller=new InternalCaller(callMode);
+    public IProcessor call() {
+        InternalProcessor processor=new InternalProcessor(processMode);
         //首先遍历生成实例并排序
         LinkedHashMap<String, ExposedServiceRelationMappingEntity> e_map=repository.entityGroup();
         ArrayList<IExposedService> exposedServices=new ArrayList<>();
@@ -131,9 +132,27 @@ public class InternalCluster implements ICluster {
         if (!exposedServices.isEmpty()){
             Collections.sort(exposedServices);
         }
-        caller.setExposedServices(exposedServices);
-        caller.setExtraObjects(extraObjectInstances);
-        return caller;
+        processor.setExposedServices(exposedServices);
+        processor.setExtraObjects(extraObjectInstances);
+        return processor;
+    }
+
+    @Override
+    public IProcessor post() {
+        InternalProcessor processor=new InternalProcessor(processMode);
+        List<IExposedService> exposedServices= ExposedServiceInstanceStorageManager.getExposedServices(repository.orgUrl(),excludeUrls.toArray(new String[excludeUrls.size()]));
+        exposedServices.addAll(extraExposedService);
+        if (!exposedServices.isEmpty()){
+            Collections.sort(exposedServices);
+        }
+        processor.setExposedServices(exposedServices);
+        return processor;
+    }
+
+    @Override
+    public ICluster processMode(int processMode) {
+        this.processMode=processMode;
+        return this;
     }
 
 

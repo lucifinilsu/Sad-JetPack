@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IPCChat {
 
@@ -14,5 +14,7 @@ public @interface IPCChat {
     String[] url();
 
     String description() default "";
+
+    int priority() default 0;
 
 }
