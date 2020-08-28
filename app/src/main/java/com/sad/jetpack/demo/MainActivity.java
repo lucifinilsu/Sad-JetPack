@@ -160,6 +160,11 @@ public class MainActivity extends AppCompatActivity {
                                 .timeout(15)
                                 .listener(new IProceedListener() {
                                     @Override
+                                    public IDataCarrier onInput(IDataCarrier inputData) {
+                                        return inputData;
+                                    }
+
+                                    @Override
                                     public void onOutput(IDataCarrier  outputData) {
                                         Log.e("sad-jetpack","------------->串行任务执行完毕:"+outputData.data());
                                     }

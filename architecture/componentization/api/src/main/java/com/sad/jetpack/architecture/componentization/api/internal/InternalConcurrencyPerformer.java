@@ -2,6 +2,8 @@ package com.sad.jetpack.architecture.componentization.api.internal;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import com.sad.core.async.ISADTaskProccessListener;
 import com.sad.core.async.SADHandlerAssistant;
@@ -42,7 +44,7 @@ public class InternalConcurrencyPerformer implements IPerformer {
 
 
     @Override
-    public void start(IDataCarrier data, boolean restart, long delay) {
+    public void start(@NonNull IDataCarrier data, boolean restart, long delay) {
         try {
             if (delay>0){
                 SADHandlerAssistant.runOnUIThread(new Runnable() {
@@ -64,7 +66,7 @@ public class InternalConcurrencyPerformer implements IPerformer {
 
     }
     private CountDownLatch countDownLatch;
-    private void proceed(IDataCarrier orgInputData){
+    private void proceed(@NonNull IDataCarrier orgInputData){
         countDownLatch=new CountDownLatch(exposedServices.size());
         List<IExposedService> es=new ArrayList<>(exposedServices.keySet());
         List<String> us=new ArrayList<>(exposedServices.values());

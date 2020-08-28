@@ -41,4 +41,6 @@ public interface ICluster {
 
     ICluster processMode(@CallMode int processMode);
 
+    IProcessor processorAs(IExposedServiceInstancesFactory factory);
+
 }

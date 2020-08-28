@@ -4,8 +4,8 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
 public interface IProceedListener {
 
-    default <T> T onInput(IDataCarrier inputData){
-        return (T) inputData;
+    default IDataCarrier onInput(IDataCarrier inputData){
+        return inputData;
     };
     default boolean onProceed(IPerformer performer, IDataCarrier data, IPCSession session, String messengerProxyId){
         return false;
@@ -16,7 +16,9 @@ public interface IProceedListener {
     default void onOutput(IDataCarrier totalOutputData){
 
     };
-    default void onExceptionInPerformer(Throwable throwable){}
+    default void onExceptionInPerformer(Throwable throwable){
+
+    }
     default void onIntercepted(IPerformer performer,IExposedService lastExposedService,IDataCarrier outputData){
 
     };

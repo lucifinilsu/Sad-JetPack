@@ -30,7 +30,7 @@ public class DefaultExposedServiceEntityGroupFactory implements IExposedServiceE
             if (url.endsWith("/")){
                 url=url.substring(0,url.length()-1);
             }
-            Log.e("sad-jetpack",">>>>要扫描："+url);
+            Log.e("sad-jetpack",">>>>扫描："+url);
             return doGetEntityGroup(url,entityFoundListener);
         }catch (Exception e){
             e.printStackTrace();
