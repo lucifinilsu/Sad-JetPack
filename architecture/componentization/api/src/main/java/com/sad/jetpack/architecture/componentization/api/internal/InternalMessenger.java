@@ -3,9 +3,9 @@ package com.sad.jetpack.architecture.componentization.api.internal;
 import com.sad.jetpack.architecture.componentization.api.IDataCarrier;
 import com.sad.jetpack.architecture.componentization.api.IPCMessenger;
 import com.sad.jetpack.architecture.componentization.api.IPCSession;
-import com.sad.jetpack.architecture.componentization.api.impl.AbsIPCMessenger;
+import com.sad.jetpack.architecture.componentization.api.impl.DefaultIPCMessenger;
 @Deprecated
-public class InternalMessenger extends AbsIPCMessenger<InternalMessenger> {
+public class InternalMessenger extends DefaultIPCMessenger {
     private IPCMessenger realMessenger;
     public InternalMessenger(String id) {
         super(id);

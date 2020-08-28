@@ -125,6 +125,12 @@ public class IPCChatProcessoer extends AbsProcessor {
                     .endControlFlow("catch($T e){e.printStackTrace();}", Exception.class)
                     .addStatement("return null")
                     .build();
+            MethodSpec ms_priority=MethodSpec.methodBuilder("priority")
+                    .addAnnotation(Override.class)
+                    .returns(TypeName.INT)
+                    .addModifiers(Modifier.PUBLIC)
+                    .addStatement("return "+annotation_eventResponse.priority())
+                    .build();
 
             MethodSpec ms_c=MethodSpec.constructorBuilder()
                     .addParameter(ParameterSpec.builder(TypeVariableName.get(e_class.asType()),"host").build())
@@ -137,6 +143,7 @@ public class IPCChatProcessoer extends AbsProcessor {
                     .addModifiers(Modifier.PUBLIC)
                     .addMethod(ms_c)
                     .addMethod(ms_onComponentResponse)
+                    .addMethod(ms_priority)
                     .superclass(ParameterizedTypeName.get(ClassName.bestGuess(Constant.PACKAGE_API+".impl.IPCChatProxy"),
                             TypeVariableName.get(e_class.asType())
                     ))

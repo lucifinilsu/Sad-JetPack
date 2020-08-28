@@ -2,13 +2,12 @@ package com.sad.jetpack.architecture.componentization.api.impl;
 
 import com.sad.jetpack.architecture.componentization.api.IDataCarrier;
 import com.sad.jetpack.architecture.componentization.api.IPCMessenger;
-import com.sad.jetpack.architecture.componentization.api.IPCSession;
 
-public abstract class AbsIPCMessenger<A extends AbsIPCMessenger<A>> implements IPCMessenger {
+public class DefaultIPCMessenger implements IPCMessenger {
     private String id="";
     private IDataCarrier extraMessage;
-    private AbsIPCMessenger(){}
-    public AbsIPCMessenger(String id){
+    private DefaultIPCMessenger(){}
+    public DefaultIPCMessenger(String id){
         this.id=id;
     }
 
@@ -22,11 +21,9 @@ public abstract class AbsIPCMessenger<A extends AbsIPCMessenger<A>> implements I
         return this.id;
     }
 
-    public A extraMessage(IDataCarrier extraMessage){
+    public DefaultIPCMessenger extraMessage(IDataCarrier extraMessage){
         this.extraMessage=extraMessage;
-        return (A) this;
+        return this;
     }
 
-    @Override
-    public abstract boolean reply(IDataCarrier d, IPCSession session);
 }

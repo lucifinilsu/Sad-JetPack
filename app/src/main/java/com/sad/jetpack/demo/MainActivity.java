@@ -14,13 +14,13 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
+import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import com.sad.jetpack.architecture.appgo.api.AppGo;
 import com.sad.jetpack.architecture.componentization.annotation.IPCChat;
 import com.sad.jetpack.architecture.componentization.api.ExposedServiceManager;
-import com.sad.jetpack.architecture.componentization.api.ICallerListener;
+import com.sad.jetpack.architecture.componentization.api.IProceedListener;
 import com.sad.jetpack.architecture.componentization.api.ICluster;
 import com.sad.jetpack.architecture.componentization.api.IDataCarrier;
-import com.sad.jetpack.architecture.componentization.api.IExposedServiceGroupRepository;
 import com.sad.jetpack.architecture.componentization.api.IExposedServiceManagerAsync;
 import com.sad.jetpack.architecture.componentization.api.IPCMessenger;
 import com.sad.jetpack.architecture.componentization.api.IPCSession;
@@ -28,7 +28,6 @@ import com.sad.jetpack.architecture.componentization.api.IExposedService;
 import com.sad.jetpack.architecture.componentization.api.IPerformer;
 import com.sad.jetpack.architecture.componentization.api.SCore;
 import com.sad.jetpack.architecture.componentization.api.impl.DataCarrierImpl;
-import com.sad.jetpack.architecture.componentization.api.impl.DefaultDataContainer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,17 +50,28 @@ public class MainActivity extends AppCompatActivity {
         }.start();
 
     }
+    @IPCChat(url = {"test://ipc/chat/sss"},priority = 995)
+    public void onTestIPCChat2(IPCMessenger messenger){
+        Log.e("sad-jetpack","------------->onTestIPCChat2收到信息:"+messenger.extraMessage().data());
+        new Thread(){
+            @Override
+            public void run() {
+                IDataCarrier dataCarrier=messenger.extraMessage();
+                dataCarrier.creator().data("onTestIPCChat2运行完毕").create();
+                messenger.reply(dataCarrier);
+            }
+        }.start();
+
+    }
     @IPCChat(url = "test://ipc/chat/ttt_r",priority = 999)
     public String onTestIPCChatWithReturnData(IPCMessenger messenger){
         Log.e("sad-jetpack","------------->onTestIPCChatWithReturnData收到信息:"+messenger.extraMessage().data());
+
         new Thread(){
             @Override
             public void run() {
                 IDataCarrier dataCarrier=messenger.extraMessage();
                 dataCarrier.creator().data("onTestIPCChatWithReturnData运行完毕").create();
-               /* DefaultDataContainer dataContainer=dataCarrier.data();
-                dataContainer.add(messenger.messengerId(),"onTestIPCChatWithReturnData运行完毕");
-                dataCarrier.creator().data(dataContainer).create();*/
                 messenger.reply(dataCarrier);
             }
         }.start();
@@ -148,19 +158,19 @@ public class MainActivity extends AppCompatActivity {
                                 .processMode(ICluster.CALL_MODE_SEQUENCE)
                                 .call()
                                 .timeout(15)
-                                .listener(new ICallerListener() {
+                                .listener(new IProceedListener() {
                                     @Override
-                                    public void onEndExposedServiceGroup(IDataCarrier outputData) {
+                                    public void onOutput(IDataCarrier  outputData) {
                                         Log.e("sad-jetpack","------------->串行任务执行完毕:"+outputData.data());
                                     }
 
                                     @Override
-                                    public boolean onProceedExposedService(IPerformer performer, IDataCarrier data, IPCSession session, String messengerProxyId) {
+                                    public boolean onProceed(IPerformer performer, IDataCarrier data, IPCSession session, String messengerProxyId) {
                                         return false;
                                     }
 
                                     @Override
-                                    public void onFailureExposedServiceGroup(IDataCarrier dataCarrier,Throwable throwable) {
+                                    public void onExceptionInPerformer(Throwable throwable) {
                                         Log.e("sad-jetpack","------------->串行任务执行异常:"+throwable.getMessage());
                                         throwable.printStackTrace();
                                     }
@@ -183,14 +193,14 @@ public class MainActivity extends AppCompatActivity {
                 .processMode(ICluster.CALL_MODE_CONCURRENCY)
                 .call()
                 .timeout(15)
-                .listener(new ICallerListener() {
+                .listener(new IProceedListener() {
                     @Override
-                    public void onEndExposedServiceGroup(IDataCarrier outputData) {
-                        Log.e("sad-jetpack","------------->并行任务执行完毕:"+outputData.data());
+                    public void onOutput(ConcurrentLinkedHashMap<String,IDataCarrier> outputData) {
+                        Log.e("sad-jetpack","------------->并行任务执行完毕:"+outputData);
                     }
 
                     @Override
-                    public void onFailureExposedServiceGroup(IDataCarrier currDataCarrier, Throwable throwable) {
+                    public void onExceptionInPerformer(Throwable throwable) {
                         Log.e("sad-jetpack","------------->并行任务执行异常:"+throwable.getMessage());
                     }
                 })
@@ -204,20 +214,20 @@ public class MainActivity extends AppCompatActivity {
                 .processMode(ICluster.CALL_MODE_CONCURRENCY)
                 .post()
                 .timeout(9)
-                .listener(new ICallerListener() {
+                .listener(new IProceedListener() {
                     @Override
-                    public boolean onProceedExposedService(IPerformer performer, IDataCarrier data, IPCSession session, String messengerProxyId) {
+                    public boolean onProceed(IPerformer performer, IDataCarrier data, IPCSession session, String messengerProxyId) {
 
                         return false;
                     }
 
                     @Override
-                    public void onEndExposedServiceGroup(IDataCarrier outputData) {
-                        Log.e("sad-jetpack","------------->并行任务执行完毕:"+outputData.data());
+                    public void onOutput(ConcurrentLinkedHashMap<String,IDataCarrier> outputData) {
+                        Log.e("sad-jetpack","------------->并行任务执行完毕:"+outputData);
                     }
 
                     @Override
-                    public void onFailureExposedServiceGroup(IDataCarrier currDataCarrier, Throwable throwable) {
+                    public void onExceptionInPerformer(Throwable throwable) {
                         Log.e("sad-jetpack","------------->并行任务执行异常:"+throwable.getMessage());
                     }
                 })
@@ -230,20 +240,20 @@ public class MainActivity extends AppCompatActivity {
                 .processMode(ICluster.CALL_MODE_SEQUENCE)
                 .post()
                 .timeout(9)
-                .listener(new ICallerListener() {
+                .listener(new IProceedListener() {
                     @Override
-                    public boolean onProceedExposedService(IPerformer performer, IDataCarrier data, IPCSession session, String messengerProxyId) {
+                    public boolean onProceed(IPerformer performer, IDataCarrier data, IPCSession session, String messengerProxyId) {
                         Log.e("sad-jetpack","------------->路过串行任务:"+messengerProxyId);
                         return false;
                     }
 
                     @Override
-                    public void onEndExposedServiceGroup(IDataCarrier outputData) {
+                    public void onOutput(IDataCarrier outputData) {
                         Log.e("sad-jetpack","------------->串行任务执行完毕:"+outputData.data());
                     }
 
                     @Override
-                    public void onFailureExposedServiceGroup(IDataCarrier currDataCarrier, Throwable throwable) {
+                    public void onExceptionInPerformer(Throwable throwable) {
                         Log.e("sad-jetpack","------------->串行任务执行异常:"+throwable.getMessage());
                     }
                 })

@@ -19,6 +19,15 @@ public class DataCarrierImpl implements IDataCarrier,IDataCarrier.Creator {
     public static IDataCarrier.Creator newInstanceCreator(){
         return new DataCarrierImpl();
     }
+
+    @Override
+    public String toString() {
+        return "DataCarrierImpl{\n" +
+                "data=" + data +
+                ", \nstate=" + state +
+                "\n}";
+    }
+
     @Override
     public <T> T data() {
         lock.readLock().lock();

@@ -3,14 +3,13 @@ package com.sad.jetpack.architecture.componentization.api.internal;
 import com.sad.core.async.SADHandlerAssistant;
 import com.sad.core.async.SADTaskSchedulerClient;
 import com.sad.jetpack.architecture.componentization.api.DataState;
-import com.sad.jetpack.architecture.componentization.api.ICallerListener;
+import com.sad.jetpack.architecture.componentization.api.IProceedListener;
 import com.sad.jetpack.architecture.componentization.api.IDataCarrier;
 import com.sad.jetpack.architecture.componentization.api.IExposedService;
 import com.sad.jetpack.architecture.componentization.api.IPCMessenger;
 import com.sad.jetpack.architecture.componentization.api.IPCSession;
 import com.sad.jetpack.architecture.componentization.api.IPerformer;
-import com.sad.jetpack.architecture.componentization.api.impl.AbsIPCMessenger;
-import com.sad.jetpack.architecture.componentization.api.impl.DataCarrierImpl;
+import com.sad.jetpack.architecture.componentization.api.impl.DefaultIPCMessenger;
 import com.sad.jetpack.architecture.componentization.api.utils.Utils;
 
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class InternalSequencePerformer implements IPerformer {
     private LinkedHashMap<IExposedService,String> exposedServices=new LinkedHashMap<>();
-    private ICallerListener callerListener;
+    private IProceedListener callerListener;
     private long timeout=-1;
     private ScheduledFuture scheduledFuture;
     public InternalSequencePerformer(LinkedHashMap<IExposedService,String> exposedServices) {
@@ -34,13 +33,13 @@ public class InternalSequencePerformer implements IPerformer {
         this.timeout = timeout;
     }
 
-    public void setCallerListener(ICallerListener callerListener) {
+    public void setCallerListener(IProceedListener callerListener) {
         this.callerListener = callerListener;
     }
 
     private void doStartProceed(IDataCarrier inputData){
         if (callerListener!=null){
-            inputData=callerListener.onStartToProceedExposedServiceGroup(inputData);
+            inputData=callerListener.onInput(inputData);
         }
         startTimeout(timeout);
         proceed(inputData);
@@ -66,10 +65,11 @@ public class InternalSequencePerformer implements IPerformer {
     }
 
     private int index=-1;
+    //private ConcurrentLinkedHashMap<String,IDataCarrier> outputData=new ConcurrentLinkedHashMap.Builder<String,IDataCarrier>().build();
     private void proceed(IDataCarrier data){
         if (isTimeout.get()){
             if (callerListener!=null){
-                callerListener.onFailureExposedServiceGroup(data,new TimeoutException("InternalSequencePerformer's task timeout !!!"));
+                callerListener.onExceptionInPerformer(new TimeoutException("InternalSequencePerformer's task timeout !!!"));
             }
             return;
         }
@@ -77,7 +77,7 @@ public class InternalSequencePerformer implements IPerformer {
             //已执行完最后一个，调用回调结束
             if (callerListener!=null){
                 finishTimeout();
-                callerListener.onEndExposedServiceGroup(data);
+                callerListener.onOutput(data);
             }
             return;
         }
@@ -85,11 +85,11 @@ public class InternalSequencePerformer implements IPerformer {
         List<String> us=new ArrayList<>(exposedServices.values());
         IExposedService exposedService=es.get(index);
         String orgUrl=us.get(index);
-        IPCMessenger messengerProxy=new AbsIPCMessenger(Utils.encodeMessengerId(orgUrl,""+index)) {
+        IPCMessenger messengerProxy=new DefaultIPCMessenger(Utils.encodeMessengerId(orgUrl,""+index)) {
             @Override
             public boolean reply(IDataCarrier d, IPCSession session) {
                 d.creator().state(DataState.RUNNING);
-                boolean intercepted= callerListener!=null?callerListener.onProceedExposedService(InternalSequencePerformer.this,d,session,messengerId()):false;
+                boolean intercepted= callerListener!=null?callerListener.onProceed(InternalSequencePerformer.this,d,session,messengerId()):false;
                 if (!intercepted){
                     //继续执行下一个
                     index++;
@@ -119,22 +119,30 @@ public class InternalSequencePerformer implements IPerformer {
 
     @Override
     public void start(IDataCarrier data, boolean restart,long delay) {
-        if (restart){
-            index=0;
+        try {
+            if (restart){
+                index=0;
+            }
+            else {
+                index++;
+            }
+            if (delay>0){
+                SADHandlerAssistant.runOnUIThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        doStartProceed(data);
+                    }
+                },delay);
+            }
+            else {
+                doStartProceed(data);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            if (callerListener!=null){
+                callerListener.onExceptionInPerformer(e);
+            }
         }
-        else {
-            index++;
-        }
-        if (delay>0){
-            SADHandlerAssistant.runOnUIThread(new Runnable() {
-                @Override
-                public void run() {
-                    doStartProceed(data);
-                }
-            },delay);
-        }
-        else {
-            doStartProceed(data);
-        }
+
     }
 }

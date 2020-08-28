@@ -1,17 +1,14 @@
 package com.sad.jetpack.architecture.componentization.api.internal;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.HasDefaultViewModelProviderFactory;
 
-import com.sad.jetpack.architecture.componentization.api.ICallerListener;
+import com.sad.jetpack.architecture.componentization.api.IProceedListener;
 import com.sad.jetpack.architecture.componentization.api.ICluster;
 import com.sad.jetpack.architecture.componentization.api.IExposedService;
 import com.sad.jetpack.architecture.componentization.api.IProcessor;
 import com.sad.jetpack.architecture.componentization.api.IPerformer;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 public class InternalProcessor implements IProcessor {
 
@@ -19,7 +16,7 @@ public class InternalProcessor implements IProcessor {
     private LinkedHashMap<IExposedService,String> exposedServices=new LinkedHashMap<>();
     private int processMode = ICluster.CALL_MODE_SEQUENCE;
     private long timeout=-1;
-    private ICallerListener callerListener;
+    private IProceedListener callerListener;
     public InternalProcessor(int processMode) {
         this.processMode = processMode;
     }
@@ -74,7 +71,7 @@ public class InternalProcessor implements IProcessor {
     }
 
     @Override
-    public IProcessor listener(ICallerListener callerListener) {
+    public IProcessor listener(IProceedListener callerListener) {
         this.callerListener=callerListener;
         return this;
     }
