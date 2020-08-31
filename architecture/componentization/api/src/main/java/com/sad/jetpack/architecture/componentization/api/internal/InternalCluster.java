@@ -4,7 +4,6 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
-import com.sad.jetpack.architecture.componentization.api.ExposedServiceInstanceStorageManager;
 import com.sad.jetpack.architecture.componentization.api.ExposedServiceRelationMappingEntity;
 import com.sad.jetpack.architecture.componentization.api.ICluster;
 import com.sad.jetpack.architecture.componentization.api.IExposedService;
@@ -18,7 +17,6 @@ import com.sad.jetpack.architecture.componentization.api.impl.DefaultInstanceUse
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +27,7 @@ public class InternalCluster implements ICluster {
     private Map<String, List<IExposedServiceInstanceConstructorParameters>> constructorParameters=new LinkedHashMap<>();
     private List<String> excludeUrls=new ArrayList<>();
     private LinkedHashMap<IExposedService,String> extraExposedService=new LinkedHashMap<>();
-    private int processMode=ICluster.CALL_MODE_SEQUENCE;
+
     private IExposedServiceInstancesFactory instancesFactory;
 
     public InternalCluster(IExposedServiceGroupRepository repository) {
@@ -81,24 +79,20 @@ public class InternalCluster implements ICluster {
 
     @Override
     public IProcessor call() {
-        return processorAs(new DefaultInstanceUseAsCaller(repository,extraExposedService,excludeUrls,constructorParameters));
+        return proceedAs(new DefaultInstanceUseAsCaller(repository,extraExposedService,excludeUrls,constructorParameters));
     }
 
     @Override
     public IProcessor post() {
-        return processorAs(new DefaultInstanceUseAsPoster(repository,extraExposedService,excludeUrls));
+        return proceedAs(new DefaultInstanceUseAsPoster(repository,extraExposedService,excludeUrls));
     }
 
-    @Override
-    public ICluster processMode(int processMode) {
-        this.processMode=processMode;
-        return this;
-    }
+
 
     @Override
-    public IProcessor processorAs(IExposedServiceInstancesFactory factory) {
+    public IProcessor proceedAs(IExposedServiceInstancesFactory factory) {
         this.instancesFactory=factory;
-        InternalProcessor processor=new InternalProcessor(processMode);
+        InternalProcessor processor=new InternalProcessor();
         processor.setExposedServices(this.instancesFactory.exposedServiceInstances());
         processor.setExtraObjects(this.instancesFactory.extraObjectInstances());
         return processor;

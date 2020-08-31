@@ -10,20 +10,7 @@ import java.lang.annotation.Target;
 
 public interface ICluster {
 
-    int CALL_MODE_CONCURRENCY=1;
-    int CALL_MODE_SEQUENCE=2;
-    int CALL_MODE_CUSTOMER=4;
-    @IntDef({
-            CALL_MODE_CONCURRENCY,
-            CALL_MODE_SEQUENCE,
-            CALL_MODE_CUSTOMER
-            })
-    @Target({
-            ElementType.PARAMETER,
-            ElementType.FIELD,
-    }) //表示注解作用范围，参数注解，成员注解，方法注解
-    @Retention(RetentionPolicy.SOURCE) //表示注解所存活的时间,在运行时,而不会存在 .class 文件中
-    @interface CallMode{}
+
 
     IExposedServiceGroupRepository repository();
 
@@ -39,8 +26,6 @@ public interface ICluster {
 
     IProcessor post();
 
-    ICluster processMode(@CallMode int processMode);
-
-    IProcessor processorAs(IExposedServiceInstancesFactory factory);
+    IProcessor proceedAs(IExposedServiceInstancesFactory factory);
 
 }

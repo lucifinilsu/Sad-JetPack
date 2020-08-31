@@ -15,7 +15,7 @@ import com.sad.jetpack.architecture.componentization.api.IPCSession;
 import com.sad.jetpack.architecture.componentization.api.impl.DataCarrierImpl;
 
 @ExposedService(url = "test://group/c/s/1")
-public class C_S_1 implements IExposedService, LifecycleOwner {
+public class C_S_1 implements IExposedService, LifecycleOwner,IPCSession{
     @Override
     public <T> T action(IPCMessenger messenger) {
         Log.e("sad-jetpack","------------->并行同步任务1");
@@ -58,5 +58,11 @@ public class C_S_1 implements IExposedService, LifecycleOwner {
                 return null;
             }
         };
+    }
+
+    @Override
+    public boolean componentChat(IDataCarrier o, IPCMessenger messenger) {
+
+        return false;
     }
 }

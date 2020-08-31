@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.sad.jetpack.architecture.componentization.api.IProcessor.*;
+
 public class MainActivity extends AppCompatActivity {
     @IPCChat(url = {"test://ipc/chat/ttt","test://ipc/chat/sss"},priority = 996)
     public void onTestIPCChat(IPCMessenger messenger){
@@ -155,8 +157,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onExposedServiceGroupRepositoryFoundSuccess(ICluster cluster) {
                         cluster
-                                .processMode(ICluster.CALL_MODE_SEQUENCE)
                                 .call()
+                                .proceedMode(PROCEED_MODE_SEQUENCE)
                                 .timeout(15)
                                 .listener(new IProceedListener() {
                                     @Override
@@ -195,8 +197,8 @@ public class MainActivity extends AppCompatActivity {
     private void testConcurrency(){
         SCore.getManager()
                 .cluster("test://group/c/")
-                .processMode(ICluster.CALL_MODE_CONCURRENCY)
                 .call()
+                .proceedMode(PROCEED_MODE_CONCURRENCY)
                 .timeout(15)
                 .listener(new IProceedListener() {
                     @Override
@@ -216,8 +218,8 @@ public class MainActivity extends AppCompatActivity {
     private void testPostConcurrency(){
         SCore.getManager()
                 .cluster("test://ipc/chat")
-                .processMode(ICluster.CALL_MODE_CONCURRENCY)
                 .post()
+                .proceedMode(PROCEED_MODE_CONCURRENCY)
                 .timeout(9)
                 .listener(new IProceedListener() {
                     @Override
@@ -242,8 +244,8 @@ public class MainActivity extends AppCompatActivity {
     private void testPostSequence(){
         SCore.getManager()
                 .cluster("test://ipc/chat")
-                .processMode(ICluster.CALL_MODE_SEQUENCE)
                 .post()
+                .proceedMode(PROCEED_MODE_SEQUENCE)
                 .timeout(9)
                 .listener(new IProceedListener() {
                     @Override
