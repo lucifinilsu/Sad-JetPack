@@ -3,29 +3,27 @@ package com.sad.jetpack.architecture.componentization.api.internal;
 import androidx.annotation.NonNull;
 
 import com.sad.jetpack.architecture.componentization.api.IProceedListener;
-import com.sad.jetpack.architecture.componentization.api.ICluster;
 import com.sad.jetpack.architecture.componentization.api.IExposedService;
-import com.sad.jetpack.architecture.componentization.api.IProcessor;
+import com.sad.jetpack.architecture.componentization.api.ILocalProcessor;
 import com.sad.jetpack.architecture.componentization.api.IPerformer;
 
 import java.util.LinkedHashMap;
 
-public class InternalProcessor implements IProcessor {
+public class InternalLocalProcessor implements ILocalProcessor<InternalLocalProcessor> {
 
     private LinkedHashMap<Object,String> extraObjects=new LinkedHashMap<>();
     private LinkedHashMap<IExposedService,String> exposedServices=new LinkedHashMap<>();
-    private int proceedMode = IProcessor.PROCEED_MODE_SEQUENCE;
+    private int proceedMode = ILocalProcessor.PROCEED_MODE_SEQUENCE;
     private long timeout=-1;
     private IProceedListener callerListener;
-    public InternalProcessor(){}
-    public InternalProcessor(LinkedHashMap<Object,String> extraObjects, LinkedHashMap<IExposedService,String> exposedServices) {
+    public InternalLocalProcessor(){}
+    public InternalLocalProcessor(LinkedHashMap<Object,String> extraObjects, LinkedHashMap<IExposedService,String> exposedServices) {
         this.extraObjects = extraObjects;
         this.exposedServices = exposedServices;
-        this.proceedMode = proceedMode;
     }
 
     @Override
-    public IProcessor proceedMode(int processMode) {
+    public InternalLocalProcessor proceedMode(int processMode) {
         this.proceedMode=processMode;
         return this;
     }
@@ -48,22 +46,22 @@ public class InternalProcessor implements IProcessor {
     }
 
     @Override
-    public IProcessor timeout(long timeout) {
+    public InternalLocalProcessor timeout(long timeout) {
         this.timeout=timeout;
         return this;
     }
 
     @Override
     public @NonNull IPerformer submit() {
-        if (proceedMode == IProcessor.PROCEED_MODE_SEQUENCE){
+        if (proceedMode == ILocalProcessor.PROCEED_MODE_SEQUENCE){
             InternalSequencePerformer performer= new InternalSequencePerformer(exposedServices);
-            performer.setCallerListener(callerListener);
+            performer.setProceedListener(callerListener);
             performer.setTimeout(timeout);
             return performer;
         }
-        else if (proceedMode ==IProcessor.PROCEED_MODE_CONCURRENCY){
+        else if (proceedMode == ILocalProcessor.PROCEED_MODE_CONCURRENCY){
             InternalConcurrencyPerformer performer=new InternalConcurrencyPerformer(exposedServices);
-            performer.setCallerListener(callerListener);
+            performer.setProceedListener(callerListener);
             performer.setTimeout(timeout);
             return performer;
         }
@@ -71,7 +69,7 @@ public class InternalProcessor implements IProcessor {
     }
 
     @Override
-    public IProcessor listener(IProceedListener callerListener) {
+    public InternalLocalProcessor listener(IProceedListener callerListener) {
         this.callerListener=callerListener;
         return this;
     }

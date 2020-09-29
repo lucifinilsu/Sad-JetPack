@@ -1,5 +1,7 @@
 package com.sad.jetpack.architecture.componentization.api;
 
+import android.content.Context;
+
 import com.sad.jetpack.architecture.componentization.annotation.EncryptUtil;
 import com.sad.jetpack.architecture.componentization.annotation.IPCChat;
 import com.sad.jetpack.architecture.componentization.annotation.NameUtils;
@@ -12,6 +14,11 @@ public class SCore {
 
     public static IExposedServiceManager getManager() {
         IExposedServiceManager exposedServiceManager = ExposedServiceManager.newInstance();
+        return exposedServiceManager;
+    }
+
+    public static IExposedServiceManager getManager(Context context) {
+        IExposedServiceManager exposedServiceManager = ExposedServiceManager.newInstance(context);
         return exposedServiceManager;
     }
 

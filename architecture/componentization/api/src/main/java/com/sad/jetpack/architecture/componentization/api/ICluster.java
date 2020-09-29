@@ -1,16 +1,8 @@
 package com.sad.jetpack.architecture.componentization.api;
 
-import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 public interface ICluster {
-
-
 
     IExposedServiceGroupRepository repository();
 
@@ -22,10 +14,14 @@ public interface ICluster {
 
     ICluster addExtraExposedServiceInstance(IExposedService exposedService,String orgUrl);
 
-    IProcessor call();
+    ILocalProcessor call();
 
-    IProcessor post();
+    ILocalProcessor post();
 
-    IProcessor proceedAs(IExposedServiceInstancesFactory factory);
+    ILocalProcessor proceedAs(IExposedServiceInstancesFactory factory);
+
+    IRemoteProcessor post(String processName);
+
+    IRemoteProcessor post(String appPkg, String processName);
 
 }

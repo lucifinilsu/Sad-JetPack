@@ -28,7 +28,7 @@ import java.util.concurrent.TimeoutException;
 
 public class InternalConcurrencyPerformer implements IPerformer {
     private LinkedHashMap<IExposedService,String> exposedServices=new LinkedHashMap<>();
-    private IProceedListener callerListener;
+    private IProceedListener proceedListener;
     private long timeout=-1;
     public InternalConcurrencyPerformer(LinkedHashMap<IExposedService,String> exposedServices) {
         this.exposedServices = exposedServices;
@@ -38,8 +38,8 @@ public class InternalConcurrencyPerformer implements IPerformer {
         this.timeout = timeout;
     }
 
-    public void setCallerListener(IProceedListener callerListener) {
-        this.callerListener = callerListener;
+    public void setProceedListener(IProceedListener proceedListener) {
+        this.proceedListener = proceedListener;
     }
 
 
@@ -59,8 +59,8 @@ public class InternalConcurrencyPerformer implements IPerformer {
             }
         }catch (Exception e){
             e.printStackTrace();
-            if (callerListener!=null){
-                callerListener.onExceptionInPerformer(e);
+            if (proceedListener !=null){
+                proceedListener.onExceptionInPerformer(e);
             }
         }
 
@@ -75,15 +75,19 @@ public class InternalConcurrencyPerformer implements IPerformer {
         ) {
             int index=es.indexOf(exposedService);
             String orgUrl=us.get(index);
-            IDataCarrier inputData= DataCarrierImpl.newInstanceCreator().data(orgInputData.data()).state(DataState.RUNNING).create();
+            Object dd=orgInputData==null?null:orgInputData.data();
+            IDataCarrier inputData= DataCarrierImpl.newInstanceCreator().data(dd).state(DataState.RUNNING).create();
             exposedService.action(new DefaultIPCMessenger(Utils.encodeMessengerId(orgUrl,""+index)) {
 
                 @Override
                 public boolean reply(IDataCarrier d, IPCSession session) {
-                    outPut.put(messengerId(),d.creator().state(DataState.DONE).create());
+                    if (d!=null){
+                        d=d.creator().state(DataState.DONE).create();
+                    }
+                    outPut.put(messengerId(),d);
                     countDownLatch.countDown();
-                    if (callerListener!=null){
-                        callerListener.onProceed(InternalConcurrencyPerformer.this,d,session,messengerId());
+                    if (proceedListener !=null){
+                        proceedListener.onProceed(d,session,messengerId());
                     }
                     return false;
                 }
@@ -93,15 +97,15 @@ public class InternalConcurrencyPerformer implements IPerformer {
             @Override
             public void onSuccess(ConcurrentLinkedHashMap<String,IDataCarrier> outputData) {
 
-                if (callerListener!=null){
-                    callerListener.onOutput(outputData);
+                if (proceedListener !=null){
+                    proceedListener.onOutput(outputData);
                 }
             }
 
             @Override
             public void onFail(Throwable throwable) {
-                if (callerListener!=null){
-                    callerListener.onExceptionInPerformer(throwable);
+                if (proceedListener !=null){
+                    proceedListener.onExceptionInPerformer(throwable);
                 }
             }
 
@@ -125,8 +129,8 @@ public class InternalConcurrencyPerformer implements IPerformer {
         });
     }
     private void doStartProceed(IDataCarrier data){
-        if (callerListener!=null){
-            data=callerListener.onInput(data);
+        if (proceedListener !=null){
+            data= proceedListener.onInput(data);
         }
         proceed(data);
     }

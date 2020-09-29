@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class InternalSequencePerformer implements IPerformer {
     private LinkedHashMap<IExposedService,String> exposedServices=new LinkedHashMap<>();
-    private IProceedListener callerListener;
+    private IProceedListener proceedListener;
     private long timeout=-1;
     private ScheduledFuture scheduledFuture;
     public InternalSequencePerformer(LinkedHashMap<IExposedService,String> exposedServices) {
@@ -33,13 +33,13 @@ public class InternalSequencePerformer implements IPerformer {
         this.timeout = timeout;
     }
 
-    public void setCallerListener(IProceedListener callerListener) {
-        this.callerListener = callerListener;
+    public void setProceedListener(IProceedListener proceedListener) {
+        this.proceedListener = proceedListener;
     }
 
     private void doStartProceed(IDataCarrier inputData){
-        if (callerListener!=null){
-            inputData=callerListener.onInput(inputData);
+        if (proceedListener !=null){
+            inputData= proceedListener.onInput(inputData);
         }
         startTimeout(timeout);
         proceed(inputData);
@@ -68,16 +68,16 @@ public class InternalSequencePerformer implements IPerformer {
     //private ConcurrentLinkedHashMap<String,IDataCarrier> outputData=new ConcurrentLinkedHashMap.Builder<String,IDataCarrier>().build();
     private void proceed(IDataCarrier data){
         if (isTimeout.get()){
-            if (callerListener!=null){
-                callerListener.onExceptionInPerformer(new TimeoutException("InternalSequencePerformer's task timeout !!!"));
+            if (proceedListener !=null){
+                proceedListener.onExceptionInPerformer(new TimeoutException("InternalSequencePerformer's task timeout !!!"));
             }
             return;
         }
         if (index==exposedServices.size()){
             //已执行完最后一个，调用回调结束
-            if (callerListener!=null){
+            if (proceedListener !=null){
                 finishTimeout();
-                callerListener.onOutput(data);
+                proceedListener.onOutput(data);
             }
             return;
         }
@@ -88,8 +88,10 @@ public class InternalSequencePerformer implements IPerformer {
         IPCMessenger messengerProxy=new DefaultIPCMessenger(Utils.encodeMessengerId(orgUrl,""+index)) {
             @Override
             public boolean reply(IDataCarrier d, IPCSession session) {
-                d.creator().state(DataState.RUNNING);
-                boolean intercepted= callerListener!=null?callerListener.onProceed(InternalSequencePerformer.this,d,session,messengerId()):false;
+                if (d!=null){
+                    d.creator().state(DataState.RUNNING);
+                }
+                boolean intercepted= proceedListener !=null? proceedListener.onProceed(d,session,messengerId()):false;
                 if (!intercepted){
                     //继续执行下一个
                     index++;
@@ -98,10 +100,12 @@ public class InternalSequencePerformer implements IPerformer {
                 }
                 else {
                     //外部要求中止串行，调用回调
-                    if (callerListener!=null){
+                    if (proceedListener !=null){
                         finishTimeout();
-                        d.creator().state(DataState.INTERCEPTED);
-                        callerListener.onIntercepted(InternalSequencePerformer.this,exposedService,d);
+                        if (d!=null){
+                            d.creator().state(DataState.INTERCEPTED);
+                        }
+                        proceedListener.onIntercepted(InternalSequencePerformer.this,exposedService,d);
                     }
                 }
                 return true;
@@ -109,7 +113,11 @@ public class InternalSequencePerformer implements IPerformer {
 
             @Override
             public IDataCarrier extraMessage() {
-                return data.creator().state(DataState.UNWORKED).create();
+                if (data!=null){
+                    return data.creator().state(DataState.UNWORKED).create();
+                }
+                return null;
+
             }
 
         };
@@ -139,8 +147,8 @@ public class InternalSequencePerformer implements IPerformer {
             }
         }catch (Exception e){
             e.printStackTrace();
-            if (callerListener!=null){
-                callerListener.onExceptionInPerformer(e);
+            if (proceedListener !=null){
+                proceedListener.onExceptionInPerformer(e);
             }
         }
 

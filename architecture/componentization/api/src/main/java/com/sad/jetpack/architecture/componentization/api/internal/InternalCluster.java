@@ -1,5 +1,6 @@
 package com.sad.jetpack.architecture.componentization.api.internal;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -10,7 +11,9 @@ import com.sad.jetpack.architecture.componentization.api.IExposedService;
 import com.sad.jetpack.architecture.componentization.api.IExposedServiceGroupRepository;
 import com.sad.jetpack.architecture.componentization.api.IExposedServiceInstanceConstructorParameters;
 import com.sad.jetpack.architecture.componentization.api.IExposedServiceInstancesFactory;
+import com.sad.jetpack.architecture.componentization.api.ILocalProcessor;
 import com.sad.jetpack.architecture.componentization.api.IProcessor;
+import com.sad.jetpack.architecture.componentization.api.IRemoteProcessor;
 import com.sad.jetpack.architecture.componentization.api.MapTraverseUtils;
 import com.sad.jetpack.architecture.componentization.api.impl.DefaultInstanceUseAsCaller;
 import com.sad.jetpack.architecture.componentization.api.impl.DefaultInstanceUseAsPoster;
@@ -27,11 +30,12 @@ public class InternalCluster implements ICluster {
     private Map<String, List<IExposedServiceInstanceConstructorParameters>> constructorParameters=new LinkedHashMap<>();
     private List<String> excludeUrls=new ArrayList<>();
     private LinkedHashMap<IExposedService,String> extraExposedService=new LinkedHashMap<>();
-
+    private Context context;
     private IExposedServiceInstancesFactory instancesFactory;
 
-    public InternalCluster(IExposedServiceGroupRepository repository) {
+    public InternalCluster(Context context,IExposedServiceGroupRepository repository) {
         this.repository = repository;
+        this.context=context;
     }
 
     @Override
@@ -78,25 +82,37 @@ public class InternalCluster implements ICluster {
     }
 
     @Override
-    public IProcessor call() {
+    public ILocalProcessor call() {
         return proceedAs(new DefaultInstanceUseAsCaller(repository,extraExposedService,excludeUrls,constructorParameters));
     }
 
     @Override
-    public IProcessor post() {
+    public ILocalProcessor post() {
         return proceedAs(new DefaultInstanceUseAsPoster(repository,extraExposedService,excludeUrls));
     }
 
-
-
     @Override
-    public IProcessor proceedAs(IExposedServiceInstancesFactory factory) {
+    public ILocalProcessor proceedAs(IExposedServiceInstancesFactory factory) {
         this.instancesFactory=factory;
-        InternalProcessor processor=new InternalProcessor();
+        InternalLocalProcessor processor=new InternalLocalProcessor();
         processor.setExposedServices(this.instancesFactory.exposedServiceInstances());
         processor.setExtraObjects(this.instancesFactory.extraObjectInstances());
         return processor;
     }
+
+    @Override
+    public IRemoteProcessor post(String processName) {
+
+        return null;
+    }
+
+    @Override
+    public IRemoteProcessor post(String appPkg, String processName) {
+        return null;
+    }
+
+
+
 
 
 }

@@ -10,12 +10,15 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.sad.jetpack.architecture.componentization.api.remote.IPCWorkBenchImpl;
+
 public class InternalContextInitializerProvider extends ContentProvider {
     @SuppressLint("StaticFieldLeak")
     protected static Context mContext;
     @Override
     public boolean onCreate() {
         mContext = getContext();
+        IPCWorkBenchImpl.registerCurrProcessClientMessenger(getContext());
         return false;
     }
 

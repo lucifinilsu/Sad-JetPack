@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.sad.jetpack.architecture.componentization.api.IProcessor.*;
+import static com.sad.jetpack.architecture.componentization.api.ILocalProcessor.*;
 
 public class MainActivity extends AppCompatActivity {
     @IPCChat(url = {"test://ipc/chat/ttt","test://ipc/chat/sss"},priority = 996)
@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
                                     }
 
                                     @Override
-                                    public boolean onProceed(IPerformer performer, IDataCarrier data, IPCSession session, String messengerProxyId) {
+                                    public boolean onProceed(IDataCarrier data, IPCSession session, String messengerProxyId) {
                                         return false;
                                     }
 
@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
                 .timeout(9)
                 .listener(new IProceedListener() {
                     @Override
-                    public boolean onProceed(IPerformer performer, IDataCarrier data, IPCSession session, String messengerProxyId) {
+                    public boolean onProceed( IDataCarrier data, IPCSession session, String messengerProxyId) {
 
                         return false;
                     }
@@ -249,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
                 .timeout(9)
                 .listener(new IProceedListener() {
                     @Override
-                    public boolean onProceed(IPerformer performer, IDataCarrier data, IPCSession session, String messengerProxyId) {
+                    public boolean onProceed(IDataCarrier data, IPCSession session, String messengerProxyId) {
                         Log.e("sad-jetpack","------------->路过串行任务:"+messengerProxyId);
                         return false;
                     }

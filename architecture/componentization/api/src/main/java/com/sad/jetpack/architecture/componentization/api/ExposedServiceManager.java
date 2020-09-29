@@ -1,5 +1,6 @@
 package com.sad.jetpack.architecture.componentization.api;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import com.sad.core.async.ISADTaskProccessListener;
@@ -14,11 +15,15 @@ import com.sad.jetpack.architecture.componentization.api.internal.InternalExpose
 import java.util.LinkedHashMap;
 
 public final class ExposedServiceManager implements IExposedServiceManager,IExposedServiceManagerAsync{
-
-    private ExposedServiceManager(){}
-
+    private Context context;
+    private ExposedServiceManager(Context context){this.context=context;}
+    private ExposedServiceManager(){this.context=this.context;}
     public static IExposedServiceManager newInstance(){
         return new ExposedServiceManager();
+    }
+
+    public static IExposedServiceManager newInstance(Context context){
+        return new ExposedServiceManager(context);
     }
 
     private IExposedServiceEntityGroupFactory entityGroupFactory;
@@ -27,7 +32,7 @@ public final class ExposedServiceManager implements IExposedServiceManager,IExpo
     @Override
     public ICluster cluster(String url){
         IExposedServiceGroupRepository repository=repository(url);
-        return new InternalCluster(repository);
+        return new InternalCluster(this.context,repository);
     }
 
     @Override
@@ -48,13 +53,13 @@ public final class ExposedServiceManager implements IExposedServiceManager,IExpo
     @Override
     public void repository(String url, OnExposedServiceGroupRepositoryFoundListener repositoryFoundListener) {
         if (entityGroupFactory==null){
-            entityGroupFactory=new DefaultExposedServiceEntityGroupFactory(InternalContextHolder.get().getContext());
+            entityGroupFactory=new DefaultExposedServiceEntityGroupFactory(this.context);
         }
         SADTaskSchedulerClient.newInstance().execute(new SADTaskRunnable<IExposedServiceGroupRepository>("GET_IExposedServiceGroupRepository", new ISADTaskProccessListener<IExposedServiceGroupRepository>() {
             @Override
             public void onSuccess(IExposedServiceGroupRepository result) {
                 if (repositoryFoundListener!=null){
-                    repositoryFoundListener.onExposedServiceGroupRepositoryFoundSuccess(new InternalCluster(result));
+                    repositoryFoundListener.onExposedServiceGroupRepositoryFoundSuccess(new InternalCluster(ExposedServiceManager.this.context,result));
                 }
             }
 
@@ -73,7 +78,7 @@ public final class ExposedServiceManager implements IExposedServiceManager,IExpo
             @Override
             public IExposedServiceGroupRepository doInBackground() throws Exception {
                 return repository(url);
-                //return new InternalExposedServiceGroupRepository(InternalContextHolder.get().getContext(),url,entityGroupFactory.getEntityGroupByUrl(url,onExposedServiceRelationMappingEntityFoundListener));
+                //return new InternalExposedServiceGroupRepository(this.context,url,entityGroupFactory.getEntityGroupByUrl(url,onExposedServiceRelationMappingEntityFoundListener));
             }
 
         });
@@ -83,9 +88,9 @@ public final class ExposedServiceManager implements IExposedServiceManager,IExpo
 
     private IExposedServiceGroupRepository repository(String url) {
         if (entityGroupFactory==null){
-            entityGroupFactory=new DefaultExposedServiceEntityGroupFactory(InternalContextHolder.get().getContext());
+            entityGroupFactory=new DefaultExposedServiceEntityGroupFactory(this.context);
         }
-        return new InternalExposedServiceGroupRepository(InternalContextHolder.get().getContext(),url,entityGroupFactory.getEntityGroupByUrl(url,this.onExposedServiceRelationMappingEntityFoundListener));
+        return new InternalExposedServiceGroupRepository(this.context,url,entityGroupFactory.getEntityGroupByUrl(url,this.onExposedServiceRelationMappingEntityFoundListener));
     }
     @Override
     public ExposedServiceRelationMappingEntity getFirstEntity(String url) throws Exception{
@@ -115,14 +120,14 @@ public final class ExposedServiceManager implements IExposedServiceManager,IExpo
 
     /*public IExposedServiceGroupRepository get(String url){
         if (entityGroupFactory==null){
-            entityGroupFactory=new DefaultExposedServiceEntityGroupFactory(InternalContextHolder.get().getContext());
+            entityGroupFactory=new DefaultExposedServiceEntityGroupFactory(this.context);
         }
         if (serviceClassFactory==null){
             serviceClassFactory=new DefaultExposedServiceClassFactory();
         }
         LinkedHashMap<String, ExposedServiceRelationMappingEntity> entityGroup=entityGroupFactory.getEntityGroup(url);
         Log.e("sad-jetpack",">>>>开始生成Repository："+url+",准备实体组："+entityGroup);
-        IExposedServiceGroupRepository repository=new InternalExposedServiceGroupRepository(InternalContextHolder.get().getContext(),serviceClassFactory,entityGroup);
+        IExposedServiceGroupRepository repository=new InternalExposedServiceGroupRepository(this.context,serviceClassFactory,entityGroup);
         return repository;
     }
     public static IExposedServiceInstanceConstructor getFirst(String url) throws Exception{
