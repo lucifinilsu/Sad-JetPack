@@ -4,6 +4,6 @@ import java.util.Map;
 
 public interface IComponentRepositoryFactory {
 
-    IComponentRepository from(String url, Map<String,IConstructor> constructors);
+    IComponentRepository from(String url,IConstructor allConstructor,Map<String,IConstructor> constructors, IComponentInitializeListener listener);
 
 }

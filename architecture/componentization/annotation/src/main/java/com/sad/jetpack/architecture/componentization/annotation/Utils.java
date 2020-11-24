@@ -26,7 +26,7 @@ public class Utils {
                 + "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?)$";
         return str.matches(regex);*/
     }
-
+    @Deprecated
     public static List<String> ermPaths(String url){
         List<String> elist=new ArrayList<>();
         URI uri=URI.create(url);
@@ -37,6 +37,20 @@ public class Utils {
                 //.append(InternalContextHolder.get().getContext().getPackageName())
                 .append(path.replace("/",File.separator));
         String e=ermPath.toString();
+        elist.add(e);
+        return elist;
+    }
+
+    public static List<String> crmPaths(String url){
+        List<String> elist=new ArrayList<>();
+        URI uri=URI.create(url);
+        String path=uri.getPath();
+        StringBuilder crmPath=new StringBuilder();
+        crmPath
+                .append("crm"/*+ File.separator*/)
+                //.append(InternalContextHolder.get().getContext().getPackageName())
+                .append(path.replace("/",File.separator));
+        String e=crmPath.toString();
         elist.add(e);
         return elist;
     }

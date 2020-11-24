@@ -6,33 +6,28 @@ public class SimpleConstructorImpl implements IConstructor {
 
     private Class[] classes;
     private Object[] objects;
-    private Class cls;
 
-    private SimpleConstructorImpl(Class cls){
-        this.cls=cls;
+    public static SimpleConstructorImpl newInstance(){
+        return new SimpleConstructorImpl();
     }
 
-    public static SimpleConstructorImpl from(Class cls){
-        return new SimpleConstructorImpl(cls);
-    }
-
-    public SimpleConstructorImpl classes(Class[] classes){
+    public SimpleConstructorImpl classes(Class... classes){
         this.classes=classes;
         return this;
     }
 
-    public SimpleConstructorImpl objects(Object[] objects){
+    public SimpleConstructorImpl objects(Object... objects){
         this.objects=objects;
         return this;
     }
 
 
     @Override
-    public <T> T instance() throws Exception {
+    public <T> T instance(Class<T> cls) throws Exception {
         try {
             Constructor<T> constructor=null;
             if ((classes==null && objects==null) || (classes.length==0 && objects.length==0)){
-                return new DefaultConstructor(cls).instance();
+                return new DefaultConstructor().instance(cls);
             }
             else {
 

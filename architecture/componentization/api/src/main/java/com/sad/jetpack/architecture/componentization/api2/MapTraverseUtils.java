@@ -11,7 +11,7 @@ public class MapTraverseUtils {
     public static interface ITraverseAction<K,V>{
         void onTraversed(K k, V v);
     }
-    public static  <K,V> void traverseGroup(LinkedHashMap<K,V> map, ITraverseAction<K,V>... actions){
+    public static  <K,V> void traverseGroup(Map<K,V> map, ITraverseAction<K,V>... actions){
         if (!ObjectUtils.isEmpty(map)){
             Iterator<Map.Entry<K, V>> iterator=map.entrySet().iterator();
             while (iterator.hasNext()){

@@ -34,7 +34,7 @@ public class SCore {
                 for (String url : urls
                 ) {
                     String proxyUrlEncrypt = EncryptUtil.getInstance().XORencode(url, "abc123");//ValidUtils.encryptMD5ToString(url);
-                    String dynamicExposedServiceClsName = NameUtils.getDynamicComponentClassSimpleName(hostClsName + "." + method.getName(), proxyUrlEncrypt, "$$");
+                    String dynamicExposedServiceClsName = NameUtils.getParasiticComponentClassSimpleName(hostClsName + "." + method.getName(), proxyUrlEncrypt, "$$");
                     //生成实例对象
                     try {
                         String className = cls.getPackage().getName() + "." + dynamicExposedServiceClsName;

@@ -15,7 +15,5 @@ public @interface Component {
 
     String description() default "";
 
-    boolean asyncWorker() default false;
-
     int version() default 1;
 }

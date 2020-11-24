@@ -10,6 +10,7 @@ public class ComponentClassInfo implements Parcelable {
     private String className="";
     private String description="";
     private int version=1;
+    public ComponentClassInfo(){}
 
     protected ComponentClassInfo(Parcel in) {
         url = in.readString();

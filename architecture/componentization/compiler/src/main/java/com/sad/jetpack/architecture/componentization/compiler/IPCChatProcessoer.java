@@ -69,17 +69,17 @@ public class IPCChatProcessoer extends AbsProcessor {
 
                 IPCChat annotation_eventResponse=e_method.getAnnotation(IPCChat.class);
                 TypeElement e_class= (TypeElement) e_method.getEnclosingElement();
-                generateNewAbstractDynamicComponent(annotation_eventResponse,executable_e_method,e_class);
+                generateNewAbstractParasiticComponent(annotation_eventResponse,executable_e_method,e_class);
             }
         }
         return false;
     }
 
-    private void generateNewAbstractDynamicComponent(IPCChat annotation_eventResponse,ExecutableElement executable_e_method,TypeElement e_class){
+    private void generateNewAbstractParasiticComponent(IPCChat annotation_eventResponse,ExecutableElement executable_e_method,TypeElement e_class){
         for (String e_name:annotation_eventResponse.url()
              ) {
             String u_name= EncryptUtil.getInstance().XORencode(e_name,"abc123");//ValidUtils.encryptMD5ToString(e_name);
-            String dynamicComponentClsName= NameUtils.getDynamicComponentClassSimpleName(e_class.getQualifiedName().toString()+"."+executable_e_method.getSimpleName(),u_name,"$$");
+            String dynamicComponentClsName= NameUtils.getParasiticComponentClassSimpleName(e_class.getQualifiedName().toString()+"."+executable_e_method.getSimpleName(),u_name,"$$");
             String pkgName=elementUtils.getPackageOf(e_class).getQualifiedName().toString();
             List<? extends VariableElement> listParams=executable_e_method.getParameters();
             boolean isHasReturnData=false;

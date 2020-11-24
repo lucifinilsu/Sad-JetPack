@@ -3,12 +3,12 @@
     <application>
         <!-- 全局Context提供者、无侵入式App初始化类 -->
         <provider
-            android:name=".InternalContextInitializerProvider"
+            android:name="com.sad.jetpack.architecture.componentization.api2.InternalContextInitializerProvider"
             android:authorities="${applicationId}.sad.jetpack.architecture.componentization.api.contextprovider"
             android:exported="true" />
 
         <service
-            android:name=".remote.AppIPCService"
+            android:name="com.sad.jetpack.architecture.componentization.api2.AppIPCService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

@@ -16,7 +16,7 @@ import com.sad.jetpack.architecture.componentization.api.IExposedService;
 import com.sad.jetpack.architecture.componentization.api.IPCSession;
 import com.sad.jetpack.architecture.componentization.api.IPerformer;
 import com.sad.jetpack.architecture.componentization.api.IProceedListener;
-import com.sad.jetpack.architecture.componentization.api.IProcessor;
+import com.sad.jetpack.architecture.componentization.api.IComponentProcessor;
 import com.sad.jetpack.architecture.componentization.api.SCore;
 import com.sad.jetpack.architecture.componentization.api.impl.DataCarrierImpl;
 import com.sad.jetpack.architecture.componentization.api.remote.IPCWorkBenchImpl;
@@ -34,7 +34,7 @@ public class ProcessResponseHandler extends Handler {
         IDataCarrier dataCarrier= DataCarrierImpl.newInstanceCreator().data(bundle).create();//bundle.getParcelable(CommonConstant.REMOTE_BUNDLE_PARAMETERS_DATACARRIER);
         long timeout=bundle.getLong(CommonConstant.REMOTE_BUNDLE_PARAMETERS_TIMEOUT,3000);
         String orgUrl=bundle.getString(CommonConstant.REMOTE_BUNDLE_PARAMETERS_ORGURL);
-        int proceedMode=bundle.getInt(CommonConstant.REMOTE_BUNDLE_PARAMETERS_PROCEED_MODE,IProcessor.PROCEED_MODE_SEQUENCE);
+        int proceedMode=bundle.getInt(CommonConstant.REMOTE_BUNDLE_PARAMETERS_PROCEED_MODE, IComponentProcessor.PROCEED_MODE_SEQUENCE);
         bundle.putString(CommonConstant.REMOTE_BUNDLE_PARAMETERS_FROM_APP,bundle.getString(CommonConstant.REMOTE_BUNDLE_PARAMETERS_TO_APP));
         bundle.putString(CommonConstant.REMOTE_BUNDLE_PARAMETERS_FROM_PROCESS, bundle.getString(CommonConstant.REMOTE_BUNDLE_PARAMETERS_TO_PROCESS));
         bundle.putString(CommonConstant.REMOTE_BUNDLE_PARAMETERS_TO_APP,bundle.getString(CommonConstant.REMOTE_BUNDLE_PARAMETERS_FROM_APP));

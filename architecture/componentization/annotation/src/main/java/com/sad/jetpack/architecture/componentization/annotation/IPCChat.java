@@ -15,6 +15,8 @@ public @interface IPCChat {
 
     String description() default "";
 
-    int priority() default 0;
+    int[] priority() default {0};
+
+    int version() default 0;
 
 }

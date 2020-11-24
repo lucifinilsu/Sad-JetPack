@@ -4,9 +4,23 @@ import java.util.LinkedHashMap;
 
 public interface IComponentRepository {
 
+    String url();
+
     LinkedHashMap<Object,String> objectInstances();
 
     LinkedHashMap<IComponent,String> componentInstances();
+
+    default <T> T firstInstance(){
+        Object o=firstObjectInstance();
+        if (o!=null){
+            return (T) o;
+        }
+        IComponent c=firstComponentInstance();
+        if (c!=null){
+            return (T) c;
+        }
+        return null;
+    }
 
     default IComponent firstComponentInstance(){
         LinkedHashMap<IComponent,String> instances= componentInstances();

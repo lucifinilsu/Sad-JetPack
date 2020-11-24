@@ -145,7 +145,7 @@ public class ComponentsFactoryProcessor extends AbsProcessor{
             StringBuilder sbCRM=new StringBuilder();
             sbCRM.append(rootPath+ File.separator)
                     .append(assetsDir)
-                    .append(ERM_DIR);
+                    .append(CRM_DIR);
             File f=new File(sbCRM.toString());
             if (f.exists()){
                 org.apache.commons.io.FileUtils.deleteDirectory(f);
@@ -166,7 +166,7 @@ public class ComponentsFactoryProcessor extends AbsProcessor{
             StringBuilder sbApath=new StringBuilder();
             StringBuilder crmPath=new StringBuilder();
             crmPath
-                    .append(ERM_DIR/*+File.separator*/)
+                    .append(CRM_DIR/*+File.separator*/)
                     //.append(packageName)
                     .append(path.replace("/",File.separator));
             sbApath
@@ -280,7 +280,7 @@ public class ComponentsFactoryProcessor extends AbsProcessor{
         }
     }
 
-    private final static String ERM_DIR="erm";
+    private final static String CRM_DIR ="crm";
 
 
     /*private final static String dir="";

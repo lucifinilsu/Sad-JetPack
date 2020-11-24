@@ -8,7 +8,7 @@ import java.lang.annotation.Annotation;
 
 public interface IComponent extends Comparable<IComponent>{
 
-    IFuture call(Message message);
+    <T> T onCall(Message message, IPCMessageSender replySender);
 
 
     default String[] urls(){
@@ -58,7 +58,7 @@ public interface IComponent extends Comparable<IComponent>{
         return o.priority()-this.priority();
     }
 
-    default String instanceOrgUrl(){return "";};
+    default String instanceOrgUrl(){return urls()!=null && urls().length>0?urls()[0]:"";};
 
     default int priority(){return 0;};
 }

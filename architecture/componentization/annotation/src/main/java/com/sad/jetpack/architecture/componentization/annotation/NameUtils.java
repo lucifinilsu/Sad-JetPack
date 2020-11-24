@@ -6,8 +6,8 @@ package com.sad.jetpack.architecture.componentization.annotation;
 
 public class NameUtils {
 
-    public static String getDynamicComponentClassSimpleName(String srcCanonicalName,String componentName,String separator){
-        String prefix="DynamicIPCChatProxy";
+    public static String getParasiticComponentClassSimpleName(String srcCanonicalName,String componentName,String separator){
+        String prefix="ParasiticIPCChatProxy";
         return getNewComponentClassSimpleName(prefix,srcCanonicalName,componentName,separator);
     }
 

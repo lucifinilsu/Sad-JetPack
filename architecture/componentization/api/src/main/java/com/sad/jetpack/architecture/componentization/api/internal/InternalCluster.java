@@ -12,7 +12,6 @@ import com.sad.jetpack.architecture.componentization.api.IExposedServiceGroupRep
 import com.sad.jetpack.architecture.componentization.api.IExposedServiceInstanceConstructorParameters;
 import com.sad.jetpack.architecture.componentization.api.IExposedServiceInstancesFactory;
 import com.sad.jetpack.architecture.componentization.api.ILocalProcessor;
-import com.sad.jetpack.architecture.componentization.api.IProcessor;
 import com.sad.jetpack.architecture.componentization.api.IRemoteProcessor;
 import com.sad.jetpack.architecture.componentization.api.MapTraverseUtils;
 import com.sad.jetpack.architecture.componentization.api.impl.DefaultInstanceUseAsCaller;

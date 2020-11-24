@@ -7,7 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-public interface IProcessor<I extends IProcessor<I>> {
+public interface IComponentProcessor<I extends IComponentProcessor<I>> {
     int PROCEED_MODE_CONCURRENCY =1;
     int PROCEED_MODE_SEQUENCE =2;
     int PROCEED_MODE_CUSTOMER =4;

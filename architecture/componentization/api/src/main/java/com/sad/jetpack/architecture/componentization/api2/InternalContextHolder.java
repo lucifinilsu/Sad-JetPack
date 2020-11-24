@@ -1,10 +1,7 @@
-package com.sad.jetpack.architecture.componentization.api;
+package com.sad.jetpack.architecture.componentization.api2;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
 import android.content.Context;
-
-import java.util.LinkedHashMap;
 
 final class InternalContextHolder {
 
@@ -18,7 +15,7 @@ final class InternalContextHolder {
     /**
      * 获取实例
      */
-    public static InternalContextHolder get() {
+    protected final static InternalContextHolder get() {
         if (instance == null) {
             synchronized (InternalContextHolder.class) {
                 if (instance == null) {
@@ -36,7 +33,7 @@ final class InternalContextHolder {
     /**
      * 获取上下文
      */
-    public Context getContext() {
+    protected final Context getContext() {
         return mContext;
     }
 }

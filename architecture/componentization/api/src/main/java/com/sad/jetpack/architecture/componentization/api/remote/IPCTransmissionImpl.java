@@ -9,7 +9,7 @@ import android.os.RemoteException;
 import com.sad.jetpack.architecture.componentization.api.CommonConstant;
 import com.sad.jetpack.architecture.componentization.api.IProceedListener;
 import com.sad.jetpack.architecture.componentization.api.utils.Utils;
-
+@Deprecated
 public class IPCTransmissionImpl implements IPCTransmission {
 
     private String toApp="";

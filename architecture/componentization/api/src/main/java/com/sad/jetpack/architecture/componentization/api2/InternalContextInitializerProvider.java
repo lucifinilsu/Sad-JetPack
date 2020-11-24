@@ -1,4 +1,4 @@
-package com.sad.jetpack.architecture.componentization.api;
+package com.sad.jetpack.architecture.componentization.api2;
 
 import android.annotation.SuppressLint;
 import android.content.ContentProvider;
