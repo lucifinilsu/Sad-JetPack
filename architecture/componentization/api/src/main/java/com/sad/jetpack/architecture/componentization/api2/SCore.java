@@ -40,29 +40,35 @@ public final class SCore {
                 .firstInstance();
     }
 
-    public static IComponent getComponent(String curl){
-        return getComponent(curl,null);
+    public static IComponentCallable getComponentCallable(String curl){
+        return getComponentCallable(curl,null);
     }
-    public static IComponent getComponent(Context context,String curl){
-        return getComponent(context,curl,null);
+    public static IComponentCallable getComponentCallable(Context context, String curl){
+        return getComponentCallable(context,curl,null);
     }
-    public static IComponent getComponent(String curl,IConstructor constructor){
-        return getComponent(InternalContextHolder.get().getContext(),curl,constructor);
+    public static IComponentCallable getComponentCallable(String curl, IConstructor constructor){
+        return getComponentCallable(InternalContextHolder.get().getContext(),curl,constructor);
     }
 
-    public static IComponent getComponent(Context context,String curl,IConstructor constructor){
+    public static IComponentCallable getComponentCallable(Context context, String curl, IConstructor constructor){
         IComponentsCluster cluster=getCluster(context);
         IComponent component = cluster
                 .addConstructorToAll(constructor)
                 .repository(curl)
                 .firstComponentInstance();
-        return component;
+        return new InternalComponentSingleCallable(context,component);
     }
 
-    public static void postCurrProcessMessage(Context context,Message message,String url){
+    public static void sequencePostMessageToCurrProcess(Context context,Message message,String url,IPCComponentProcessorSession session){
         IComponentsCluster cluster=getCluster(context).componentRepositoryFactory(new ParasiticComponentRepositoryFactory(context));
         // I drive my car to working
-        ComponentProcessorBuilderImpl.newBuilder(url).asSequence().then(cluster).submit(message);
+        ComponentProcessorBuilderImpl.newBuilder(url).asSequence().processorSession(session).join(cluster.repository(url)).submit(message);
+    }
+
+    public static void concurrencyPostMessageToCurrProcess(Context context,Message message,String url,IPCComponentProcessorSession session){
+        IComponentsCluster cluster=getCluster(context).componentRepositoryFactory(new ParasiticComponentRepositoryFactory(context));
+        // I drive my car to working
+        ComponentProcessorBuilderImpl.newBuilder(url).asConcurrency().processorSession(session).join(cluster.repository(url)).submit(message);
     }
 
     public static void ipc(Context context,Message message,IPCTarget target,IPCResultCallback callback) throws Exception{

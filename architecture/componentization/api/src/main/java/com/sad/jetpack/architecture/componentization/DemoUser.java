@@ -19,9 +19,23 @@ import com.sad.jetpack.architecture.componentization.api2.SimpleConstructorImpl;
 
 public class DemoUser {
     public static void main(String[] args) {
+
+        SCore.getComponentCallable("").call(Message.obtain(),new IPCResultCallback(){
+
+            @Override
+            public void onException(IPCMessageTransmissionConfig transmissionConfig, Throwable throwable) {
+
+            }
+
+            @Override
+            public void onDone(Message msg, IPCMessageTransmissionConfig transmissionConfig) {
+
+            }
+        });
     }
 
     public static void testIPC(Context context){
+
         try {
             //1、初始化
             SCore.initIPC(context);
@@ -37,7 +51,7 @@ public class DemoUser {
             //这时可以直接执行ipc方法发送message。
             SCore.ipc(context, message, target, new IPCResultCallback() {
                 @Override
-                public void onGetMessage(Message msg) {
+                public void onDone(Message msg, IPCMessageTransmissionConfig transmissionConfig) {
 
                 }
 
@@ -53,7 +67,7 @@ public class DemoUser {
                     try {
                         SCore.ipc(context, message, target, new IPCResultCallback() {
                             @Override
-                            public void onGetMessage(Message msg) {
+                            public void onDone(Message msg, IPCMessageTransmissionConfig transmissionConfig) {
                                 Messenger reply=message.replyTo;
                                 try {
                                     messageSender.sendMessage(reply,msg,null);

@@ -55,18 +55,17 @@ public class ComponentResponseHandler extends Handler{
 
                     }
 
-
                 };
                 if (pm==IPCTarget.PROCESSOR_MODE_SEQUENCE){
                     processorBuilder.asSequence()
                             .processorSession(processorSession)
-                            .then(cluster.repository(url))
+                            .join(cluster.repository(url))
                             .submit(msg);
                 }
                 else if (pm==IPCTarget.PROCESSOR_MODE_CONCURRENCY){
                     processorBuilder.asConcurrency()
                             .processorSession(processorSession)
-                            .parallel(cluster.repository(url))
+                            .join(cluster.repository(url))
                             .submit(msg);
                 }
             }

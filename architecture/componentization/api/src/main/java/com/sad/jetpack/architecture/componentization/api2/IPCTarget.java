@@ -11,6 +11,8 @@ public interface IPCTarget extends Parcelable {
 
     int PROCESSOR_MODE_CONCURRENCY=1;
 
+    int SINGLE=-1;
+
     String toApp();
 
     String toProcess();

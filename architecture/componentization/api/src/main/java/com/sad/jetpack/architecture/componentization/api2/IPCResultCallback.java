@@ -4,6 +4,6 @@ import android.os.Message;
 
 public interface IPCResultCallback extends IPCExceptionListener{
 
-    void onGetMessage(Message msg);
+    void onDone(Message msg, IPCMessageTransmissionConfig transmissionConfig);
 
 }

@@ -93,7 +93,7 @@ public class IPCLauncherImpl implements IPCLauncher{
             }
             else {
                 if (callback!=null){
-                    callback.onGetMessage(msg);
+                    callback.onDone(msg,transmissionConfig);
                 }
             }
         }

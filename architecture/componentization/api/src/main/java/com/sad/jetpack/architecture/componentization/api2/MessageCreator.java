@@ -1,5 +1,6 @@
 package com.sad.jetpack.architecture.componentization.api2;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.Parcelable;
@@ -46,8 +47,13 @@ public class MessageCreator {
     }
 
     public static IPCMessageTransmissionConfig standardMessage(Message message,String url,long delay,long timeout,int processorMode){
+        return standardMessage(InternalContextHolder.get().getContext(),message,url,delay,timeout,processorMode);
+    }
+
+
+    public static IPCMessageTransmissionConfig standardMessage(Context context,Message message, String url, long delay, long timeout, int processorMode){
         Bundle bundle=message.getData();
-        IPCMessageTransmissionConfig transmissionConfig=IPCMessageTransmissionConfigImpl.fromCurrProcess(InternalContextHolder.get().getContext())
+        IPCMessageTransmissionConfig transmissionConfig=IPCMessageTransmissionConfigImpl.fromCurrProcess(context)
                 .destType(CommonConstant.CREATE_REMOTE_IPC_CHAT)
                 .target(IPCTargetImpl.toCurrProcess(InternalContextHolder.get().getContext())
                         .url(url)

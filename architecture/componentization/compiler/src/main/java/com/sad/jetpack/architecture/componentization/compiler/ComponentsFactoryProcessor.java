@@ -186,7 +186,7 @@ public class ComponentsFactoryProcessor extends AbsProcessor{
                     fa.createNewFile();
                     //FileUtils.createFile(fa,content);
                 }
-                org.apache.commons.io.FileUtils.write(fa,content,"UTF-8");
+                org.apache.commons.io.FileUtils.fileWrite(fa.getAbsolutePath(),content);
                 /*else {
                     FileUtils.writeToFile(fa,content);
                 }*/

@@ -43,6 +43,7 @@ import javax.tools.StandardLocation;
 @SupportedAnnotationTypes({
         Constant.PACKAGE_ANNOTATION +".ExposedService"
 })
+@Deprecated
 public class ExposedServiceFactoryProcessor extends AbsProcessor{
 
     @Override
@@ -186,7 +187,7 @@ public class ExposedServiceFactoryProcessor extends AbsProcessor{
                     fa.createNewFile();
                     //FileUtils.createFile(fa,content);
                 }
-                org.apache.commons.io.FileUtils.write(fa,content,"UTF-8");
+                org.apache.commons.io.FileUtils.fileWrite(fa.getAbsolutePath(),content);
                 /*else {
                     FileUtils.writeToFile(fa,content);
                 }*/
@@ -288,7 +289,6 @@ public class ExposedServiceFactoryProcessor extends AbsProcessor{
         String path=url.getPath();
         String name=path.substring(path.lastIndexOf('/')+1);
         String query=url.getQuery();
-
 
     }*/
 

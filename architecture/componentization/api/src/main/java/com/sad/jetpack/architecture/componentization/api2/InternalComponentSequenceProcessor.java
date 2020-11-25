@@ -130,18 +130,20 @@ final class InternalComponentSequenceProcessor implements IComponentSequenceProc
             SADHandlerAssistant.runOnUIThread(new Runnable() {
                 @Override
                 public void run() {
+                    startTimeout(timeout);
                     proceed(message,processorSession);
                 }
             },delay);
         }
         else {
+            startTimeout(timeout);
             proceed(message,processorSession);
         }
     }
 
     private void proceed(Message message,IPCComponentProcessorSession processorSession){
+
         try {
-            startTimeout(timeout);
             doProceed(message,processorSession);
         } catch (Exception e) {
             e.printStackTrace();
@@ -154,77 +156,69 @@ final class InternalComponentSequenceProcessor implements IComponentSequenceProc
     }
 
     private int index=-1;
-    public void doProceed(Message message, IPCComponentProcessorSession processorSession){
-        try {
-            if (isTimeout.get()){
-                throw new TimeoutException("the processor of the unit whose type is SEQUENCE_PROCESSOR is timeout !!!");
+    private void doProceed(Message message, IPCComponentProcessorSession processorSession) throws Exception{
+        if (isTimeout.get()){
+            throw new TimeoutException("the processor of the unit whose type is SEQUENCE_PROCESSOR is timeout !!!");
+        }
+        if (index== units.size()-1){
+            finishTimeout();
+            //最后一个
+            if (boundaryInterceptor!=null){
+                message=boundaryInterceptor.handleMessage(message);
             }
-            if (index== units.size()-1){
-                finishTimeout();
-                //最后一个
-                if (boundaryInterceptor!=null){
-                    message=boundaryInterceptor.handleMessage(message);
-                }
-                if (processorSession!=null){
-                    processorSession.onProcessorOutput(processorId,message);
-                }
-                return;
-            }
-            index++;
-            Object o= keyList.get(index+1);
-            if (o instanceof IComponent){
-                IComponent component= (IComponent)o;
-                IPCMessageTransmissionConfig transmissionConfig=MessageCreator.standardMessage(message,component.instanceOrgUrl(),delay,timeout,IPCTarget.PROCESSOR_MODE_SEQUENCE);
-                IPCLauncher launcher=IPCLauncherImpl.newInstance(InternalContextHolder.get().getContext()).transmissionConfig(transmissionConfig);
-                Messenger replyMessengerProxy=new Messenger(new ProxyHandler(this,processorSession,component.instanceOrgUrl()));
-                message.replyTo=replyMessengerProxy;
-                component.onCall(message,launcher);
-            }
-            else if (o instanceof IComponentProcessor){
-                IComponentProcessor processor= (IComponentProcessor) o;
-                IPCComponentProcessorSession processorSessionSelf=processor.processorSession();
-                IPCComponentProcessorSession processorSessionProxy=new IPCComponentProcessorSession() {
-                    @Override
-                    public void onProcessorOutput(String processorId, Message message) {
-                        if (processorSessionSelf!=null){
-                            processorSessionSelf.onProcessorOutput(processorId,message);
-                        }
-                        doProceed(message,processorSession);
-                    }
-
-                    @Override
-                    public void onProcessorOutput(ConcurrentLinkedHashMap<Message, String> messages) {
-                        if (processorSessionSelf!=null){
-                            processorSessionSelf.onProcessorOutput(messages);
-                        }
-                    }
-
-                    @Override
-                    public void onComponentChat(String curl, Message message) {
-                        if (processorSessionSelf!=null){
-                            processorSessionSelf.onComponentChat(curl,message);
-                        }
-                    }
-
-                    @Override
-                    public void onException(IPCMessageTransmissionConfig transmissionConfig,Throwable throwable) {
-                        if (processorSessionSelf!=null){
-                            processorSessionSelf.onException(transmissionConfig,throwable);
-                        }
-                        //串行环节在异常的情况下直接断路
-                        if (processorSession!=null){
-                            processorSession.onException(transmissionConfig,throwable);
-                        }
-                    }
-                };
-                processor.processorSession(processorSessionProxy).submit(message);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
             if (processorSession!=null){
-                IPCMessageTransmissionConfig transmissionConfig=MessageCreator.standardMessage(message, processorId,delay,timeout,IPCTarget.PROCESSOR_MODE_SEQUENCE);
-                processorSession.onException(transmissionConfig,e);
+                processorSession.onProcessorOutput(processorId,message);
             }
+            return;
+        }
+        index++;
+        Object o= keyList.get(index+1);
+        if (o instanceof IComponent){
+            IComponent component= (IComponent)o;
+            IPCMessageTransmissionConfig transmissionConfig=MessageCreator.standardMessage(message,component.instanceOrgUrl(),delay,timeout,IPCTarget.PROCESSOR_MODE_SEQUENCE);
+            IPCLauncher launcher=IPCLauncherImpl.newInstance(InternalContextHolder.get().getContext()).transmissionConfig(transmissionConfig);
+            Messenger replyMessengerProxy=new Messenger(new ProxyHandler(this,processorSession,component.instanceOrgUrl()));
+            message.replyTo=replyMessengerProxy;
+            component.onCall(message,launcher);
+        }
+        else if (o instanceof IComponentProcessor){
+            IComponentProcessor processor= (IComponentProcessor) o;
+            IPCComponentProcessorSession processorSessionSelf=processor.processorSession();
+            IPCComponentProcessorSession processorSessionProxy=new IPCComponentProcessorSession() {
+                @Override
+                public void onProcessorOutput(String processorId, Message message) {
+                    if (processorSessionSelf!=null){
+                        processorSessionSelf.onProcessorOutput(processorId,message);
+                    }
+                    proceed(message,processorSession);
+                }
+
+                @Override
+                public void onProcessorOutput(ConcurrentLinkedHashMap<Message, String> messages) {
+                    if (processorSessionSelf!=null){
+                        processorSessionSelf.onProcessorOutput(messages);
+                    }
+                }
+
+                @Override
+                public void onComponentChat(String curl, Message message) {
+                    if (processorSessionSelf!=null){
+                        processorSessionSelf.onComponentChat(curl,message);
+                    }
+                }
+
+                @Override
+                public void onException(IPCMessageTransmissionConfig transmissionConfig,Throwable throwable) {
+                    if (processorSessionSelf!=null){
+                        processorSessionSelf.onException(transmissionConfig,throwable);
+                    }
+                    //串行环节在异常的情况下直接断路
+                    if (processorSession!=null){
+                        processorSession.onException(transmissionConfig,throwable);
+                    }
+                }
+            };
+            processor.processorSession(processorSessionProxy).submit(message);
         }
 
 
@@ -262,7 +256,7 @@ final class InternalComponentSequenceProcessor implements IComponentSequenceProc
                 prcessorSession.onComponentChat(url,msg);
             }
             if (sequenceProcessor!=null){
-                sequenceProcessor.doProceed(msg,prcessorSession);
+                sequenceProcessor.proceed(msg,prcessorSession);
             }
         }
     }

@@ -135,6 +135,7 @@ final class InternalComponentConcurrencyProcessor implements IComponentConcurren
         }catch (Exception e){
             e.printStackTrace();
             if (processorSession!=null){
+                message.obj=e;
                 IPCMessageTransmissionConfig transmissionConfig=
                         MessageCreator.standardMessage(message, processorId,delay,timeout,IPCTarget.PROCESSOR_MODE_CONCURRENCY);
                 processorSession.onException(transmissionConfig,e);
@@ -160,7 +161,7 @@ final class InternalComponentConcurrencyProcessor implements IComponentConcurren
                 @Override
                 public void onFail(Throwable throwable) {
                     if (processorSession !=null){
-                        IPCMessageTransmissionConfig transmissionConfig=MessageCreator.standardMessage(msg, processorId,delay,timeout,IPCTarget.PROCESSOR_MODE_SEQUENCE);
+                        IPCMessageTransmissionConfig transmissionConfig=MessageCreator.standardMessage(msg, processorId,delay,timeout,IPCTarget.PROCESSOR_MODE_CONCURRENCY);
                         processorSession.onException(transmissionConfig,throwable);
                     }
                 }
