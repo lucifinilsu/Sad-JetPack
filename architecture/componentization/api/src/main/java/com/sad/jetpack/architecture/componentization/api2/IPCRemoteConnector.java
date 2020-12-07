@@ -1,6 +1,12 @@
 package com.sad.jetpack.architecture.componentization.api2;
 
+import android.os.Messenger;
+
 public interface IPCRemoteConnector {
+
+    IRequest request();
+
+    ITarget target();
 
     IPCRemoteCallListener listener();
 
@@ -8,15 +14,23 @@ public interface IPCRemoteConnector {
 
     @RemoteAction int action();
 
-    void sendRequest(IRequest request,ITarget target) throws Exception;
+    Messenger replyMessenger();
+
+    void execute() throws Exception;
 
     Builder toBuilder();
 
     interface Builder{
 
+        Builder request(IRequest request);
+
+        Builder target(ITarget target);
+
         Builder listener(IPCRemoteCallListener listener);
 
         Builder action(@RemoteAction int action);
+
+        Builder replyMessenger(Messenger replyMessenger);
 
         Builder callerConfig(ICallerConfig callerConfig);
 

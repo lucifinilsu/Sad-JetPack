@@ -2,6 +2,7 @@ package com.sad.jetpack.architecture.componentization.api2;
 
 import android.content.Context;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
@@ -29,7 +30,8 @@ public class ParasiticComponentRepositoryFactory implements InstancesRepositoryF
                 for (IComponentCallable componentCallable:componentCallables
                      ) {
                     try {
-                        Uri c_uri=Uri.parse(componentCallable.componentId());
+                        String cid=componentCallable.componentId();
+                        Uri c_uri=Uri.parse(cid);
                         String c_scheme=c_uri.getScheme();
                         String c_host=c_uri.getAuthority();
                         String c_path=c_uri.getPath();
@@ -39,7 +41,7 @@ public class ParasiticComponentRepositoryFactory implements InstancesRepositoryF
                         String host=uri.getAuthority();
                         String path=uri.getPath();
 
-                        if (c_scheme.equals(scheme) && c_host.equals(host) && c_path.startsWith(path)){
+                        if (TextUtils.isEmpty(cid) || (c_scheme.equals(scheme) && c_host.equals(host) && c_path.startsWith(path))){
                             if (componentCallableInitializeListener!=null){
                                 componentCallableInitializeListener.onComponentCallableInstanceObtained(componentCallable);
                             }

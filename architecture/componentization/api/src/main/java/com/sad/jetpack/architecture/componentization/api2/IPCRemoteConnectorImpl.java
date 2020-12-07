@@ -14,11 +14,15 @@ import androidx.annotation.NonNull;
 import java.lang.ref.WeakReference;
 
 public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConnector.Builder{
-    private static ComponentResponseHandler processResponseHandler =new ComponentResponseHandler();
-    protected final static Messenger processSingleClientMessenger=new Messenger(processResponseHandler);
+
+    private final static ComponentResponseHandler processResponseHandler =new ComponentResponseHandler();
+    private final static Messenger processSingleClientMessenger=new Messenger(processResponseHandler);
     private Context context;
+    private IRequest request;
+    private ITarget target;
     private IPCRemoteCallListener listener;
     private ICallerConfig callerConfig;
+    private Messenger replyMessenger;
     private @RemoteAction int action=RemoteAction.REMOTE_ACTION_CREATE_REMOTE_IPC_CHAT;
     protected IPCRemoteConnectorImpl(Context context){
         this.context=context;
@@ -43,6 +47,16 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
     }
 
     @Override
+    public IRequest request() {
+        return this.request;
+    }
+
+    @Override
+    public ITarget target() {
+        return this.target;
+    }
+
+    @Override
     public IPCRemoteCallListener listener() {
         return this.listener;
     }
@@ -58,13 +72,32 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
     }
 
     @Override
-    public void sendRequest(IRequest request, ITarget target) throws Exception {
+    public Messenger replyMessenger() {
+        if (action()==RemoteAction.REMOTE_ACTION_CREATE_REMOTE_IPC_CHAT){
+            return new Messenger(new RemoteCallbackHandler(request,this,target));
+        }
+        else if (action()==RemoteAction.REMOTE_ACTION_REGISTER_TO_MESSENGERS_POOL){
+            return processSingleClientMessenger;
+        }
+        else if (action()==RemoteAction.REMOTE_ACTION_CREATE_REMOTE_IPC_CUSTOMER){
+            return replyMessenger;
+        }
+        return null;
+    }
+
+    @Override
+    public void execute() throws Exception {
 
         if (target==null){
-            throw new Exception("ur ITarget is null !!!");
+            target=TargetImpl.newBuilder()
+                    .toApp(context.getPackageName())
+                    .toProcess(Utils.getCurrAppProccessName(context))
+                    .build();
+            //throw new Exception("ur ITarget is null !!!");
         }
         if (request==null){
-            throw new Exception("ur IRequest is null !!!");
+            request=RequestImpl.newInstance("EMPTY_DATA_REQUEST");
+            //throw new Exception("ur IRequest is null !!!");
         }
         if (listener!=null){
             request=listener.onRemoteCallInputRequest(request,target);
@@ -77,7 +110,7 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
         bundle.putInt(CommonConstant.REMOTE_BUNDLE_ACTION,action);
         bundle.putParcelable(CommonConstant.REMOTE_BUNDLE_CALLER_CONFIG,callerConfig);
         message.setData(bundle);
-        message.replyTo=new Messenger(new RemoteCallbackHandler(request,this,target));
+        message.replyTo=replyMessenger();
         IRequest finalRequest = request;
         connect(context, target.toApp(), new AppIPCServiceConnectionCallback() {
             @Override
@@ -105,6 +138,18 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
     }
 
     @Override
+    public Builder request(IRequest request) {
+        this.request=request;
+        return null;
+    }
+
+    @Override
+    public Builder target(ITarget target) {
+        this.target=target;
+        return this;
+    }
+
+    @Override
     public Builder listener(IPCRemoteCallListener listener) {
         this.listener=listener;
         return this;
@@ -113,6 +158,12 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
     @Override
     public Builder action(int action) {
         this.action=action;
+        return this;
+    }
+
+    @Override
+    public Builder replyMessenger(Messenger replyMessenger) {
+        this.replyMessenger=replyMessenger;
         return this;
     }
 
@@ -153,7 +204,7 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
             }
             Bundle bundle=msg.getData();
             if (bundle!=null){
-                int state= (int) msg.obj;
+                int state= msg.what;
                 if (state==RemoteActionResultState.REMOTE_ACTION_RESULT_STATE_SUCCESS){
                     if (remoteConnector!=null){
                         IResponse response=bundle.getParcelable(CommonConstant.REMOTE_BUNDLE_RESPONSE);
@@ -175,9 +226,11 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
                                     //外部调用方再次与远程组件进行通信
                                     try {
                                         finalRemoteConnector.toBuilder()
+                                                .request(request)
+                                                .target(finalTarget)
                                                 .callerConfig(callerConfig)
                                                 .build()
-                                                .sendRequest(request, finalTarget);
+                                                .execute();
                                     }catch (Exception e){
                                         e.printStackTrace();
                                     }

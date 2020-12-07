@@ -66,6 +66,25 @@ public class SCore {
         registerParasiticComponentFromHost(host,null);
     }
 
+    public static void initIPC(Context context){
+        try {
+            IPCRemoteConnectorImpl.newBuilder(context)
+                    .action(RemoteAction.REMOTE_ACTION_REGISTER_TO_MESSENGERS_POOL)
+                    .build()
+                    .execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static IPCRemoteConnector.Builder ipc(Context context){
+        return IPCRemoteConnectorImpl.newBuilder(context);
+    }
+
+    public static IPCRemoteConnector.Builder ipc(){
+        return IPCRemoteConnectorImpl.newBuilder(InternalContextHolder.get().getContext());
+    }
+
     public static <O> void registerParasiticComponentFromHost(O host, IConstructor constructor) {
         Class<?> cls = host.getClass();
         String hostClsName = cls.getCanonicalName();

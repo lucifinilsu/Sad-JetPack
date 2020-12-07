@@ -3,17 +3,17 @@ package com.sad.jetpack.architecture.componentization;
 import android.content.Context;
 import android.os.Message;
 
-import com.sad.jetpack.architecture.componentization.api.IPCMessageTransmissionConfig;
-import com.sad.jetpack.architecture.componentization.api.IPCResultCallback;
-import com.sad.jetpack.architecture.componentization.api.SCore;
 import com.sad.jetpack.architecture.componentization.api2.CallerConfigImpl;
+import com.sad.jetpack.architecture.componentization.api2.IDataContainer;
 import com.sad.jetpack.architecture.componentization.api2.IPCRemoteCallListener;
 import com.sad.jetpack.architecture.componentization.api2.IPCRemoteConnectorImpl;
+import com.sad.jetpack.architecture.componentization.api2.IRequestSession;
 import com.sad.jetpack.architecture.componentization.api2.IResponse;
-import com.sad.jetpack.architecture.componentization.api2.IResponseSession;
 import com.sad.jetpack.architecture.componentization.api2.ITarget;
+import com.sad.jetpack.architecture.componentization.api2.RemoteAction;
 import com.sad.jetpack.architecture.componentization.api2.RequestImpl;
 import com.sad.jetpack.architecture.componentization.api2.IRequest;
+import com.sad.jetpack.architecture.componentization.api2.SCore;
 import com.sad.jetpack.architecture.componentization.api2.TargetImpl;
 
 public class DemoUser {
@@ -26,12 +26,17 @@ public class DemoUser {
     }
     static void testIPC(IRequest request) throws Exception {
         Context context=null;
-        IPCRemoteConnectorImpl.newBuilder(context)
+        SCore.ipc(context)
                 .callerConfig(CallerConfigImpl.newBuilder().build())
+                .action(RemoteAction.REMOTE_ACTION_CREATE_REMOTE_IPC_CHAT)
+                .request(request)
+                .target(TargetImpl.newBuilder().toApp("xxx.xxx").toProcess("xxx.xxx:aaa").id("123").build())
                 .listener(new IPCRemoteCallListener() {
                     @Override
-                    public boolean onRemoteCallReceivedResponse(IResponse response, IResponseSession session, ITarget target) {
-                        session.postResponseData(null, session);
+                    public boolean onRemoteCallReceivedResponse(IResponse response, IRequestSession session, ITarget target) {
+                        IDataContainer dataContainer=response.dataContainer();
+                        dataContainer.getMap().put("new request","干的很好");
+                        session.replyRequestData(dataContainer);
                         return false;
                     }
 
@@ -41,12 +46,12 @@ public class DemoUser {
                     }
                 })
                 .build()
-                .sendRequest(request,TargetImpl.newBuilder().toApp("xxx.xxx").toProcess("xxx.xxx:aaa").id("123").build());
+                .execute();
     }
     static void testITarget(){
         TargetImpl.newBuilder().id("").build();
     }
-    static void testcall(){
+    /*static void testcall(){
         SCore.getComponentCallable("").call(Message.obtain(),new IPCResultCallback(){
 
             @Override
@@ -59,7 +64,7 @@ public class DemoUser {
 
             }
         });
-    }
+    }*/
 
     /*public static void testIPC(Context context){
 
