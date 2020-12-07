@@ -4,69 +4,132 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.RemoteException;
-import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
-public class ComponentResponseHandler extends Handler{
+final class ComponentResponseHandler extends Handler {
     @Override
     public void handleMessage(@NonNull Message msg) {
         super.handleMessage(msg);
         Bundle bundle=msg.getData();
         Messenger replyMessenger=msg.replyTo;
-        if (bundle!=null){
-            IPCMessageTransmissionConfig tc=bundle.getParcelable(CommonConstant.REMOTE_BUNDLE_TC);
-            IPCTarget target=tc.target();
-            String url=target.url();
-            if (!TextUtils.isEmpty(url)){
-                IComponentsCluster cluster=SCore.getCluster();
-                int pm=tc.target().prcessorMode();
-                IComponentProcessorBuilder processorBuilder=ComponentProcessorBuilderImpl.newBuilder(url)
-                        .timeout(target.timeout())
-                        .delay(target.delay())
-                        ;
-                IPCComponentProcessorSession processorSession=new IPCComponentProcessorSession() {
-                    @Override
-                    public void onException(IPCMessageTransmissionConfig transmissionConfig, Throwable throwable) {
-                        try {
-                            if (replyMessenger!=null){
-                                replyMessenger.send(MessageCreator.createThrowableMessage(msg,transmissionConfig,throwable));
-                            }
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
-                        }
-                    }
+        if (replyMessenger!=null){
+            if (bundle!=null){
+                IRequest request=bundle.getParcelable(CommonConstant.REMOTE_BUNDLE_REQUEST);
+                ICallerConfig callerConfig=bundle.getParcelable(CommonConstant.REMOTE_BUNDLE_CALLER_CONFIG);
+                ITarget target=bundle.getParcelable(CommonConstant.REMOTE_BUNDLE_TARGET);
+                int action=bundle.getInt(CommonConstant.REMOTE_BUNDLE_ACTION);
+                int processorMode=target.processorMode();
+                IComponentsCluster cluster=new InternalComponentCluster(InternalContextHolder.get().getContext());
+                InstancesRepository repository=cluster.repository(target.id());
+                if (processorMode==ProcessorMode.PROCESSOR_MODE_SINGLE){
+                    IComponentCallable componentCallable=repository.firstComponentCallableInstance();
+                    componentCallable.toBuilder()
+                            .callerConfig(callerConfig)
+                            .listener(new IComponentCallListener() {
+                                @Override
+                                public boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                                    try {
+                                        bundle.setClassLoader(getClass().getClassLoader());
+                                        bundle.putParcelable(CommonConstant.REMOTE_BUNDLE_RESPONSE,response);
+                                        msg.what=RemoteActionResultState.REMOTE_ACTION_RESULT_STATE_SUCCESS;
+                                        msg.setData(bundle);
+                                        replyMessenger.send(msg);
+                                    }catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                    return false;
+                                }
 
-                    @Override
-                    public void onProcessorOutput(String processorId, Message message) {
-
-                    }
-
-                    @Override
-                    public void onProcessorOutput(ConcurrentLinkedHashMap<Message, String> messages) {
-
-                    }
-
-                    @Override
-                    public void onComponentChat(String curl, Message message) {
-
-                    }
-
-                };
-                if (pm==IPCTarget.PROCESSOR_MODE_SEQUENCE){
-                    processorBuilder.asSequence()
-                            .processorSession(processorSession)
-                            .join(cluster.repository(url))
-                            .submit(msg);
+                                @Override
+                                public void onComponentException(IRequest request, Throwable throwable, String componentId) {
+                                    try {
+                                        bundle.setClassLoader(getClass().getClassLoader());
+                                        bundle.putSerializable(CommonConstant.REMOTE_BUNDLE_THROWABLE,throwable);
+                                        msg.what=RemoteActionResultState.REMOTE_ACTION_RESULT_STATE_FAILURE;
+                                        msg.setData(bundle);
+                                        replyMessenger.send(msg);
+                                    }catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                }
+                            })
+                            .build()
+                            .call(request);
+                            ;
                 }
-                else if (pm==IPCTarget.PROCESSOR_MODE_CONCURRENCY){
-                    processorBuilder.asConcurrency()
-                            .processorSession(processorSession)
-                            .join(cluster.repository(url))
-                            .submit(msg);
+                else {
+                    IComponentProcessor.Builder processorBuilder=(processorMode==ProcessorMode.PROCESSOR_MODE_CONCURRENCY?
+                            InternalComponentConcurrencyProcessor.newBuilder()
+                            :
+                            InternalComponentSequenceProcessor.newBuilder());
+                    processorBuilder
+                            .callerConfig(callerConfig)
+                            .listenerCrossed(false)
+                            .listener(new IComponentProcessorCallListener() {
+                                @Override
+                                public boolean onProcessorReceivedResponse(IResponse response, String processorId) {
+                                    try {
+                                        bundle.setClassLoader(getClass().getClassLoader());
+                                        bundle.putParcelable(CommonConstant.REMOTE_BUNDLE_RESPONSE,response);
+                                        msg.what=RemoteActionResultState.REMOTE_ACTION_RESULT_STATE_SUCCESS;
+                                        msg.setData(bundle);
+                                        replyMessenger.send(msg);
+                                    }catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                    return false;
+                                }
+
+                                @Override
+                                public IResponse onProcessorMergeResponses(ConcurrentLinkedHashMap<IResponse, String> responses, String processorId) {
+                                    return null;
+                                }
+
+                                @Override
+                                public void onProcessorException(IRequest request, Throwable throwable, String processorId) {
+                                    try {
+                                        bundle.setClassLoader(getClass().getClassLoader());
+                                        bundle.putSerializable(CommonConstant.REMOTE_BUNDLE_THROWABLE,throwable);
+                                        msg.what=RemoteActionResultState.REMOTE_ACTION_RESULT_STATE_FAILURE;
+                                        msg.setData(bundle);
+                                        replyMessenger.send(msg);
+                                    }catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                @Override
+                                public boolean onChildComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                                    return false;
+                                }
+
+                                @Override
+                                public void onChildComponentException(IRequest request, Throwable throwable, String componentId) {
+
+                                }
+
+                                @Override
+                                public boolean onChildProcessorReceivedResponse(IResponse response, String childProcessorId) {
+                                    return false;
+                                }
+
+                                @Override
+                                public IResponse onChildProcessorMergeResponses(ConcurrentLinkedHashMap<IResponse, String> responses, IResponse childResponse, String childProcessorId) {
+                                    return null;
+                                }
+
+                                @Override
+                                public void onChildProcessorException(IRequest request, Throwable throwable, String childProcessorId) {
+
+                                }
+                            })
+                            .build()
+                            .join(repository.componentCallableInstances())
+                            .submit(request);
+                            ;
                 }
             }
         }

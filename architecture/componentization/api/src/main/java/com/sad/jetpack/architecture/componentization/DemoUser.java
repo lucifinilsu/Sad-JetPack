@@ -2,24 +2,51 @@ package com.sad.jetpack.architecture.componentization;
 
 import android.content.Context;
 import android.os.Message;
-import android.os.Messenger;
 
-import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
-import com.sad.jetpack.architecture.componentization.api2.ComponentProcessorBuilderImpl;
-import com.sad.jetpack.architecture.componentization.api2.IComponent;
-import com.sad.jetpack.architecture.componentization.api2.IPCComponentProcessorCombinerSession;
-import com.sad.jetpack.architecture.componentization.api2.IPCComponentProcessorSession;
-import com.sad.jetpack.architecture.componentization.api2.IPCMessageSender;
-import com.sad.jetpack.architecture.componentization.api2.IPCMessageTransmissionConfig;
-import com.sad.jetpack.architecture.componentization.api2.IPCResultCallback;
-import com.sad.jetpack.architecture.componentization.api2.IPCTarget;
-import com.sad.jetpack.architecture.componentization.api2.IPCTargetImpl;
-import com.sad.jetpack.architecture.componentization.api2.SCore;
-import com.sad.jetpack.architecture.componentization.api2.SimpleConstructorImpl;
+import com.sad.jetpack.architecture.componentization.api.IPCMessageTransmissionConfig;
+import com.sad.jetpack.architecture.componentization.api.IPCResultCallback;
+import com.sad.jetpack.architecture.componentization.api.SCore;
+import com.sad.jetpack.architecture.componentization.api2.CallerConfigImpl;
+import com.sad.jetpack.architecture.componentization.api2.IPCRemoteCallListener;
+import com.sad.jetpack.architecture.componentization.api2.IPCRemoteConnectorImpl;
+import com.sad.jetpack.architecture.componentization.api2.IResponse;
+import com.sad.jetpack.architecture.componentization.api2.IResponseSession;
+import com.sad.jetpack.architecture.componentization.api2.ITarget;
+import com.sad.jetpack.architecture.componentization.api2.RequestImpl;
+import com.sad.jetpack.architecture.componentization.api2.IRequest;
+import com.sad.jetpack.architecture.componentization.api2.TargetImpl;
 
 public class DemoUser {
     public static void main(String[] args) {
+        IRequest request= RequestImpl.newBuilder("cs")
+                .addData("s",00)
+                .addData("q",true)
+                .build();
 
+    }
+    static void testIPC(IRequest request) throws Exception {
+        Context context=null;
+        IPCRemoteConnectorImpl.newBuilder(context)
+                .callerConfig(CallerConfigImpl.newBuilder().build())
+                .listener(new IPCRemoteCallListener() {
+                    @Override
+                    public boolean onRemoteCallReceivedResponse(IResponse response, IResponseSession session, ITarget target) {
+                        session.postResponseData(null, session);
+                        return false;
+                    }
+
+                    @Override
+                    public void onRemoteCallException(IRequest request, Throwable throwable, ITarget target) {
+
+                    }
+                })
+                .build()
+                .sendRequest(request,TargetImpl.newBuilder().toApp("xxx.xxx").toProcess("xxx.xxx:aaa").id("123").build());
+    }
+    static void testITarget(){
+        TargetImpl.newBuilder().id("").build();
+    }
+    static void testcall(){
         SCore.getComponentCallable("").call(Message.obtain(),new IPCResultCallback(){
 
             @Override
@@ -34,7 +61,7 @@ public class DemoUser {
         });
     }
 
-    public static void testIPC(Context context){
+    /*public static void testIPC(Context context){
 
         try {
             //1、初始化
@@ -106,7 +133,7 @@ public class DemoUser {
                         }
 
                         @Override
-                        public void onProcessorOutput(ConcurrentLinkedHashMap<Message, String> messages) {
+                        public void onProcessorGenerate(ConcurrentLinkedHashMap<Message, String> messages) {
 
                         }
 
@@ -125,6 +152,6 @@ public class DemoUser {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
 }

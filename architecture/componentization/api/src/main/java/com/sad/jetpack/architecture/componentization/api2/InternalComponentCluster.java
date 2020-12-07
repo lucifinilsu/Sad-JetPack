@@ -15,8 +15,8 @@ final class InternalComponentCluster implements IComponentsCluster {
 
     private Map<String,IConstructor> constructorMap=new HashMap<>();
     private IConstructor allConstructor;
-    private IComponentInitializeListener componentInitializeListener;
-    private IComponentRepositoryFactory componentRepositoryFactory;
+    private IComponentCallableInitializeListener componentCallableInitializeListener;
+    private InstancesRepositoryFactory intancesRepositoryFactory;
     private Context context;
     protected InternalComponentCluster(Context context){
         this.context=context;
@@ -42,34 +42,34 @@ final class InternalComponentCluster implements IComponentsCluster {
     }
 
     @Override
-    public IComponentsCluster instanceInitializeListener(IComponentInitializeListener listener) {
-        this.componentInitializeListener=listener;
+    public IComponentsCluster instanceInitializeListener(IComponentCallableInitializeListener listener) {
+        this.componentCallableInitializeListener =listener;
         return this;
     }
 
     @Override
-    public IComponentsCluster componentRepositoryFactory(IComponentRepositoryFactory componentRepositoryFactory) {
-        this.componentRepositoryFactory=componentRepositoryFactory;
+    public IComponentsCluster instancesRepositoryFactory(InstancesRepositoryFactory instancesRepositoryFactory){
+        this.intancesRepositoryFactory =instancesRepositoryFactory;
         return this;
     }
 
     @Override
-    public IComponentRepository repository(String url) {
-        if (componentRepositoryFactory==null){
-            componentRepositoryFactory=new StaticComponentRepositoryFactory(context);
+    public InstancesRepository repository(String url) {
+        if (intancesRepositoryFactory ==null){
+            intancesRepositoryFactory =new StaticComponentRepositoryFactory(context);
         }
-        IComponentRepository componentRepository=componentRepositoryFactory.from(url,this.allConstructor,this.constructorMap,this.componentInitializeListener);
-        return componentRepository;
+        InstancesRepository instancesRepository= intancesRepositoryFactory.from(url,this.allConstructor,this.constructorMap,this.componentCallableInitializeListener);
+        return instancesRepository;
     }
 
     @Override
-    public Future<IComponentRepository> repositoryAsync(String url,IComponentRepositoryObtainedCallback callback) {
-        Future<IComponentRepository> future=getDefaultExecutor().submit(new Callable<IComponentRepository>() {
+    public Future<InstancesRepository> repositoryAsync(String url,IComponentRepositoryObtainedCallback callback) {
+        Future<InstancesRepository> future=getDefaultExecutor().submit(new Callable<InstancesRepository>() {
             @Override
-            public IComponentRepository call() throws Exception {
-                IComponentRepository repository= repository(url);
+            public InstancesRepository call() throws Exception {
+                InstancesRepository repository= repository(url);
                 if (callback!=null){
-                    callback.onComponentRepositoryObtained(repository);
+                    callback.onInstancesRepositoryObtained(repository);
                 }
                 return repository;
             }

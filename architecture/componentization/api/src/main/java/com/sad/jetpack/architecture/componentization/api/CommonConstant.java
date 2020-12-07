@@ -2,6 +2,12 @@ package com.sad.jetpack.architecture.componentization.api;
 
 public class CommonConstant {
 
+    public final static int REGISTER_TO_MESSENGERS_POOL=1;
+    public static final int UNREGISTER_FROM_MESSENGERS_POOL=2;
+    public final static int CREATE_REMOTE_IPC_CHAT =4;
+
+    public final static String REMOTE_BUNDLE_TC="REMOTE_BUNDLE_TC";
+
     public final static String REMOTE_BUNDLE_PARAMETERS_TIMEOUT="REMOTE_BUNDLE_PARAMETERS_TIMEOUT";
 
     public final static String REMOTE_BUNDLE_PARAMETERS_ORGURL="REMOTE_BUNDLE_PARAMETERS_ORGURL";

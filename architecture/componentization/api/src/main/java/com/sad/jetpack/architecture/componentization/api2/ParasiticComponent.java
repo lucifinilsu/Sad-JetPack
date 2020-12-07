@@ -1,13 +1,11 @@
 package com.sad.jetpack.architecture.componentization.api2;
 
-import android.os.Message;
-
 import com.sad.jetpack.architecture.componentization.annotation.Component;
 import com.sad.jetpack.architecture.componentization.annotation.IPCChat;
 
 import java.lang.annotation.Annotation;
 
-public abstract class ParasiticComponent<H> implements IComponent{
+public abstract class ParasiticComponent<H> implements IComponent {
 
     private H host;
     private IPCChat chat;

@@ -1,52 +1,21 @@
 package com.sad.jetpack.architecture.componentization.api2;
 
+import androidx.annotation.IntDef;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 public class CommonConstant {
 
-    public final static int REGISTER_TO_MESSENGERS_POOL=1;
-    public static final int UNREGISTER_FROM_MESSENGERS_POOL=2;
-    public final static int CREATE_REMOTE_IPC_CHAT =4;
+    public final static String REMOTE_BUNDLE_REQUEST="REMOTE_BUNDLE_REQUEST";
 
-    public final static String REMOTE_BUNDLE_TC="REMOTE_BUNDLE_TC";
+    public final static String REMOTE_BUNDLE_RESPONSE="REMOTE_BUNDLE_RESPONSE";
 
-    public final static String REMOTE_BUNDLE_PARAMETERS_TIMEOUT="REMOTE_BUNDLE_PARAMETERS_TIMEOUT";
+    public final static String REMOTE_BUNDLE_TARGET="REMOTE_BUNDLE_TARGET";
 
-    public final static String REMOTE_BUNDLE_PARAMETERS_ORGURL="REMOTE_BUNDLE_PARAMETERS_ORGURL";
+    public static final String REMOTE_BUNDLE_ACTION = "REMOTE_BUNDLE_ACTION";
 
-    public final static String REMOTE_BUNDLE_PARAMETERS_FROM_APP="REMOTE_BUNDLE_PARAMETERS_FROM_APP";
+    public static final String REMOTE_BUNDLE_THROWABLE = "REMOTE_BUNDLE_THROWABLE";
 
-    public final static String REMOTE_BUNDLE_PARAMETERS_FROM_PROCESS="REMOTE_BUNDLE_PARAMETERS_FROM_PROCESS";
-
-    public final static String REMOTE_BUNDLE_PARAMETERS_TO_APP="REMOTE_BUNDLE_PARAMETERS_TO_APP";
-
-    public final static String REMOTE_BUNDLE_PARAMETERS_TO_PROCESS="REMOTE_BUNDLE_PARAMETERS_TO_PROCESS";
-
-
-
-    public final static int REMOTE_CHAT_ES_CALLBACK_INPUT=12;
-
-    public final static int REMOTE_CHAT_ES_CALLBACK_OUTPUT_MAP=563;
-
-    public final static int REMOTE_CHAT_ES_CALLBACK_OUTPUT=89;
-
-    public final static int REMOTE_CHAT_ES_CALLBACK_PROCEED=959;
-
-    public final static int REMOTE_CHAT_ES_CALLBACK_EXCEPTION= 66622;
-
-    public final static int REMOTE_CHAT_ES_CALLBACK_INTERCEPTED= 3012;
-
-
-    public final static String REMOTE_BUNDLE_PARAMETERS_EXCEPTION="REMOTE_BUNDLE_PARAMETERS_EXCEPTION";
-
-    public final static String REMOTE_BUNDLE_PARAMETERS_DATACARRIER="REMOTE_BUNDLE_PARAMETERS_DATACARRIER";
-
-    public final static String REMOTE_BUNDLE_PARAMETERS_DATACARRIER_MAP="REMOTE_BUNDLE_PARAMETERS_DATACARRIER_MAP";
-
-    //public final static String REMOTE_BUNDLE_PARAMETERS_DATA="REMOTE_BUNDLE_PARAMETERS_DATA";
-
-    public final static String REMOTE_BUNDLE_PARAMETERS_PROCEED_MODE="REMOTE_BUNDLE_PARAMETERS_PROCEED_MODE";
-
-    public final static String REMOTE_BUNDLE_PARAMETERS_MESSAGEPROXY_ID="REMOTE_BUNDLE_PARAMETERS_MESSAGEPROXY_ID";
-
-    public final static String REMOTE_BUNDLE_PARAMETERS_PROCEED_FROM_INTERCEPTED="REMOTE_BUNDLE_PARAMETERS_PROCEED_FROM_INTERCEPTED";
-
+    public static final String REMOTE_BUNDLE_CALLER_CONFIG = "REMOTE_BUNDLE_CALLER_CONFIG";
 }
