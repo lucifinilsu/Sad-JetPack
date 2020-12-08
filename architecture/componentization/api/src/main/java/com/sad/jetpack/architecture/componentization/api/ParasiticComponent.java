@@ -5,7 +5,7 @@ import com.sad.jetpack.architecture.componentization.annotation.IPCChat;
 
 import java.lang.annotation.Annotation;
 
-public abstract class ParasiticComponent<H> implements IComponent{
+public abstract class ParasiticComponent<H> implements IComponent {
 
     private H host;
     private IPCChat chat;

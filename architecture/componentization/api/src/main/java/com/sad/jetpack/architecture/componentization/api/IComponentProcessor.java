@@ -1,29 +1,36 @@
 package com.sad.jetpack.architecture.componentization.api;
 
 
-import android.os.Message;
+import java.util.List;
 
-import java.util.LinkedHashMap;
+public interface IComponentProcessor{
 
-public interface IComponentProcessor<I extends IComponentProcessor<I>> {
+    boolean listenerCrossed();
 
     String processorId();
 
-    I processorSession(IPCComponentProcessorSession processorSession);
+    IComponentProcessorCallListener listener();
 
-    IPCComponentProcessorSession processorSession();
+    ICallerConfig callerConfig();
 
-    long timeout();
+    IComponentProcessor join(IComponentCallable componentCallable);
 
-    long delay();
+    IComponentProcessor join(List<IComponentCallable> componentCallables);
 
-    void submit(Message message);
+    IComponentProcessor join(IComponentProcessor processor);
 
-    I join(IComponent component,String curl);
+    void submit(IRequest request);
 
-    I join(LinkedHashMap<IComponent,String> components);
+    Builder toBuilder();
 
-    I join(IComponentRepository repository);
+    interface Builder{
 
-    I join(IComponentProcessor sequenceProcessor);
+        Builder listener(IComponentProcessorCallListener listener);
+
+        Builder listenerCrossed(boolean crossed);
+
+        Builder callerConfig(ICallerConfig callerConfig);
+
+        IComponentProcessor build();
+    }
 }

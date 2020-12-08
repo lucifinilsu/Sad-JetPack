@@ -1,282 +1,277 @@
 package com.sad.jetpack.architecture.componentization.api;
 
-import android.os.Handler;
-import android.os.Message;
-import android.os.Messenger;
-import android.util.Log;
 
-import androidx.annotation.NonNull;
+import android.os.Handler;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import com.sad.core.async.ISADTaskProccessListener;
-import com.sad.core.async.SADHandlerAssistant;
 import com.sad.core.async.SADTaskRunnable;
 import com.sad.core.async.SADTaskSchedulerClient;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-final class InternalComponentConcurrencyProcessor implements IComponentConcurrencyProcessor<InternalComponentConcurrencyProcessor>{
-    private IConcurrencyMessageBoundaryInterceptor boundaryInterceptor;
-    private String processorId ="";
-    private long timeout=-1;
-    private long delay=-1;
-    private LinkedHashMap<Object,String> units =new LinkedHashMap<>();
-    private List<Object> keyList=new ArrayList<>();
-    private IPCComponentProcessorSession processorSession;
+final class InternalComponentConcurrencyProcessor extends AbsInternalComponentProcessor{
     private CountDownLatch countDownLatch;
-    private ConcurrentLinkedHashMap<Message, String> outPutMessagesMap;
-    protected ConcurrentLinkedHashMap<Message, String> getMessageMap() {
-        return outPutMessagesMap;
+    private ConcurrentLinkedHashMap<IResponse,String> responses;
+    protected static IComponentProcessor.Builder newBuilder(){
+        return new InternalComponentConcurrencyProcessor();
     }
-    protected CountDownLatch getCountDownLatch(){
-        return countDownLatch;
+    protected static IComponentProcessor newInstance(){
+        return new InternalComponentConcurrencyProcessor();
     }
-    protected InternalComponentConcurrencyProcessor(IConcurrencyMessageBoundaryInterceptor boundaryInterceptor, String processorId, long timeout, long delay){
-        this.boundaryInterceptor=boundaryInterceptor;
-        this.processorId = processorId;
-        this.timeout=timeout;
-        this.delay=delay;
-        this.outPutMessagesMap=new ConcurrentLinkedHashMap.Builder<Message,String>().build();
+    private InternalComponentConcurrencyProcessor(){
+        responses=new ConcurrentLinkedHashMap.Builder<IResponse,String>().build();
     }
-
-
     @Override
-    public InternalComponentConcurrencyProcessor join(IComponent component, String curl) {
-        units.put(component,curl);
-        return this;
-    }
-
-    @Override
-    public InternalComponentConcurrencyProcessor join(LinkedHashMap<IComponent, String> components) {
-        units.putAll(components);
-        return this;
-    }
-
-    @Override
-    public InternalComponentConcurrencyProcessor join(IComponentRepository repository) {
-        if (repository!=null){
-            units.putAll(repository.componentInstances());
+    public void submit(IRequest request) {
+        if (callListener!=null){
+            request=callListener.onProcessorInputRequest(request,processorId);
         }
-        return this;
-    }
-
-    @Override
-    public InternalComponentConcurrencyProcessor join(IComponentProcessor processor) {
-        units.put(processor,processor.processorId());
-        return this;
-    }
-
-    @Override
-    public String processorId() {
-        return this.processorId;
-    }
-
-    @Override
-    public InternalComponentConcurrencyProcessor processorSession(IPCComponentProcessorSession processorSession) {
-        this.processorSession=processorSession;
-        return this;
-    }
-
-    @Override
-    public IPCComponentProcessorSession processorSession() {
-        return this.processorSession;
-    }
-
-    @Override
-    public long timeout() {
-        return this.timeout;
-    }
-
-    @Override
-    public long delay() {
-        return this.delay;
-    }
-
-    @Override
-    public void submit(Message message) {
-        if (message==null){
-            message=Message.obtain();
-        }
-        if (units.isEmpty()){
-            if (processorSession!=null){
-                processorSession.onProcessorOutput(processorId,message);
+        IRequest r=request;
+        countDownLatch=new CountDownLatch(units.size());
+        SADTaskSchedulerClient.newInstance().execute(new SADTaskRunnable<ConcurrentLinkedHashMap<IResponse,String>>("PROCESSOR_COUNTDOWN", new ISADTaskProccessListener<ConcurrentLinkedHashMap<IResponse, String>>() {
+            @Override
+            public void onSuccess(ConcurrentLinkedHashMap<IResponse, String> result) {
+                if (callListener!=null){
+                    IResponse response=callListener.onProcessorMergeResponses(result,processorId);
+                    callListener.onProcessorReceivedResponse(response, processorId);
+                }
             }
-            return;
-        }
-        if (processorSession!=null){
-            message=processorSession.onProcessorInput(processorId,message);
-        }
-        startProceed(message,processorSession);
-    }
 
-    private void startProceed(Message message, IPCComponentProcessorSession processorSession){
-        if (delay>0){
-            SADHandlerAssistant.runOnUIThread(new Runnable() {
-                @Override
-                public void run() {
-                    proceed(message,processorSession);
+            @Override
+            public void onFail(Throwable throwable) {
+                if (callListener!=null){
+                    callListener.onProcessorException(r,throwable,processorId);
                 }
-            },delay);
-        }
-        else {
-            proceed(message,processorSession);
-        }
-    }
-
-    private void proceed(Message message, IPCComponentProcessorSession processorSession){
-        try {
-            doProceed(message,processorSession);
-        }catch (Exception e){
-            e.printStackTrace();
-            if (processorSession!=null){
-                message.obj=e;
-                IPCMessageTransmissionConfig transmissionConfig=
-                        MessageCreator.standardMessage(message, processorId,delay,timeout,IPCTarget.PROCESSOR_MODE_CONCURRENCY);
-                processorSession.onException(transmissionConfig,e);
             }
-        }
-    }
-    private void doProceed(Message msg, IPCComponentProcessorSession processorSession){
-        try {
-            countDownLatch=new CountDownLatch(units.size());
-            SADTaskSchedulerClient.newInstance().execute(new SADTaskRunnable<ConcurrentLinkedHashMap<Message, String>>("Terminal_WaittingFor_Result", new ISADTaskProccessListener<ConcurrentLinkedHashMap<Message, String>>() {
-                @Override
-                public void onSuccess(ConcurrentLinkedHashMap<Message, String> messages) {
-                    if (processorSession!=null){
-                        processorSession.onProcessorGenerate(messages);
-                    }
-                    if (boundaryInterceptor!=null){
-                        Message msg=boundaryInterceptor.handleMessages(messages);
-                        if (processorSession !=null){
-                            processorSession.onProcessorOutput(processorId,msg);
-                        }
-                    }
-                }
-                @Override
-                public void onFail(Throwable throwable) {
-                    if (processorSession !=null){
-                        IPCMessageTransmissionConfig transmissionConfig=MessageCreator.standardMessage(msg, processorId,delay,timeout,IPCTarget.PROCESSOR_MODE_CONCURRENCY);
-                        processorSession.onException(transmissionConfig,throwable);
-                    }
-                }
 
-                @Override
-                public void onCancel() {
-                }
-            }) {
-                @Override
-                public ConcurrentLinkedHashMap<Message, String> doInBackground() throws Exception {
-                    if (timeout>0){
-                        Log.e("sad-jetpack","------------->超时设定:"+timeout);
-                        if (!countDownLatch.await(timeout, TimeUnit.MILLISECONDS)){
-                            throw new TimeoutException("the task of the unit whose type is CONCURRENCY_PROCESSOR is timeout !!!");
-                        }
+            @Override
+            public void onCancel() {
+
+            }
+        }) {
+            @Override
+            public ConcurrentLinkedHashMap<IResponse, String> doInBackground() throws Exception {
+                if (needCheckTimeout()){
+                    if (countDownLatch.await(callerConfig.timeout(), TimeUnit.MILLISECONDS)){
+                        return responses;
                     }
                     else {
-                        countDownLatch.await();
+                        throw new TimeoutException("the task of the processor whose id is '"+processorId+"' is timeout !!!");
                     }
-                    return getMessageMap();
                 }
-            });
-            keyList=new ArrayList<>(units.keySet());
-            for (Object o:keyList
-            ) {
-                Message message=Message.obtain(msg);
-                if (o instanceof IComponent){
-                    IComponent component= (IComponent) o;
-                    Messenger replyMessengerProxy=new Messenger(new ProxyHandler(this,processorSession,component.instanceOrgUrl()));
-                    message.replyTo=replyMessengerProxy;
-                    IPCMessageTransmissionConfig transmissionConfig=MessageCreator.standardMessage(message,component.instanceOrgUrl(),delay,timeout,IPCTarget.PROCESSOR_MODE_CONCURRENCY);
-                    IPCLauncher launcher=IPCLauncherImpl.newInstance(InternalContextHolder.get().getContext()).transmissionConfig(transmissionConfig);
-                    component.onCall(message,launcher);
+                else {
+                    countDownLatch.await();
                 }
-                else if (o instanceof IComponentProcessor){
+                return responses;
+            }
+        });
+        if (needDelay()){
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    doSubmit(r);
+                }
+            },callerConfig.delay());
+        }
+        else {
+            doSubmit(r);
+        }
+    }
+
+    private void doSubmit(IRequest request){
+        try {
+            for (Object o:units
+                 ) {
+                IRequest r= RequestImpl.newBuilder(request.id())
+                        .dataContainer(request.dataContainer())
+                        .fromApp(request.fromApp())
+                        .fromProcess(request.fromProcess())
+                        .build()
+                        ;
+                if (o instanceof  IComponentCallable){
+                    IComponentCallable callable= (IComponentCallable) o;
+                    IComponentCallListener listenerSelf=callable.listener();
+                    IComponentCallable callablePro=callable.toBuilder()
+                            .listener(new IComponentCallListener() {
+                                @Override
+                                public IRequest onComponentInputRequest(IRequest request, String componentId) {
+                                    if (listenerSelf!=null){
+                                        request= listenerSelf.onComponentInputRequest(request,componentId);
+                                    }
+                                    if (callListener!=null){
+                                        request = callListener.onChildComponentInputRequest(request,componentId);
+                                    }
+                                    return request;
+                                }
+
+                                @Override
+                                public boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                                    if (listenerSelf!=null){
+                                        listenerSelf.onComponentReceivedResponse(response,session,componentId);
+                                    }
+                                    if (callListener!=null){
+                                        callListener.onChildComponentReceivedResponse(response,session,componentId);
+                                    }
+                                    responses.put(response, callable.componentId());
+                                    countDownLatch.countDown();
+                                    return false;
+                                }
+
+                                @Override
+                                public void onComponentException(IRequest request, Throwable throwable,String componentId) {
+                                    if (listenerSelf!=null){
+                                        listenerSelf.onComponentException(request,throwable,componentId);
+                                    }
+                                    if (callListener!=null){
+                                        callListener.onChildComponentException(request,throwable,componentId);
+                                    }
+                                    countDownLatch.countDown();
+                                }
+                            })
+                            .build()
+                    ;
+                    callablePro.call(r);
+                }
+                else if (o instanceof  IComponentProcessor){
                     IComponentProcessor processor= (IComponentProcessor) o;
-                    IPCComponentProcessorSession processorSessionSelf=processor.processorSession();
-                    IPCComponentProcessorSession processorSessionProxy=new IPCComponentProcessorSession() {
-                        @Override
-                        public void onProcessorOutput(String processorId, Message message) {
-                            if (processorSessionSelf!=null){
-                                processorSessionSelf.onProcessorOutput(processorId,message);
-                            }
-                            getMessageMap().put(message, processorId);
-                            getCountDownLatch().countDown();
-                        }
+                    IComponentProcessorCallListener listenerSelf=processor.listener();
+                    IComponentProcessor processorPro=processor.toBuilder()
+                            .listener(new IComponentProcessorCallListener() {
+                                @Override
+                                public IRequest onProcessorInputRequest(IRequest request, String processorId) {
+                                    if (listenerSelf!=null){
+                                        request=listenerSelf.onProcessorInputRequest(request,processorId);
+                                    }
+                                    if (callListener!=null){
+                                        request=callListener.onChildProcessorInputRequest(request,processorId);
+                                    }
+                                    return request;
+                                }
 
-                        @Override
-                        public void onProcessorGenerate(ConcurrentLinkedHashMap<Message, String> messages) {
-                            if (processorSessionSelf!=null){
-                                processorSessionSelf.onProcessorGenerate(messages);
-                            }
-                        }
+                                @Override
+                                public IRequest onChildComponentInputRequest(IRequest request, String componentId) {
+                                    if (listenerSelf!=null){
+                                        request=listenerSelf.onChildComponentInputRequest(request,componentId);
+                                    }
+                                    if (listenerCrossed && callListener!=null){
+                                        request = callListener.onChildComponentInputRequest(request,componentId);
+                                    }
+                                    return request;
+                                }
 
-                        @Override
-                        public void onComponentChat(String curl, Message message) {
-                            if (processorSessionSelf!=null){
-                                processorSessionSelf.onComponentChat(curl,message);
-                            }
-                        }
+                                @Override
+                                public boolean onChildComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                                    if (listenerSelf!=null){
+                                        listenerSelf.onChildComponentReceivedResponse(response,session,componentId);
+                                    }
+                                    if (listenerCrossed && callListener!=null){
+                                        callListener.onChildComponentReceivedResponse(response,session,componentId);
+                                    }
+                                    return false;
+                                }
 
-                        @Override
-                        public void onException(IPCMessageTransmissionConfig config,Throwable throwable) {
-                            if (processorSessionSelf!=null){
-                                processorSessionSelf.onException(config,throwable);
-                            }
-                            getCountDownLatch().countDown();
-                        }
-                    };
-                    processor.processorSession(processorSessionProxy).submit(message);
+                                @Override
+                                public void onChildComponentException(IRequest request, Throwable throwable, String componentId) {
+                                    if (listenerSelf!=null){
+                                        listenerSelf.onChildComponentException(request,throwable,componentId);
+                                    }
+                                    if (listenerCrossed && callListener!=null){
+                                        callListener.onChildComponentException(request,throwable,componentId);
+                                    }
+                                }
+
+                                @Override
+                                public IRequest onChildProcessorInputRequest(IRequest request, String processorId) {
+                                    if (listenerSelf!=null){
+                                        request=listenerSelf.onChildProcessorInputRequest(request,processorId);
+                                    }
+                                    if (listenerCrossed && callListener!=null){
+                                        request=callListener.onChildProcessorInputRequest(request,processorId);
+                                    }
+                                    return request;
+                                }
+
+                                @Override
+                                public boolean onChildProcessorReceivedResponse(IResponse response, String childProcessorId) {
+                                    if (listenerSelf!=null){
+                                        listenerSelf.onChildProcessorReceivedResponse(response,childProcessorId);
+                                    }
+                                    if (listenerCrossed && callListener!=null){
+                                        callListener.onChildProcessorReceivedResponse(response,childProcessorId);
+                                    }
+                                    return false;
+                                }
+
+                                @Override
+                                public IResponse onChildProcessorMergeResponses(ConcurrentLinkedHashMap<IResponse, String> responses, IResponse childResponse, String childProcessorId) {
+                                    IResponse response=childResponse;
+                                    if (listenerSelf!=null){
+                                        response=listenerSelf.onChildProcessorMergeResponses(responses,response,childProcessorId);
+                                    }
+                                    if (listenerCrossed && callListener!=null){
+                                        response=callListener.onChildProcessorMergeResponses(responses,response,childProcessorId);
+                                    }
+                                    return response;
+                                }
+
+                                @Override
+                                public void onChildProcessorException(IRequest request, Throwable throwable, String childProcessorId) {
+                                    if (listenerSelf!=null){
+                                        listenerSelf.onChildProcessorException(request,throwable,childProcessorId);
+                                    }
+                                    if (listenerCrossed && callListener!=null){
+                                        callListener.onChildProcessorException(request,throwable,childProcessorId);
+                                    }
+                                }
+
+                                @Override
+                                public boolean onProcessorReceivedResponse(IResponse response, String processorId) {
+                                    if (listenerSelf!=null){
+                                        listenerSelf.onProcessorReceivedResponse(response,processorId);
+                                    }
+                                    if (callListener!=null){
+                                        callListener.onChildProcessorReceivedResponse(response,processorId);
+                                    }
+                                    responses.put(response, processorId);
+                                    countDownLatch.countDown();
+                                    return false;
+                                }
+
+                                @Override
+                                public IResponse onProcessorMergeResponses(ConcurrentLinkedHashMap<IResponse, String> responses,String processorId) {
+                                    IResponse response=null;
+                                    if (listenerSelf!=null){
+                                        response = listenerSelf.onProcessorMergeResponses(responses,processorId);
+                                    }
+                                    if (callListener!=null){
+                                        response=callListener.onChildProcessorMergeResponses(responses,response,processorId);
+                                    }
+                                    return response;
+                                }
+
+                                @Override
+                                public void onProcessorException(IRequest request, Throwable throwable, String processorId) {
+                                    if (listenerSelf!=null){
+                                        listenerSelf.onProcessorException(request,throwable,processorId);
+                                    }
+                                    if (callListener!=null){
+                                        callListener.onChildProcessorException(request,throwable,processorId);
+                                    }
+                                    countDownLatch.countDown();
+                                }
+
+                            })
+                            .build();
+                    processorPro.submit(r);
                 }
             }
         }catch (Exception e){
             e.printStackTrace();
-        }
-    }
-    private static class ProxyHandler extends Handler {
-        private WeakReference<IPCComponentProcessorSession> processorSessionWeakReference;
-        private WeakReference<String> curlWeakReference;
-        private WeakReference<InternalComponentConcurrencyProcessor> concurrencyProcessorWeakReference;
-        ProxyHandler(
-                InternalComponentConcurrencyProcessor concurrencyProcessor,
-                IPCComponentProcessorSession processorSession,
-                String curl
-        ){
-            this.concurrencyProcessorWeakReference =new WeakReference<InternalComponentConcurrencyProcessor>(concurrencyProcessor);
-            this.processorSessionWeakReference =new WeakReference<IPCComponentProcessorSession>(processorSession);
-            this.curlWeakReference =new WeakReference<String>(curl);
-        }
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            InternalComponentConcurrencyProcessor componentConcurrencyProcessor=null;
-            IPCComponentProcessorSession prcessorSession = null;
-            String curl="";
-            if (this.concurrencyProcessorWeakReference !=null){
-                componentConcurrencyProcessor= this.concurrencyProcessorWeakReference.get();
-            }
-            if (processorSessionWeakReference !=null){
-                prcessorSession= processorSessionWeakReference.get();
-            }
-            if (curlWeakReference !=null){
-                curl= curlWeakReference.get();
-            }
-
-            if (prcessorSession!=null){
-                prcessorSession.onComponentChat(curl,msg);
-            }
-            if (componentConcurrencyProcessor!=null){
-                try {
-                    componentConcurrencyProcessor.getMessageMap().put(msg,curl);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                componentConcurrencyProcessor.getCountDownLatch().countDown();
+            if (callListener!=null){
+                callListener.onProcessorException(request,e,processorId);
             }
         }
     }

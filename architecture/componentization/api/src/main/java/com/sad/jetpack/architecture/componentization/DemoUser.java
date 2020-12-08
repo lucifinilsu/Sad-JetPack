@@ -1,20 +1,22 @@
 package com.sad.jetpack.architecture.componentization;
 
 import android.content.Context;
-import android.os.Message;
 
-import com.sad.jetpack.architecture.componentization.api2.CallerConfigImpl;
-import com.sad.jetpack.architecture.componentization.api2.IDataContainer;
-import com.sad.jetpack.architecture.componentization.api2.IPCRemoteCallListener;
-import com.sad.jetpack.architecture.componentization.api2.IPCRemoteConnectorImpl;
-import com.sad.jetpack.architecture.componentization.api2.IRequestSession;
-import com.sad.jetpack.architecture.componentization.api2.IResponse;
-import com.sad.jetpack.architecture.componentization.api2.ITarget;
-import com.sad.jetpack.architecture.componentization.api2.RemoteAction;
-import com.sad.jetpack.architecture.componentization.api2.RequestImpl;
-import com.sad.jetpack.architecture.componentization.api2.IRequest;
-import com.sad.jetpack.architecture.componentization.api2.SCore;
-import com.sad.jetpack.architecture.componentization.api2.TargetImpl;
+import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import com.sad.jetpack.architecture.componentization.api.CallerConfigImpl;
+import com.sad.jetpack.architecture.componentization.api.IComponentCallListener;
+import com.sad.jetpack.architecture.componentization.api.IComponentProcessorCallListener;
+import com.sad.jetpack.architecture.componentization.api.IDataContainer;
+import com.sad.jetpack.architecture.componentization.api.IPCRemoteCallListener;
+import com.sad.jetpack.architecture.componentization.api.IRequestSession;
+import com.sad.jetpack.architecture.componentization.api.IResponse;
+import com.sad.jetpack.architecture.componentization.api.ITarget;
+import com.sad.jetpack.architecture.componentization.api.ParasiticComponentRepositoryFactory;
+import com.sad.jetpack.architecture.componentization.api.RemoteAction;
+import com.sad.jetpack.architecture.componentization.api.RequestImpl;
+import com.sad.jetpack.architecture.componentization.api.IRequest;
+import com.sad.jetpack.architecture.componentization.api.SCore;
+import com.sad.jetpack.architecture.componentization.api.TargetImpl;
 
 public class DemoUser {
     public static void main(String[] args) {
@@ -50,6 +52,83 @@ public class DemoUser {
     }
     static void testITarget(){
         TargetImpl.newBuilder().id("").build();
+    }
+
+    static void testCall(IRequest request){
+        Context context=null;
+        SCore.asSequenceProcessor()
+                .listener(new IComponentProcessorCallListener() {
+                    @Override
+                    public boolean onProcessorReceivedResponse(IResponse response, String processorId) {
+                        return false;
+                    }
+
+                    @Override
+                    public IResponse onProcessorMergeResponses(ConcurrentLinkedHashMap<IResponse, String> responses, String processorId) {
+                        return null;
+                    }
+
+                    @Override
+                    public void onProcessorException(IRequest request, Throwable throwable, String processorId) {
+
+                    }
+
+                    @Override
+                    public boolean onChildComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onChildComponentException(IRequest request, Throwable throwable, String componentId) {
+
+                    }
+
+                    @Override
+                    public boolean onChildProcessorReceivedResponse(IResponse response, String childProcessorId) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onChildProcessorException(IRequest request, Throwable throwable, String childProcessorId) {
+
+                    }
+                })
+                .build()
+                .submit(request);
+        SCore.getCluster()
+                .instancesRepositoryFactory(new ParasiticComponentRepositoryFactory(context))
+                .repository("xcccc")
+                .firstComponentCallableInstance()
+                .toBuilder()
+                .listener(new IComponentCallListener() {
+                    @Override
+                    public boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onComponentException(IRequest request, Throwable throwable, String componentId) {
+
+                    }
+                })
+                .build()
+                .call(RequestImpl.newInstance("666"));
+
+        SCore.getComponentCallable("cxcxc")
+                .toBuilder()
+                .listener(new IComponentCallListener() {
+                    @Override
+                    public boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onComponentException(IRequest request, Throwable throwable, String componentId) {
+
+                    }
+                })
+                .build()
+                .call(RequestImpl.newInstance("666"));
     }
     /*static void testcall(){
         SCore.getComponentCallable("").call(Message.obtain(),new IPCResultCallback(){

@@ -1,16 +1,27 @@
 package com.sad.jetpack.architecture.componentization.api;
 
-import android.os.Message;
-
 public interface IComponentCallable {
+
+    String componentId();
 
     IComponent component();
 
-    <T> T call(Message message);
+    ICallerConfig callerConfig();
 
-    <T> T call(Message message,IPCResultCallback callback);
+    IComponentCallListener listener();
 
-    <T> T call(Message message,long timeout,IPCResultCallback callback);
+    void call(IRequest request);
 
-    void call(Message message,long timeout,long delay,IPCResultCallback callback);
+    Builder toBuilder();
+
+    interface Builder{
+
+        Builder callerConfig(ICallerConfig config);
+
+        Builder listener(IComponentCallListener listener);
+
+        Builder componentId(String id);
+
+        IComponentCallable build();
+    }
 }

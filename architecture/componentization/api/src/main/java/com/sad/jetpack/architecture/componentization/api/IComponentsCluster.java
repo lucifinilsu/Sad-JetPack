@@ -1,5 +1,7 @@
 package com.sad.jetpack.architecture.componentization.api;
 
+
+
 import java.util.Map;
 import java.util.concurrent.Future;
 
@@ -9,17 +11,17 @@ public interface IComponentsCluster {
 
     IComponentsCluster addConstructor(String curl,IConstructor constructor);
 
-    IComponentsCluster addConstructors(Map<String,IConstructor> constructors);
+    IComponentsCluster addConstructors(Map<String, IConstructor> constructors);
 
-    IComponentsCluster instanceInitializeListener(IComponentInitializeListener listener);
+    IComponentsCluster instanceInitializeListener(IComponentCallableInitializeListener listener);
 
-    IComponentsCluster componentRepositoryFactory(IComponentRepositoryFactory componentRepositoryFactory);
+    IComponentsCluster instancesRepositoryFactory(InstancesRepositoryFactory instancesRepositoryFactory);
 
-    IComponentRepository repository(String url);
+    InstancesRepository repository(String url);
 
-    Future<IComponentRepository> repositoryAsync(String url,IComponentRepositoryObtainedCallback callback);
+    Future<InstancesRepository> repositoryAsync(String url,IComponentRepositoryObtainedCallback callback);
 
     interface IComponentRepositoryObtainedCallback {
-        void onComponentRepositoryObtained(IComponentRepository repository);
+        void onInstancesRepositoryObtained(InstancesRepository repository);
     }
 }

@@ -1,15 +1,12 @@
 package com.sad.jetpack.architecture.componentization.api;
 
-import android.os.Message;
-
 import com.sad.jetpack.architecture.componentization.annotation.Component;
 
 import java.lang.annotation.Annotation;
 
 public interface IComponent extends Comparable<IComponent>{
 
-    <T> T onCall(Message message, IPCMessageSender replySender);
-
+    void onCall(IRequest request, IResponseSession session);
 
     default String[] urls(){
         Component component=info();
@@ -58,7 +55,7 @@ public interface IComponent extends Comparable<IComponent>{
         return o.priority()-this.priority();
     }
 
-    default String instanceOrgUrl(){return urls()!=null && urls().length>0?urls()[0]:"";};
+    //default String instanceOrgUrl(){return urls()!=null && urls().length>0?urls()[0]:"";};
 
     default int priority(){return 0;};
 }

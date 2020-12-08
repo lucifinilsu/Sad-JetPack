@@ -2,18 +2,6 @@
     package="com.sad.jetpack.architecture.componentization.api" >
     <application>
         <!-- 全局Context提供者、无侵入式App初始化类 -->
-        <provider
-            android:name=".InternalContextInitializerProvider"
-            android:authorities="${applicationId}.sad.jetpack.architecture.componentization.api.contextprovider"
-            android:exported="true" />
 
-        <service
-            android:name=".AppIPCService"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="${applicationId}.ipc"/>
-            </intent-filter>
-        </service>
     </application>
 </manifest>
