@@ -76,7 +76,7 @@ public class ComponentsFactoryProcessor extends AbsProcessor{
 
                 registerERM(element);
 
-                Element elementIAC=elementUtils.getTypeElement("com.sad.jetpack.architecture.componentization.api.IExposedWorkerService");
+                /*Element elementIAC=elementUtils.getTypeElement(Constant.PACKAGE_API+".IExposedWorkerService");
                 if (!typeUtils.isSubtype(typeUtils.erasure(element.asType()),typeUtils.erasure(elementIAC.asType()))){
                     String note=">>>请注意"+element.getSimpleName().toString()+"不是IExposedWorkerService的实现类，无法注册其Worker。";
                     log.error(note);
@@ -87,7 +87,7 @@ public class ComponentsFactoryProcessor extends AbsProcessor{
                     createWorker(element);
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
+                }*/
             }
 
         }
@@ -101,7 +101,6 @@ public class ComponentsFactoryProcessor extends AbsProcessor{
     private List<String> assetsDirs=new ArrayList<>();
     private void registerERM(Element element){
         Component exposedAnnotation=element.getAnnotation(Component.class);
-
         if (exposedAnnotation!=null){
             String[] assetsDs=exposedAnnotation.assetsDir();
             String[] urls=exposedAnnotation.url();
@@ -186,7 +185,7 @@ public class ComponentsFactoryProcessor extends AbsProcessor{
                     fa.createNewFile();
                     //FileUtils.createFile(fa,content);
                 }
-                org.apache.commons.io.FileUtils.fileWrite(fa.getAbsolutePath(),content);
+                org.apache.commons.io.FileUtils.writeStringToFile(fa,content,"utf-8");
                 /*else {
                     FileUtils.writeToFile(fa,content);
                 }*/
@@ -221,7 +220,7 @@ public class ComponentsFactoryProcessor extends AbsProcessor{
         }
         return j;
     }
-
+    @Deprecated
     private void createWorker(Element element){
         try {
             String workerPackage="androidx.work";

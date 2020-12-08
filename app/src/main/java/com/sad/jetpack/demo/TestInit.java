@@ -1,14 +1,11 @@
 package com.sad.jetpack.demo;
 
 import android.app.Application;
-import android.content.res.Configuration;
 
 import com.sad.jetpack.architecture.appgo.annotation.ApplicationLifeCycleAction;
 import com.sad.jetpack.architecture.appgo.api.IApplicationLifecyclesObserver;
-import com.sad.jetpack.architecture.componentization.annotation.ExposedService;
 
 
-@ExposedService(url ="xxx://ssss.php.cn/java/base6/index?dww=cs")
 public class TestInit extends TestInitParent implements IApplicationLifecyclesObserver {
 
     @ApplicationLifeCycleAction(processName = {"123456"},priority = 199)

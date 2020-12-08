@@ -4,7 +4,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     api 'org.apache.commons:commons-lang3:latest.release'
     api 'org.apache.commons:commons-collections4:latest.release'
-    api 'commons-io:commons-io:latest.release'
+    api rootProject.ext.dependencies["commons-io"]
 }
 sourceCompatibility = rootProject.ext.android.javaVersionInt
 targetCompatibility = rootProject.ext.android.javaVersionInt

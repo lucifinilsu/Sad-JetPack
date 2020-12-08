@@ -103,6 +103,7 @@ class ClassScanner {
                         )
 
                         FileUtils.copyDirectory(unzipDir, repackageFolder)
+                        //.copyDirectory(unzipDir, repackageFolder)
 
                         unzipDir.eachFileRecurse(FileType.FILES) { File it ->
                             //checkAndTransformClass(classPool, it, repackageFolder)

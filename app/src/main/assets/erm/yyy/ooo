@@ -1,8 +1,0 @@
-{
-  "path": "erm\\yyy\\ooo",
-  "element": {
-    "url": "https://www.baidu.com/yyy/ooo",
-    "class": "com.sad.jetpack.demo.TestWorkerAsyncService2",
-    "description": ""
-  }
-}

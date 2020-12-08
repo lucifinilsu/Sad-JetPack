@@ -82,19 +82,19 @@ public class RequestImpl implements IRequest, IRequest.Builder {
     }
     public RequestImpl addData(String name, Object data){
         if (dataContainer !=null){
-            dataContainer.getMap().put(name,data);
+            dataContainer.put(name,data);
         }
         return this;
     }
     public RequestImpl addData(Map data){
         if (dataContainer !=null){
-            dataContainer.getMap().putAll(data);
+            dataContainer.putAll(data);
         }
         return this;
     }
     public RequestImpl addData(IDataContainer data){
         if (dataContainer !=null && data!=null){
-            dataContainer.getMap().putAll(data.getMap());
+            dataContainer.putAll(data);
         }
         return this;
     }

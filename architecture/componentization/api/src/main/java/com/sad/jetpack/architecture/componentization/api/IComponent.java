@@ -6,7 +6,7 @@ import java.lang.annotation.Annotation;
 
 public interface IComponent extends Comparable<IComponent>{
 
-    void onCall(IRequest request, IResponseSession session);
+    void onCall(IRequest request, IResponseSession session) throws Exception;
 
     default String[] urls(){
         Component component=info();

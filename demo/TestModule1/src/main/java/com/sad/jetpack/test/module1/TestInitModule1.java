@@ -3,25 +3,21 @@ package com.sad.jetpack.test.module1;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.sad.jetpack.architecture.appgo.annotation.ApplicationLifeCycleAction;
 import com.sad.jetpack.architecture.appgo.api.AppGo;
 import com.sad.jetpack.architecture.appgo.api.IApplicationLifecyclesObserver;
-import com.sad.jetpack.architecture.componentization.annotation.ExposedService;
-import com.sad.jetpack.architecture.componentization.api.DataState;
-import com.sad.jetpack.architecture.componentization.api.IDataCarrier;
-import com.sad.jetpack.architecture.componentization.api.IPCMessenger;
-import com.sad.jetpack.architecture.componentization.api.IPCSession;
-import com.sad.jetpack.architecture.componentization.api.IExposedService;
-import com.sad.jetpack.architecture.componentization.api.IPerformer;
-import com.sad.jetpack.architecture.componentization.api.impl.DataCarrierImpl;
+import com.sad.jetpack.architecture.componentization.annotation.Component;
+import com.sad.jetpack.architecture.componentization.api.DefaultDataContainer;
+import com.sad.jetpack.architecture.componentization.api.IComponent;
+import com.sad.jetpack.architecture.componentization.api.IRequest;
+import com.sad.jetpack.architecture.componentization.api.IResponseSession;
 
 import static com.sad.jetpack.test.module1.TestInitModule1.path;
 
-@ExposedService(url =path)
-public class TestInitModule1 implements IApplicationLifecyclesObserver, IExposedService,IPCSession {
+@Component(url =path)
+public class TestInitModule1 implements IApplicationLifecyclesObserver, IComponent {
     protected static final String path="xxx://ssss.php.cn/java/base7/index?dww=cs";
     @ApplicationLifeCycleAction(priority = 1561)
     @Override
@@ -33,34 +29,10 @@ public class TestInitModule1 implements IApplicationLifecyclesObserver, IExposed
     public void attachApplicationBaseContext(Application application,Context base) {
 
     }
-
     @Override
-    public <T> T action(IPCMessenger messenger) {
+    public void onCall(IRequest request, IResponseSession session) throws Exception {
         Toast.makeText(AppGo.get().getContext(),"服务调用",Toast.LENGTH_LONG).show();
-        messenger.reply(DataCarrierImpl.newInstanceCreator().data("老大，我的工作做完了").state(DataState.DONE).create(), this);
-
-       /* session.openChat(new IPCMessenger() {
-            @Override
-            public boolean reply(IPCSession session, Object o) {
-                Log.e("sad-jetpack","------------->总部回复:"+o);
-                session.openChat(this,"不要再回复了");
-                return false;
-            }
-        },"模块下服务被调用");*/
-
-        /*notifier.chat(new IPCSession() {
-            @Override
-            public boolean chat(IPCMessenger messenger, Object o) {
-
-                return false;
-            }
-        }, "模块下服务被调用");*/
-        return null;
-    }
-
-    @Override
-    public boolean componentChat(IDataCarrier o, IPCMessenger messenger) {
-        return false;
+        session.postResponseData(DefaultDataContainer.newIntance().put("result","老大，我的工作做完了"));
     }
 
 

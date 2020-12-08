@@ -44,14 +44,14 @@ ext {
 
             //sad-jetpack
             "local_appgo_annotation"           : ":architecture:appgo:annotation",
-            "appgo_annotation"                 : "com.sad.jetpack.architecture.appgo:annotation:1.0.8",
+            "appgo_annotation"                 : "com.sad.jetpack.architecture.appgo:annotation:1.0.9",
             "local_appgo_api"                  : ":architecture:appgo:api",
-            "appgo_api"                        : "com.sad.jetpack.architecture.appgo:api:1.0.9",
-            "lib-ClassScanner"                 : "com.sad.jetpack.lib.classscanner:ClassScanner:1.0.1-G3-test",
+            "appgo_api"                        : "com.sad.jetpack.architecture.appgo:api:1.1.0",
+            "lib-ClassScanner"                 : "com.sad.jetpack.lib.classscanner:ClassScanner:1.0.1-Beta6",
             "local_componentization_api"       : ":architecture:componentization:api",
             "local_componentization_annotation": ":architecture:componentization:annotation",
             "local_componentization_compiler"  : ":architecture:componentization:compiler",
-            "componentization_annotation"      : "com.sad.jetpack.architecture.componentization:annotation:1.0.4",
+            "componentization_annotation"      : "com.sad.jetpack.architecture.componentization:annotation:1.0.6",
             "componentization_api"             : "com.sad.jetpack.architecture.componentization:api:1.0.0",
 
             //SAD
@@ -80,7 +80,7 @@ ext {
             "picture_library"                  : "com.github.LuckSiege.PictureSelector:picture_library:latest.release",
             "permission"                       : "com.yanzhenjie:permission:latest.release",
             "javapoet"                         : 'com.squareup:javapoet:latest.release',
-
+            "commons-io"                       : 'commons-io:commons-io:2.8.0',
 
             //self
             "self-demo-TestModule1"            : ":demo:TestModule1"

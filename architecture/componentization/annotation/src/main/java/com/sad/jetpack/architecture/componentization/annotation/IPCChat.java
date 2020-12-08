@@ -13,6 +13,8 @@ public @interface IPCChat {
 
     String[] url();
 
+    /*String parametersName() default "";*/
+
     String description() default "";
 
     int[] priority() default {0};

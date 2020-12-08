@@ -18,6 +18,7 @@ import com.squareup.javapoet.TypeVariableName;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -76,60 +77,87 @@ public class IPCChatProcessoer extends AbsProcessor {
     }
 
     private void generateNewAbstractParasiticComponent(IPCChat annotation_eventResponse,ExecutableElement executable_e_method,TypeElement e_class){
-        for (String e_name:annotation_eventResponse.url()
+        int[] priority=annotation_eventResponse.priority();
+        if (priority.length!=annotation_eventResponse.url().length){
+            log.error(String.format("%s方法所注解的url数量（"+annotation_eventResponse.url().length+"）与priority配置数量（"+priority.length+"）不一致。",executable_e_method.getSimpleName().toString()));
+            return;
+        }
+        List<String> urls=Arrays.asList(annotation_eventResponse.url());
+        for (String e_name:urls
              ) {
             String u_name= EncryptUtil.getInstance().XORencode(e_name,"abc123");//ValidUtils.encryptMD5ToString(e_name);
             String dynamicComponentClsName= NameUtils.getParasiticComponentClassSimpleName(e_class.getQualifiedName().toString()+"."+executable_e_method.getSimpleName(),u_name,"$$");
             String pkgName=elementUtils.getPackageOf(e_class).getQualifiedName().toString();
             List<? extends VariableElement> listParams=executable_e_method.getParameters();
-            boolean isHasReturnData=false;
-            //检查被注解的方法参数
-            if (listParams.size()!=1){
-                log.error(String.format("错误的方法参数数目，@%s方法只能有且仅有一个参数",executable_e_method.getSimpleName().toString()));
-                return;
-            }
-            Element elementIAC_0=elementUtils.getTypeElement(Constant.PACKAGE_API+".IPCMessenger");
-            if (!typeUtils.isSubtype(typeUtils.erasure(listParams.get(0).asType()),typeUtils.erasure(elementIAC_0.asType()))){
-                log.error(String.format("错误的方法参数类型，@%s方法第一个参数必须是IPCMessenger类型",executable_e_method.getSimpleName().toString()));
-                return;
-            }
-            //检查返回类型
-            Element elementIAC_return=elementUtils.getTypeElement(Void.class.getCanonicalName());
-            TypeMirror re =executable_e_method.getReturnType();
-            isHasReturnData=!"void".equals(typeUtils.erasure(re).toString());
-            CodeBlock codeInvokeHostMethod=null;
-            if (isHasReturnData){
-                codeInvokeHostMethod=CodeBlock.builder()
-                        .addStatement("$T returnData=getHost().$L(messenger)",
-                                re,
-                                executable_e_method.getSimpleName()
-                        )
-                        .addStatement("return returnData")
-                        .build();
+            //取出被注解的方法的所有参数类型
+            CodeBlock.Builder codeInvokeHostMethodBuilder=CodeBlock.builder();
+            if (listParams.size()==0){
+                //无参数
+                codeInvokeHostMethodBuilder.addStatement("getHost().$L()",executable_e_method.getSimpleName());
             }
             else {
-                codeInvokeHostMethod=CodeBlock.builder()
-                        .addStatement("getHost().$L(messenger)",
-                                executable_e_method.getSimpleName()
-                        )
-                        .build();
-            }
+                Element elementIAC_Request=elementUtils.getTypeElement(Constant.PACKAGE_API+".IRequest");
+                Element elementIAC_ResponseSession=elementUtils.getTypeElement(Constant.PACKAGE_API+".IResponseSession");
+                //检测参数中是否含有Request和session之外的类型
+                boolean hasUnknownTypeParameters=false;
+                for (VariableElement ve:listParams
+                     ) {
+                    if (!typeUtils.isSubtype(typeUtils.erasure(ve.asType()),typeUtils.erasure(elementIAC_Request.asType()))
+                        && !typeUtils.isSubtype(typeUtils.erasure(ve.asType()),typeUtils.erasure(elementIAC_ResponseSession.asType()))
+                    ){
+                        //log.error(String.format("错误的方法参数类型，@%s方法第一个参数必须是IPCMessenger类型",executable_e_method.getSimpleName().toString()));
+                        hasUnknownTypeParameters=true;
+                        break;
+                    }
+                }
+                if (hasUnknownTypeParameters){
+                    //若含有
+                    codeInvokeHostMethodBuilder.addStatement("$T dataContainer=request.dataContainer()",ClassName.bestGuess(Constant.PACKAGE_API+".IDataContainer"));
+                    //遍历未知类型参数
+                    for (VariableElement ve:listParams
+                         ) {
+                        if (!typeUtils.isSubtype(typeUtils.erasure(ve.asType()),typeUtils.erasure(elementIAC_Request.asType()))
+                                && !typeUtils.isSubtype(typeUtils.erasure(ve.asType()),typeUtils.erasure(elementIAC_ResponseSession.asType()))
+                        ) {
+                            codeInvokeHostMethodBuilder.addStatement("$T $L = dataContainer.get($S)",ve.asType(),ve.getSimpleName().toString(),ve.getSimpleName().toString());
+                        }
+                    }
+                    //log.error(String.format("错误的方法参数类型，@%s方法不能含有IRequest、IResponseSession之外的类型",executable_e_method.getSimpleName().toString()));
 
-            MethodSpec ms_onComponentResponse=MethodSpec.methodBuilder("action")
+                }
+
+                String ps="";
+                //生成参数列表
+                for (VariableElement ve:listParams
+                     ) {
+                    String sp=(listParams.indexOf(ve)==listParams.size()-1?"":",");
+                    if (typeUtils.isSubtype(typeUtils.erasure(ve.asType()),typeUtils.erasure(elementIAC_Request.asType()))){
+
+                        ps+="request"+sp;
+                    }
+                    else if (typeUtils.isSubtype(typeUtils.erasure(ve.asType()),typeUtils.erasure(elementIAC_ResponseSession.asType()))){
+                        ps+="session"+sp;
+                    }
+                    else {
+                        ps+=ve.getSimpleName().toString()+sp;
+                    }
+                }
+                codeInvokeHostMethodBuilder.addStatement("getHost().$L("+ps+")",executable_e_method.getSimpleName());
+            }
+            MethodSpec ms_onComponentResponse=MethodSpec.methodBuilder("onCall")
                     .addAnnotation(Override.class)
-                    .returns(isHasReturnData?TypeVariableName.get(re): TypeName.OBJECT)
+                    .returns(TypeName.VOID)
                     .addModifiers(Modifier.PUBLIC)
-                    .addParameter(ParameterSpec.builder(ClassName.bestGuess(Constant.PACKAGE_API+".IPCMessenger"),"messenger").build())
-                    .beginControlFlow("try")
-                    .addCode(codeInvokeHostMethod)
-                    .endControlFlow("catch($T e){e.printStackTrace();}", Exception.class)
-                    .addStatement("return null")
+                    .addException(Exception.class)
+                    .addParameter(ParameterSpec.builder(ClassName.bestGuess(Constant.PACKAGE_API+".IRequest"),"request").build())
+                    .addParameter(ParameterSpec.builder(ClassName.bestGuess(Constant.PACKAGE_API+".IResponseSession"),"session").build())
+                    .addCode(codeInvokeHostMethodBuilder.build())
                     .build();
             MethodSpec ms_priority=MethodSpec.methodBuilder("priority")
                     .addAnnotation(Override.class)
                     .returns(TypeName.INT)
                     .addModifiers(Modifier.PUBLIC)
-                    .addStatement("return "+annotation_eventResponse.priority())
+                    .addStatement("return "+annotation_eventResponse.priority()[urls.indexOf(e_name)])
                     .build();
 
             MethodSpec ms_c=MethodSpec.constructorBuilder()
@@ -144,7 +172,7 @@ public class IPCChatProcessoer extends AbsProcessor {
                     .addMethod(ms_c)
                     .addMethod(ms_onComponentResponse)
                     .addMethod(ms_priority)
-                    .superclass(ParameterizedTypeName.get(ClassName.bestGuess(Constant.PACKAGE_API+".impl.IPCChatProxy"),
+                    .superclass(ParameterizedTypeName.get(ClassName.bestGuess(Constant.PACKAGE_API+".ParasiticComponent"),
                             TypeVariableName.get(e_class.asType())
                     ))
 

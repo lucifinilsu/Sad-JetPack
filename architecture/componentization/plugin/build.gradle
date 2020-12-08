@@ -22,4 +22,4 @@ targetCompatibility = rootProject.ext.android.javaVersionInt
 //sourceCompatibility = JavaVersion.VERSION_1_8//rootProject.ext.android.javaVersion
 //targetCompatibility = JavaVersion.VERSION_1_8//rootProject.ext.android.javaVersion
 //apply from: rootProject.file('/architecture/componentization/plugin/publishToJceneterScript.gradle')
-//apply from: rootProject.file('/architecture/componentization/plugin/publishToLocalScript.gradle')
+apply from: rootProject.file('/architecture/componentization/plugin/publishToLocalScript.gradle')
