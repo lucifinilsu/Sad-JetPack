@@ -2,21 +2,18 @@ package com.sad.jetpack.demo;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.res.Configuration;
-import android.util.Log;
+import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
 
-import androidx.annotation.NonNull;
 
 import com.sad.jetpack.architecture.appgo.annotation.ApplicationAccess;
 
-import java.io.IOException;
 
 @ApplicationAccess
 public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e("test","------->i am onreate");
+        LogcatUtils.e("test","------->i am onreate");
     }
 
 

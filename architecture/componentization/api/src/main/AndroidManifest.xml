@@ -2,6 +2,8 @@
     package="com.sad.jetpack.architecture.componentization.api" >
     <application>
         <!-- 全局Context提供者、无侵入式App初始化类 -->
-
+        <provider
+            android:authorities="${applicationId}.com.sad.jetpack.architecture.componentization.api"
+            android:name="com.sad.jetpack.architecture.componentization.api.InternalContextInitializerProvider"/>
     </application>
 </manifest>

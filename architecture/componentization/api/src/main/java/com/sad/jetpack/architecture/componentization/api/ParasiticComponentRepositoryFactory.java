@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import com.googlecode.concurrentlinkedhashmap.Weighers;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +17,7 @@ public class ParasiticComponentRepositoryFactory implements InstancesRepositoryF
 
     public ParasiticComponentRepositoryFactory(Context context) {
         this.context = context;
+        initContainer();
     }
 
     @Override
@@ -59,9 +61,22 @@ public class ParasiticComponentRepositoryFactory implements InstancesRepositoryF
         return componentRepository;
     }
 
-    protected final static ConcurrentLinkedHashMap<Object,List<IComponentCallable>> DYNAMIC_COMPONENT_STORAGE=new ConcurrentLinkedHashMap.Builder<Object,List<IComponentCallable>>().build();
+    protected final static ConcurrentLinkedHashMap<Object,List<IComponentCallable>> DYNAMIC_COMPONENT_STORAGE=new ConcurrentLinkedHashMap.Builder<Object,List<IComponentCallable>>()
+                    .maximumWeightedCapacity(999)
+                    .weigher(Weighers.singleton())
+                    .build();
+    @Deprecated
+    private static void initContainer(){
+        /*if (DYNAMIC_COMPONENT_STORAGE==null){
+            DYNAMIC_COMPONENT_STORAGE=new ConcurrentLinkedHashMap.Builder<Object,List<IComponentCallable>>()
+                    .maximumWeightedCapacity(99)
+                    .weigher(Weighers.singleton())
+                    .build();
+        }*/
+    }
 
     protected static void registerParasiticComponent(Object host,IComponentCallable componentCallable){
+        initContainer();
         List<IComponentCallable> componentCallables=DYNAMIC_COMPONENT_STORAGE.get(host);
         if (componentCallables==null){
             componentCallables=new LinkedList<>();
@@ -70,6 +85,7 @@ public class ParasiticComponentRepositoryFactory implements InstancesRepositoryF
         DYNAMIC_COMPONENT_STORAGE.put(host,componentCallables);
     }
     protected static void unregisterParasiticComponent(Object host,String curl){
+        initContainer();
         List<IComponentCallable> componentCallables=DYNAMIC_COMPONENT_STORAGE.get(host);
         if (componentCallables!=null && !componentCallables.isEmpty()){
             componentCallables.remove(curl);
@@ -77,6 +93,7 @@ public class ParasiticComponentRepositoryFactory implements InstancesRepositoryF
         }
     }
     protected static void unregisterParasiticComponent(Object host){
+        initContainer();
         DYNAMIC_COMPONENT_STORAGE.remove(host);
     }
 }

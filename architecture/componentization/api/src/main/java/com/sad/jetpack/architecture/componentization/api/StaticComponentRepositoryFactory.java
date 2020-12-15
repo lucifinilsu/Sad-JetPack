@@ -2,7 +2,7 @@ package com.sad.jetpack.architecture.componentization.api;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
+import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
 
 import com.sad.jetpack.architecture.componentization.annotation.Utils;
 
@@ -33,7 +33,7 @@ public class StaticComponentRepositoryFactory implements InstancesRepositoryFact
                 if (url.endsWith("/")){
                     url=url.substring(0,url.length()-1);
                 }
-                Log.e("sad-jetpack",">>>>扫描："+url);
+                LogcatUtils.e("sad-jetpack",">>>>扫描："+url);
                 List<String> crmPaths= Utils.crmPaths(url);
                 for (String ermPath:crmPaths
                 ) {
@@ -47,6 +47,7 @@ public class StaticComponentRepositoryFactory implements InstancesRepositoryFact
         }catch (Exception e){
             e.printStackTrace();
         }
+        //LogcatUtils.e("sad-jetpack",">>>> componentCallableInstances is "+componentCallableInstances);
         componentRepository.setComponentInstances(componentCallableInstances);
         componentRepository.setObjectInstances(objectInstances);
         return componentRepository;
@@ -89,6 +90,7 @@ public class StaticComponentRepositoryFactory implements InstancesRepositoryFact
                     }
                     if (IComponent.class.isAssignableFrom(cls)){
                         IComponent component= (IComponent) instance;
+                        LogcatUtils.e("sad-jetpack",">>>>'"+crmPath+"' whose type is IComponent is found,it is "+component);
                         IComponentCallable componentCallable=InternalComponentCallable.newBuilder(component)
                                 .componentId(c_url)
                                 .build()
@@ -142,7 +144,7 @@ public class StaticComponentRepositoryFactory implements InstancesRepositoryFact
             return result;
         }catch (Exception e){
             //e.printStackTrace();
-            Log.e("sad-jetpack",">>>>"+fn+" is not file");
+            LogcatUtils.e("sad-jetpack",">>>>"+fn+" is not file");
             return null;
         }
     }

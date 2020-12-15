@@ -18,4 +18,6 @@ public class CommonConstant {
     public static final String REMOTE_BUNDLE_THROWABLE = "REMOTE_BUNDLE_THROWABLE";
 
     public static final String REMOTE_BUNDLE_CALLER_CONFIG = "REMOTE_BUNDLE_CALLER_CONFIG";
+
+    protected static boolean enableLog=false;
 }

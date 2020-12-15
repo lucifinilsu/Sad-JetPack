@@ -12,6 +12,10 @@ public class SCore {
 
     private SCore(){}
 
+    public static void enableLog(boolean e){
+        CommonConstant.enableLog=e;
+    }
+
     public static IComponentsCluster getCluster(Context context){
         return new InternalComponentCluster(context);
     }

@@ -13,12 +13,21 @@ import com.sad.jetpack.architecture.componentization.api.DefaultDataContainer;
 import com.sad.jetpack.architecture.componentization.api.IComponent;
 import com.sad.jetpack.architecture.componentization.api.IRequest;
 import com.sad.jetpack.architecture.componentization.api.IResponseSession;
+import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
+import com.sad.jetpack.architecture.componentization.api.SCore;
 
 import static com.sad.jetpack.test.module1.TestInitModule1.path;
 
 @Component(url =path)
 public class TestInitModule1 implements IApplicationLifecyclesObserver, IComponent {
     protected static final String path="xxx://ssss.php.cn/java/base7/index?dww=cs";
+    @ApplicationLifeCycleAction(priority = 9999)
+    @Override
+    public void onApplicationCreated(Application application) {
+        SCore.enableLog(true);
+        LogcatUtils.e(">>> 666666666666666666666");
+    }
+
     @ApplicationLifeCycleAction(priority = 1561)
     @Override
     public void onApplicationConfigurationChanged(Application application, Configuration newConfig) {

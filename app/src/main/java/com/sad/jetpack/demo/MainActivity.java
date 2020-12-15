@@ -2,7 +2,7 @@ package com.sad.jetpack.demo;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,11 +35,11 @@ import java.util.concurrent.TimeUnit;
 public class MainActivity extends AppCompatActivity {
     @IPCChat(url = {"test://ipc/chat/ttt","test://ipc/chat/sss"},priority = {996,822})
     public void onTestIPCChat(IRequest request, String xxx, IResponseSession session,Bundle bundle){
-        Log.e("sad-jetpack","------------->onTestIPCChat收到信息:"+request.dataContainer().getMap());
+        LogcatUtils.e("sad-jetpack","------------->onTestIPCChat收到信息:"+request.dataContainer().getMap());
         new Thread(){
             @Override
             public void run() {
-
+                session.postResponseData(request.dataContainer().put("xxx","89898989"));
             }
         }.start();
     }
@@ -49,9 +49,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         //华安生态 宝盈互联网 鹏华混合 融通新能源、景气AB 国投新能源 广发新经济
         SCore.registerParasiticComponentFromHost(this);
+        testCall();
+    }
+
+    private void testCall(){
+        SCore.getComponentCallable(getApplicationContext(),"xxx://ssss.php.cn/java").call(RequestImpl.newBuilder("551").build());
+    }
+
+    private void testPostMsgRemote(){
+
+    }
+
+
+    private void testPostMsgToLocal(){
         try {
             IRequest request= RequestImpl.newBuilder("c")
-                    .addData("xxx",666666)
+                    .addData("xxx","666666")
                     .build()
                     ;
             InstancesRepository instancesRepository=SCore.getCluster()
@@ -67,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     public void testWorker(){
         /*new InternalPerformer(ExposedServiceManager.newInstance()
                 .get("https://www.baidu.com/xxx/"))
@@ -94,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                                 .observe(MainActivity.this, new Observer<WorkInfo>() {
                                     @Override
                                     public void onChanged(WorkInfo workInfo) {
-                                        Log.e("sad-jetpack",">>>>末端任务状态："+workInfo.toString());
+                                        LogcatUtils.e("sad-jetpack",">>>>末端任务状态："+workInfo.toString());
                                     }
                                 });
                     }
@@ -130,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 .observe(MainActivity.this, new Observer<Operation.State>() {
                     @Override
                     public void onChanged(Operation.State state) {
-                        Log.e("sad-jetpack",">>>>全部任务执行完毕："+state);
+                        LogcatUtils.e("sad-jetpack",">>>>全部任务执行完毕："+state);
                     }
                 })*//*
         ;
@@ -139,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                 .observe(this, new Observer<WorkInfo>() {
                     @Override
                     public void onChanged(WorkInfo workInfo) {
-                        Log.e("sad-jetpack",">>>>末端任务状态："+workInfo.toString());
+                        LogcatUtils.e("sad-jetpack",">>>>末端任务状态："+workInfo.toString());
                     }
                 });
 

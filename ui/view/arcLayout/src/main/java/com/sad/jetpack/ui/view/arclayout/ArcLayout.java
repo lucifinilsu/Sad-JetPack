@@ -13,7 +13,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Shader;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.RelativeLayout;
 
@@ -92,7 +91,7 @@ public class ArcLayout extends RelativeLayout {
             if (height<arcHeight){
                 arcHeight=height;
             }
-            //Log.e("arc","--------->mHeight="+height+",mArcHeight="+arcHeight+",w="+width);
+            //LogcatUtils.e("arc","--------->mHeight="+height+",mArcHeight="+arcHeight+",w="+width);
         }
     }
 

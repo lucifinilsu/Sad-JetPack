@@ -15,10 +15,10 @@ final class ParasiticComponentFromHostConstructor implements IConstructor {
     public <T> T instance(Class<T> cls) throws Exception {
         Constructor constructor = null;
         try {
-            constructor = cls.getDeclaredConstructor(cls, IPCChat.class);
+            constructor = cls.getDeclaredConstructor(host.getClass(), IPCChat.class);
         } catch (Exception e) {
             e.printStackTrace();
-            constructor = cls.getConstructor(cls, IPCChat.class);
+            constructor = cls.getConstructor(host.getClass(), IPCChat.class);
         }
         constructor.setAccessible(true);
         IComponent parasiticComponent = (IComponent) constructor.newInstance(host, chat);

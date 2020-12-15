@@ -29,7 +29,7 @@ public class AppIPCService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //Log.e("ipc","---------------->服务端被调用");
+        //LogcatUtils.e("ipc","---------------->服务端被调用");
         return START_NOT_STICKY;
     }
 }

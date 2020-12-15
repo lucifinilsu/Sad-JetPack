@@ -99,7 +99,7 @@ final class InternalComponentCallable implements IComponentCallable,IComponentCa
 
     private void doCall(IRequest request, ICallerConfig config, IComponentCallListener listener){
         try {
-            if (component!=null){
+            if (component==null){
                 throw new Exception("ur component instance is null !!!");
             }
             boolean needTimeout=(config!=null && config.timeout()>0);

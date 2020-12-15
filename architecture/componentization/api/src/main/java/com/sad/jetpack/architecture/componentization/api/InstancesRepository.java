@@ -38,7 +38,7 @@ public interface InstancesRepository {
     default IComponentCallable firstComponentCallableInstance(){
         List<IComponentCallable> instances= componentCallableInstances();
         if (instances!=null && !instances.isEmpty()){
-            instances.get(0);
+            return instances.get(0);
         }
         return null;
     }

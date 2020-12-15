@@ -4,6 +4,7 @@ package com.sad.jetpack.architecture.componentization.api;
 import android.os.Handler;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import com.googlecode.concurrentlinkedhashmap.Weighers;
 import com.sad.core.async.ISADTaskProccessListener;
 import com.sad.core.async.SADTaskRunnable;
 import com.sad.core.async.SADTaskSchedulerClient;
@@ -22,7 +23,10 @@ final class InternalComponentConcurrencyProcessor extends AbsInternalComponentPr
         return new InternalComponentConcurrencyProcessor();
     }
     private InternalComponentConcurrencyProcessor(){
-        responses=new ConcurrentLinkedHashMap.Builder<IResponse,String>().build();
+        responses=new ConcurrentLinkedHashMap.Builder<IResponse,String>()
+                .maximumWeightedCapacity(999)
+                .weigher(Weighers.singleton())
+                .build();
     }
     @Override
     public void submit(IRequest request) {
