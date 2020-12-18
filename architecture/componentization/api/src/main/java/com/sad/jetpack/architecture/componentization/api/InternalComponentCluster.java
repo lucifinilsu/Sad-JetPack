@@ -16,12 +16,14 @@ final class InternalComponentCluster implements IComponentsCluster {
     private Map<String,IConstructor> constructorMap=new HashMap<>();
     private IConstructor allConstructor;
     private IComponentCallableInitializeListener componentCallableInitializeListener;
-    private InstancesRepositoryFactory intancesRepositoryFactory;
+    private InstancesRepositoryFactory intancesRepositoryFactory=StaticComponentRepositoryFactory.newInstance();
     private Context context;
-    protected InternalComponentCluster(Context context){
+    protected static IComponentsCluster newInstance(Context context){
+        return new InternalComponentCluster(context);
+    }
+    private InternalComponentCluster(Context context){
         this.context=context;
     }
-
 
     @Override
     public IComponentsCluster addConstructorToAll(IConstructor constructor) {
@@ -55,10 +57,7 @@ final class InternalComponentCluster implements IComponentsCluster {
 
     @Override
     public InstancesRepository repository(String url) {
-        if (intancesRepositoryFactory ==null){
-            intancesRepositoryFactory =new StaticComponentRepositoryFactory(context);
-        }
-        InstancesRepository instancesRepository= intancesRepositoryFactory.from(url,this.allConstructor,this.constructorMap,this.componentCallableInitializeListener);
+        InstancesRepository instancesRepository= intancesRepositoryFactory.from(context,url,this.allConstructor,this.constructorMap,this.componentCallableInitializeListener);
         return instancesRepository;
     }
 

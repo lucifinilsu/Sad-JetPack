@@ -2,7 +2,6 @@ package com.sad.jetpack.architecture.componentization.api;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-
 final class InternalContextHolder {
 
     @SuppressLint("StaticFieldLeak")
@@ -21,7 +20,7 @@ final class InternalContextHolder {
                 if (instance == null) {
                     Context context = InternalContextInitializerProvider.mContext;
                     if (context == null) {
-                        throw new IllegalStateException("context == null");
+                        //throw new IllegalStateException("context == null");
                     }
                     instance = new InternalContextHolder(context);
                 }

@@ -20,6 +20,7 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
     private Context context;
     private IRequest request;
     private ITarget target;
+    private InstancesRepositoryFactory instancesRepositoryFactory = StaticComponentRepositoryFactory.newInstance();
     private IPCRemoteCallListener listener;
     private ICallerConfig callerConfig;
     private Messenger replyMessenger;
@@ -34,12 +35,12 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
         Intent intent;
         boolean isBindCurrAppMainProcess= TextUtils.isEmpty(app) || context.getPackageName().equals(app);
         if (isBindCurrAppMainProcess) {
-            //LogcatUtils.e("ipc","------------------->连接当前App服务端："+app);
+            LogcatUtils.e("ipc","------------------->连接当前App服务端："+app);
             intent = new Intent(context, AppIPCService.class);
         }
         else {
             //跨App调起事件分发服务
-            //LogcatUtils.e("ipc","------------------->连接其他App服务端："+app);
+            LogcatUtils.e("ipc","------------------->连接其他App服务端："+app);
             intent = new Intent(app + ".ipc");
             intent.setPackage(app);
         }
@@ -72,6 +73,11 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
     }
 
     @Override
+    public InstancesRepositoryFactory instancesRepositoryFactory() {
+        return this.instancesRepositoryFactory;
+    }
+
+    @Override
     public Messenger replyMessenger() {
         if (action()==RemoteAction.REMOTE_ACTION_CREATE_REMOTE_IPC_CHAT){
             return new Messenger(new RemoteCallbackHandler(request,this,target));
@@ -89,6 +95,7 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
     public void execute() throws Exception {
 
         if (target==null){
+            //默认目标是当前app的当前进程
             target=TargetImpl.newBuilder()
                     .toApp(context.getPackageName())
                     .toProcess(Utils.getCurrAppProccessName(context))
@@ -96,7 +103,12 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
             //throw new Exception("ur ITarget is null !!!");
         }
         if (request==null){
-            request=RequestImpl.newInstance("EMPTY_DATA_REQUEST");
+            //默认来源是当前app的当前进程
+            request=RequestImpl.newBuilder("EMPTY_DATA_REQUEST")
+                        .fromApp(context.getPackageName())
+                        .fromProcess(Utils.getCurrAppProccessName(context))
+                        .build()
+            ;
             //throw new Exception("ur IRequest is null !!!");
         }
         if (listener!=null){
@@ -109,6 +121,7 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
         bundle.putParcelable(CommonConstant.REMOTE_BUNDLE_TARGET,target);
         bundle.putInt(CommonConstant.REMOTE_BUNDLE_ACTION,action);
         bundle.putParcelable(CommonConstant.REMOTE_BUNDLE_CALLER_CONFIG,callerConfig);
+        bundle.putParcelable(CommonConstant.REMOTE_BUNDLE_CALLER_INSTANCES_REPOSITORY_FACTORY,instancesRepositoryFactory);
         message.setData(bundle);
         message.replyTo=replyMessenger();
         IRequest finalRequest = request;
@@ -140,7 +153,7 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
     @Override
     public Builder request(IRequest request) {
         this.request=request;
-        return null;
+        return this;
     }
 
     @Override
@@ -174,6 +187,12 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
     }
 
     @Override
+    public Builder instancesFactory(InstancesRepositoryFactory instancesRepositoryFactory) {
+        this.instancesRepositoryFactory =instancesRepositoryFactory;
+        return this;
+    }
+
+    @Override
     public IPCRemoteConnector build() {
         return this;
     }
@@ -203,10 +222,12 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
                 target=targetWeakReference.get();
             }
             Bundle bundle=msg.getData();
+            bundle.setClassLoader(getClass().getClassLoader());
             if (bundle!=null){
                 int state= msg.what;
                 if (state==RemoteActionResultState.REMOTE_ACTION_RESULT_STATE_SUCCESS){
                     if (remoteConnector!=null){
+                        bundle.setClassLoader(getClass().getClassLoader());
                         IResponse response=bundle.getParcelable(CommonConstant.REMOTE_BUNDLE_RESPONSE);
                         IRequest finalRequest = request;
                         IPCRemoteCallListener listener=remoteConnector.listener();
@@ -243,6 +264,7 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
                 }
                 else if(state==RemoteActionResultState.REMOTE_ACTION_RESULT_STATE_FAILURE){
                     if (remoteConnector!=null){
+                        bundle.setClassLoader(getClass().getClassLoader());
                         Throwable throwable= (Throwable) bundle.getSerializable(CommonConstant.REMOTE_BUNDLE_THROWABLE);
                         IPCRemoteCallListener listener=remoteConnector.listener();
                         if (listener!=null){

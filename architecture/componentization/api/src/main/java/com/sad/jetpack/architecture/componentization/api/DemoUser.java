@@ -1,4 +1,4 @@
-package com.sad.jetpack.architecture.componentization;
+package com.sad.jetpack.architecture.componentization.api;
 
 import android.content.Context;
 
@@ -11,6 +11,7 @@ import com.sad.jetpack.architecture.componentization.api.IPCRemoteCallListener;
 import com.sad.jetpack.architecture.componentization.api.IRequestSession;
 import com.sad.jetpack.architecture.componentization.api.IResponse;
 import com.sad.jetpack.architecture.componentization.api.ITarget;
+import com.sad.jetpack.architecture.componentization.api.InternalContextHolder;
 import com.sad.jetpack.architecture.componentization.api.ParasiticComponentRepositoryFactory;
 import com.sad.jetpack.architecture.componentization.api.RemoteAction;
 import com.sad.jetpack.architecture.componentization.api.RequestImpl;
@@ -95,8 +96,8 @@ public class DemoUser {
                 })
                 .build()
                 .submit(request);
-        SCore.getCluster()
-                .instancesRepositoryFactory(new ParasiticComponentRepositoryFactory(context))
+        SCore.getCluster(InternalContextHolder.get().getContext())
+                .instancesRepositoryFactory(ParasiticComponentRepositoryFactory.newInstance())
                 .repository("xcccc")
                 .firstComponentCallableInstance()
                 .toBuilder()
@@ -114,7 +115,7 @@ public class DemoUser {
                 .build()
                 .call(RequestImpl.newInstance("666"));
 
-        SCore.getComponentCallable("cxcxc")
+        SCore.getComponentCallable(InternalContextHolder.get().getContext(),"cxcxc")
                 .toBuilder()
                 .listener(new IComponentCallListener() {
                     @Override

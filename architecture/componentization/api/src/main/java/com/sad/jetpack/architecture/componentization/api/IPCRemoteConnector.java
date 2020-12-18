@@ -14,6 +14,8 @@ public interface IPCRemoteConnector {
 
     @RemoteAction int action();
 
+    InstancesRepositoryFactory instancesRepositoryFactory();
+
     Messenger replyMessenger();
 
     void execute() throws Exception;
@@ -33,6 +35,8 @@ public interface IPCRemoteConnector {
         Builder replyMessenger(Messenger replyMessenger);
 
         Builder callerConfig(ICallerConfig callerConfig);
+
+        Builder instancesFactory(InstancesRepositoryFactory instancesRepositoryFactory);
 
         IPCRemoteConnector build();
 

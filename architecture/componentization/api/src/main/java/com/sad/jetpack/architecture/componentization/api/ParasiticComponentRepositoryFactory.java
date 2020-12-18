@@ -2,6 +2,8 @@ package com.sad.jetpack.architecture.componentization.api;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
@@ -11,17 +13,31 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class ParasiticComponentRepositoryFactory implements InstancesRepositoryFactory {
+public class ParasiticComponentRepositoryFactory implements InstancesRepositoryFactory
+{
+    protected ParasiticComponentRepositoryFactory(Parcel in) {
+    }
 
-    private Context context;
+    public static final Creator<ParasiticComponentRepositoryFactory> CREATOR = new Creator<ParasiticComponentRepositoryFactory>() {
+        @Override
+        public ParasiticComponentRepositoryFactory createFromParcel(Parcel in) {
+            return new ParasiticComponentRepositoryFactory(in);
+        }
 
-    public ParasiticComponentRepositoryFactory(Context context) {
-        this.context = context;
-        initContainer();
+        @Override
+        public ParasiticComponentRepositoryFactory[] newArray(int size) {
+            return new ParasiticComponentRepositoryFactory[size];
+        }
+    };
+
+    public static InstancesRepositoryFactory newInstance(){
+        return new ParasiticComponentRepositoryFactory();
+    }
+    private ParasiticComponentRepositoryFactory() {
     }
 
     @Override
-    public InstancesRepository from(String url, IConstructor allConstructor, Map<String,IConstructor> constructors, IComponentCallableInitializeListener componentCallableInitializeListener) {
+    public InstancesRepository from(Context context,String url, IConstructor allConstructor, Map<String,IConstructor> constructors, IComponentCallableInitializeListener componentCallableInitializeListener) {
         InternalInstancesRepository componentRepository=new InternalInstancesRepository(url);
         List<IComponentCallable> componentCallableInstances =new LinkedList<>();
         MapTraverseUtils.traverseGroup(DYNAMIC_COMPONENT_STORAGE, new MapTraverseUtils.ITraverseAction<Object,List<IComponentCallable>>() {
@@ -65,18 +81,9 @@ public class ParasiticComponentRepositoryFactory implements InstancesRepositoryF
                     .maximumWeightedCapacity(999)
                     .weigher(Weighers.singleton())
                     .build();
-    @Deprecated
-    private static void initContainer(){
-        /*if (DYNAMIC_COMPONENT_STORAGE==null){
-            DYNAMIC_COMPONENT_STORAGE=new ConcurrentLinkedHashMap.Builder<Object,List<IComponentCallable>>()
-                    .maximumWeightedCapacity(99)
-                    .weigher(Weighers.singleton())
-                    .build();
-        }*/
-    }
+
 
     protected static void registerParasiticComponent(Object host,IComponentCallable componentCallable){
-        initContainer();
         List<IComponentCallable> componentCallables=DYNAMIC_COMPONENT_STORAGE.get(host);
         if (componentCallables==null){
             componentCallables=new LinkedList<>();
@@ -85,7 +92,6 @@ public class ParasiticComponentRepositoryFactory implements InstancesRepositoryF
         DYNAMIC_COMPONENT_STORAGE.put(host,componentCallables);
     }
     protected static void unregisterParasiticComponent(Object host,String curl){
-        initContainer();
         List<IComponentCallable> componentCallables=DYNAMIC_COMPONENT_STORAGE.get(host);
         if (componentCallables!=null && !componentCallables.isEmpty()){
             componentCallables.remove(curl);
@@ -93,7 +99,15 @@ public class ParasiticComponentRepositoryFactory implements InstancesRepositoryF
         }
     }
     protected static void unregisterParasiticComponent(Object host){
-        initContainer();
         DYNAMIC_COMPONENT_STORAGE.remove(host);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
     }
 }

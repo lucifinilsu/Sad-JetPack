@@ -11,6 +11,7 @@ import com.sad.jetpack.architecture.appgo.api.IApplicationLifecyclesObserver;
 import com.sad.jetpack.architecture.componentization.annotation.Component;
 import com.sad.jetpack.architecture.componentization.api.DefaultDataContainer;
 import com.sad.jetpack.architecture.componentization.api.IComponent;
+import com.sad.jetpack.architecture.componentization.api.IDataContainer;
 import com.sad.jetpack.architecture.componentization.api.IRequest;
 import com.sad.jetpack.architecture.componentization.api.IResponseSession;
 import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
@@ -21,10 +22,12 @@ import static com.sad.jetpack.test.module1.TestInitModule1.path;
 @Component(url =path)
 public class TestInitModule1 implements IApplicationLifecyclesObserver, IComponent {
     protected static final String path="xxx://ssss.php.cn/java/base7/index?dww=cs";
+
     @ApplicationLifeCycleAction(priority = 9999)
     @Override
-    public void onApplicationCreated(Application application) {
+    public void onApplicationPreCreated(Application application) {
         SCore.enableLog(true);
+        SCore.initIPC(application);
         LogcatUtils.e(">>> 666666666666666666666");
     }
 
@@ -40,8 +43,18 @@ public class TestInitModule1 implements IApplicationLifecyclesObserver, ICompone
     }
     @Override
     public void onCall(IRequest request, IResponseSession session) throws Exception {
-        Toast.makeText(AppGo.get().getContext(),"服务调用",Toast.LENGTH_LONG).show();
-        session.postResponseData(DefaultDataContainer.newIntance().put("result","老大，我的工作做完了"));
+        //Toast.makeText(AppGo.get().getContext(),"服务调用",Toast.LENGTH_LONG).show();
+
+
+        IDataContainer dataContainer=request.dataContainer();
+        if (dataContainer!=null){
+            if (dataContainer.getMap().containsKey("remote")){
+                LogcatUtils.e("---->远端回送信息："+dataContainer.getMap());
+            }
+        }
+        else {
+            session.postResponseData(DefaultDataContainer.newIntance().put("result","老大，我的工作做完了"));
+        }
     }
 
 

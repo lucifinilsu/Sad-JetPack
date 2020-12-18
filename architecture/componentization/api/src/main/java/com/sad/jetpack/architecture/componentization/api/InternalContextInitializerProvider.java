@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,9 +16,11 @@ public class InternalContextInitializerProvider extends ContentProvider {
     protected static Context mContext;
     @Override
     public boolean onCreate() {
+        Log.e("SAD","-------------->初始化Context");
         mContext = getContext();
         return false;
     }
+
 
     @Nullable
     @Override

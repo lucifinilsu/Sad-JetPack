@@ -34,6 +34,13 @@ final class InternalComponentConcurrencyProcessor extends AbsInternalComponentPr
             request=callListener.onProcessorInputRequest(request,processorId);
         }
         IRequest r=request;
+        if (units.isEmpty()){
+            Exception e= new Exception("the units of ur remote task'target is empty !!!");
+            if (callListener!=null){
+                callListener.onProcessorException(request,e,processorId);
+            }
+            return;
+        }
         countDownLatch=new CountDownLatch(units.size());
         SADTaskSchedulerClient.newInstance().execute(new SADTaskRunnable<ConcurrentLinkedHashMap<IResponse,String>>("PROCESSOR_COUNTDOWN", new ISADTaskProccessListener<ConcurrentLinkedHashMap<IResponse, String>>() {
             @Override
@@ -87,6 +94,7 @@ final class InternalComponentConcurrencyProcessor extends AbsInternalComponentPr
 
     private void doSubmit(IRequest request){
         try {
+
             for (Object o:units
                  ) {
                 IRequest r= RequestImpl.newBuilder(request.id())

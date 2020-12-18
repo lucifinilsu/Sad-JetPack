@@ -32,6 +32,13 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
             request=callListener.onProcessorInputRequest(request,processorId);
         }
         IRequest r=request;
+        if (units.isEmpty()){
+            Exception e= new Exception("the units of ur remote task'target is empty !!!");
+            if (callListener!=null){
+                callListener.onProcessorException(request,e,processorId);
+            }
+            return;
+        }
         countDownLatch=new CountDownLatch(units.size());
         SADTaskSchedulerClient.newInstance().execute(new SADTaskRunnable<IResponse>("PROCESSOR_COUNTDOWN", new ISADTaskProccessListener<IResponse>() {
             @Override

@@ -17,6 +17,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:label="子进程"
+            android:launchMode="standard"
+            android:name="com.sad.jetpack.demo.RemoteActivity"
+            android:process=":remote"
+            />
     </application>
 
 </manifest>

@@ -1,7 +1,9 @@
 package com.sad.jetpack.architecture.componentization.compiler;
 
 import com.google.auto.service.AutoService;
+import com.sad.jetpack.architecture.componentization.annotation.Data;
 import com.sad.jetpack.architecture.componentization.annotation.EncryptUtil;
+import com.sad.jetpack.architecture.componentization.annotation.IDataConverter;
 import com.sad.jetpack.architecture.componentization.annotation.IPCChat;
 import com.sad.jetpack.architecture.componentization.annotation.NameUtils;
 import com.sad.jetpack.architecture.componentization.annotation.ValidUtils;
@@ -18,6 +20,7 @@ import com.squareup.javapoet.TypeVariableName;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +38,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.MirroredTypeException;
 import javax.lang.model.type.TypeMirror;
 
 @AutoService(Processor.class)
@@ -119,7 +123,26 @@ public class IPCChatProcessoer extends AbsProcessor {
                         if (!typeUtils.isSubtype(typeUtils.erasure(ve.asType()),typeUtils.erasure(elementIAC_Request.asType()))
                                 && !typeUtils.isSubtype(typeUtils.erasure(ve.asType()),typeUtils.erasure(elementIAC_ResponseSession.asType()))
                         ) {
-                            codeInvokeHostMethodBuilder.addStatement("$T $L = dataContainer.get($S)",ve.asType(),ve.getSimpleName().toString(),ve.getSimpleName().toString());
+                            String p_name=ve.getSimpleName().toString();
+                            Data data=ve.getAnnotation(Data.class);
+                            //TypeMirror dm=null;
+                            Class<? extends IDataConverter> converterClass=null;
+                            if (data!=null){
+                                p_name=data.name();
+                                //converterClass=data.converter();
+                                //dm=getConverterClassTypeMirror(data);
+                            }
+                            codeInvokeHostMethodBuilder.addStatement("$T $L = dataContainer.get($S)",ve.asType(),ve.getSimpleName().toString(),p_name);
+
+                            /*if (dm!=null){
+                                codeInvokeHostMethodBuilder.addStatement("Object _$L = dataContainer.get($S)",ve.getSimpleName().toString(),p_name);
+                                codeInvokeHostMethodBuilder.addStatement("$T dataConverter_$L = new $T()",IDataConverter.class,ve.getSimpleName().toString(),ClassName.bestGuess(dm.toString()));
+                                codeInvokeHostMethodBuilder.addStatement("$T $L = dataConverter_$L.convert(_$L)",ve.asType(),ve.getSimpleName().toString(),ve.getSimpleName().toString(),ve.getSimpleName().toString());
+                            }*/
+                            /*else {
+                                codeInvokeHostMethodBuilder.addStatement("$T $L = dataContainer.get($S)",ve.asType(),ve.getSimpleName().toString(),p_name);
+                            }*/
+
                         }
                     }
                     //log.error(String.format("错误的方法参数类型，@%s方法不能含有IRequest、IResponseSession之外的类型",executable_e_method.getSimpleName().toString()));
@@ -188,6 +211,17 @@ public class IPCChatProcessoer extends AbsProcessor {
                 e.printStackTrace();
             }
         }
-
     }
+
+    /*private static TypeMirror getConverterClassTypeMirror(Data annotation) {
+        try
+        {
+            annotation.converter(); // this should throw
+        }
+        catch( MirroredTypeException mte )
+        {
+            return mte.getTypeMirror();
+        }
+        return null; // can this ever happen ??
+    }*/
 }

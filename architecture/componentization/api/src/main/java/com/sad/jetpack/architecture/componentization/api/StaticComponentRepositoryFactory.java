@@ -1,6 +1,9 @@
 package com.sad.jetpack.architecture.componentization.api;
 
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
 
@@ -16,14 +19,32 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class StaticComponentRepositoryFactory implements InstancesRepositoryFactory {
-    private Context context;
+public class StaticComponentRepositoryFactory implements InstancesRepositoryFactory,Parcelable {
     private int index=-1;
-    public StaticComponentRepositoryFactory(Context context){
-        this.context=context;
+
+    protected StaticComponentRepositoryFactory(Parcel in) {
+        index = in.readInt();
+    }
+
+    public static final Creator<StaticComponentRepositoryFactory> CREATOR = new Creator<StaticComponentRepositoryFactory>() {
+        @Override
+        public StaticComponentRepositoryFactory createFromParcel(Parcel in) {
+            return new StaticComponentRepositoryFactory(in);
+        }
+
+        @Override
+        public StaticComponentRepositoryFactory[] newArray(int size) {
+            return new StaticComponentRepositoryFactory[size];
+        }
+    };
+
+    public static InstancesRepositoryFactory newInstance(){
+        return new StaticComponentRepositoryFactory();
+    }
+    private StaticComponentRepositoryFactory(){
     }
     @Override
-    public InstancesRepository from(String url, IConstructor allConstructor, Map<String,IConstructor> constructors, IComponentCallableInitializeListener componentInitializeListener) {
+    public InstancesRepository from(Context context,String url, IConstructor allConstructor, Map<String,IConstructor> constructors, IComponentCallableInitializeListener componentInitializeListener) {
         InternalInstancesRepository componentRepository=new InternalInstancesRepository(url);
         LinkedHashMap<Object, String> objectInstances =new LinkedHashMap<>();
         List<IComponentCallable> componentCallableInstances =new LinkedList<>();
@@ -38,7 +59,7 @@ public class StaticComponentRepositoryFactory implements InstancesRepositoryFact
                 for (String ermPath:crmPaths
                 ) {
                     try {
-                        traverse(ermPath,componentCallableInstances,objectInstances,allConstructor,constructors,componentInitializeListener);
+                        traverse(context,ermPath,componentCallableInstances,objectInstances,allConstructor,constructors,componentInitializeListener);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -54,6 +75,7 @@ public class StaticComponentRepositoryFactory implements InstancesRepositoryFact
     }
 
     private void traverse(
+            Context context,
             String crmPath,
             List<IComponentCallable> componentCallableInstances,
             LinkedHashMap<Object, String> objectInstances,
@@ -124,7 +146,7 @@ public class StaticComponentRepositoryFactory implements InstancesRepositoryFact
                 String[] nextPlist=context.getAssets().list(crmPath);
                 for (String nextPath:nextPlist
                 ) {
-                    traverse(crmPath+ File.separator+nextPath,componentCallableInstances,objectInstances,allConstructor,constructors,componentCallableInitializeListener);
+                    traverse(context,crmPath+ File.separator+nextPath,componentCallableInstances,objectInstances,allConstructor,constructors,componentCallableInitializeListener);
                 }
 
             }
@@ -133,6 +155,7 @@ public class StaticComponentRepositoryFactory implements InstancesRepositoryFact
             }
         }
     }
+
     private String readStringFrom(Context context,String fn){
         try {
             StringBuffer sb=new StringBuffer();
@@ -147,5 +170,15 @@ public class StaticComponentRepositoryFactory implements InstancesRepositoryFact
             LogcatUtils.e("sad-jetpack",">>>>"+fn+" is not file");
             return null;
         }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(index);
     }
 }

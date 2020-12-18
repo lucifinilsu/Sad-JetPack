@@ -10,28 +10,26 @@ import java.lang.reflect.Method;
 
 public class SCore {
 
-    private SCore(){}
+    /*public static void initInternalContext(){
+        InternalContextInitializerProvider.mContext=context;
+    }*/
 
     public static void enableLog(boolean e){
         CommonConstant.enableLog=e;
     }
 
     public static IComponentsCluster getCluster(Context context){
-        return new InternalComponentCluster(context);
+        return InternalComponentCluster.newInstance(context);
     }
-    public static IComponentsCluster getCluster(){
+    /*public static IComponentsCluster getCluster(){
         return getCluster(InternalContextHolder.get().getContext());
-    }
+    }*/
 
-    public static <T> T getFirstInstance(String curl){
-        return getFirstInstance(curl,null);
-    }
+
     public static <T> T getFirstInstance(Context context,String curl){
         return getFirstInstance(context,curl,null);
     }
-    public static <T> T getFirstInstance(String curl, IConstructor constructor){
-        return getFirstInstance(InternalContextHolder.get().getContext(),curl,constructor);
-    }
+
     public static <T> T getFirstInstance(Context context, String curl, IConstructor constructor){
         IComponentsCluster cluster=getCluster(context);
         return cluster
@@ -47,14 +45,9 @@ public class SCore {
                 .repository(curl)
                 .firstInstance();
     }
-    public static IComponentCallable getComponentCallable(String curl){
-        return getComponentCallable(curl,null);
-    }
+
     public static IComponentCallable getComponentCallable(Context context, String curl){
         return getComponentCallable(context,curl,null);
-    }
-    public static IComponentCallable getComponentCallable(String curl, IConstructor constructor){
-        return getComponentCallable(InternalContextHolder.get().getContext(),curl,constructor);
     }
 
     public static IComponentCallable getComponentCallable(Context context, String curl,IConstructor constructor){
@@ -80,8 +73,16 @@ public class SCore {
 
     public static void initIPC(Context context){
         try {
+            if (InternalContextInitializerProvider.mContext==null){
+                InternalContextInitializerProvider.mContext=context;
+            }
             IPCRemoteConnectorImpl.newBuilder(context)
                     .action(RemoteAction.REMOTE_ACTION_REGISTER_TO_MESSENGERS_POOL)
+                    .request(RequestImpl.newBuilder("REMOTE_ACTION_REGISTER_TO_MESSENGERS_POOL")
+                            .fromApp(context.getPackageName())
+                            .fromProcess(Utils.getCurrAppProccessName(context))
+                            .build()
+                    )
                     .build()
                     .execute();
         } catch (Exception e) {
@@ -91,10 +92,6 @@ public class SCore {
 
     public static IPCRemoteConnector.Builder ipc(Context context){
         return IPCRemoteConnectorImpl.newBuilder(context);
-    }
-
-    public static IPCRemoteConnector.Builder ipc(){
-        return IPCRemoteConnectorImpl.newBuilder(InternalContextHolder.get().getContext());
     }
 
     public static <O> void registerParasiticComponentFromHost(O host, IConstructor constructor) {

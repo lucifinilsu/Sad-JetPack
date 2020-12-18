@@ -17,12 +17,16 @@ final class ComponentResponseHandler extends Handler {
         Messenger replyMessenger=msg.replyTo;
         if (replyMessenger!=null){
             if (bundle!=null){
+                bundle.setClassLoader(IPCRemoteConnectorImpl.class.getClassLoader());
                 IRequest request=bundle.getParcelable(CommonConstant.REMOTE_BUNDLE_REQUEST);
                 ICallerConfig callerConfig=bundle.getParcelable(CommonConstant.REMOTE_BUNDLE_CALLER_CONFIG);
                 ITarget target=bundle.getParcelable(CommonConstant.REMOTE_BUNDLE_TARGET);
                 int action=bundle.getInt(CommonConstant.REMOTE_BUNDLE_ACTION);
                 int processorMode=target.processorMode();
-                IComponentsCluster cluster=new InternalComponentCluster(InternalContextHolder.get().getContext());
+                InstancesRepositoryFactory instancesRepositoryFactory=bundle.getParcelable(CommonConstant.REMOTE_BUNDLE_CALLER_INSTANCES_REPOSITORY_FACTORY);
+                IComponentsCluster cluster=InternalComponentCluster.newInstance(InternalContextHolder.get().getContext())
+                        .instancesRepositoryFactory(instancesRepositoryFactory)
+                        ;
                 InstancesRepository repository=cluster.repository(target.id());
                 if (processorMode==ProcessorMode.PROCESSOR_MODE_SINGLE){
                     IComponentCallable componentCallable=repository.firstComponentCallableInstance();
@@ -32,11 +36,13 @@ final class ComponentResponseHandler extends Handler {
                                 @Override
                                 public boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
                                     try {
-                                        bundle.setClassLoader(getClass().getClassLoader());
+                                        bundle.setClassLoader(ComponentResponseHandler.this.getClass().getClassLoader());
                                         bundle.putParcelable(CommonConstant.REMOTE_BUNDLE_RESPONSE,response);
                                         msg.what=RemoteActionResultState.REMOTE_ACTION_RESULT_STATE_SUCCESS;
                                         msg.setData(bundle);
-                                        replyMessenger.send(msg);
+                                        Message message=Message.obtain();
+                                        message.copyFrom(msg);
+                                        replyMessenger.send(message);
                                     }catch (Exception e){
                                         e.printStackTrace();
                                     }
@@ -46,11 +52,13 @@ final class ComponentResponseHandler extends Handler {
                                 @Override
                                 public void onComponentException(IRequest request, Throwable throwable, String componentId) {
                                     try {
-                                        bundle.setClassLoader(getClass().getClassLoader());
+                                        bundle.setClassLoader(ComponentResponseHandler.this.getClass().getClassLoader());
                                         bundle.putSerializable(CommonConstant.REMOTE_BUNDLE_THROWABLE,throwable);
                                         msg.what=RemoteActionResultState.REMOTE_ACTION_RESULT_STATE_FAILURE;
                                         msg.setData(bundle);
-                                        replyMessenger.send(msg);
+                                        Message message=Message.obtain();
+                                        message.copyFrom(msg);
+                                        replyMessenger.send(message);
                                     }catch (Exception e){
                                         e.printStackTrace();
                                     }
@@ -72,11 +80,15 @@ final class ComponentResponseHandler extends Handler {
                                 @Override
                                 public boolean onProcessorReceivedResponse(IResponse response, String processorId) {
                                     try {
-                                        bundle.setClassLoader(getClass().getClassLoader());
+                                        bundle.setClassLoader(ComponentResponseHandler.this.getClass().getClassLoader());
                                         bundle.putParcelable(CommonConstant.REMOTE_BUNDLE_RESPONSE,response);
                                         msg.what=RemoteActionResultState.REMOTE_ACTION_RESULT_STATE_SUCCESS;
                                         msg.setData(bundle);
-                                        replyMessenger.send(msg);
+                                        LogcatUtils.e("ipc","--------->msg="+msg.toString());
+                                        Message message=Message.obtain();
+                                        message.copyFrom(msg);
+                                        LogcatUtils.e("ipc","--------->message="+message.toString());
+                                        replyMessenger.send(message);
                                     }catch (Exception e){
                                         e.printStackTrace();
                                     }
@@ -91,11 +103,14 @@ final class ComponentResponseHandler extends Handler {
                                 @Override
                                 public void onProcessorException(IRequest request, Throwable throwable, String processorId) {
                                     try {
-                                        bundle.setClassLoader(getClass().getClassLoader());
+                                        bundle.setClassLoader(ComponentResponseHandler.this.getClass().getClassLoader());
                                         bundle.putSerializable(CommonConstant.REMOTE_BUNDLE_THROWABLE,throwable);
                                         msg.what=RemoteActionResultState.REMOTE_ACTION_RESULT_STATE_FAILURE;
                                         msg.setData(bundle);
-                                        replyMessenger.send(msg);
+                                        Message message=Message.obtain();
+                                        message.copyFrom(msg);
+                                        LogcatUtils.e("ipc","--------->message="+message.toString());
+                                        replyMessenger.send(message);
                                     }catch (Exception e){
                                         e.printStackTrace();
                                     }

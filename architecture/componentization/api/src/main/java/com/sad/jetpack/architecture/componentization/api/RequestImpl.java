@@ -21,8 +21,10 @@ public class RequestImpl implements IRequest, IRequest.Builder {
     private RequestImpl(String id){
         this.id=id;
         Context context=InternalContextHolder.get().getContext();
-        this.fromApp=context.getPackageName();
-        this.fromProcess=Utils.getCurrAppProccessName(context);
+        if (context!=null){
+            this.fromApp=context.getPackageName();
+            this.fromProcess=Utils.getCurrAppProccessName(context);
+        }
     }
 
     protected RequestImpl(Parcel in) {

@@ -1,7 +1,13 @@
 package com.sad.jetpack.demo;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+
+import com.sad.jetpack.architecture.componentization.annotation.Data;
+import com.sad.jetpack.architecture.componentization.annotation.DefaultConverter;
 import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
 
 import androidx.annotation.RequiresApi;
@@ -26,6 +32,7 @@ import com.sad.jetpack.architecture.componentization.api.InstancesRepository;
 import com.sad.jetpack.architecture.componentization.api.ParasiticComponentRepositoryFactory;
 import com.sad.jetpack.architecture.componentization.api.RequestImpl;
 import com.sad.jetpack.architecture.componentization.api.SCore;
+import com.sad.jetpack.architecture.componentization.api.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +41,9 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
     @IPCChat(url = {"test://ipc/chat/ttt","test://ipc/chat/sss"},priority = {996,822})
-    public void onTestIPCChat(IRequest request, String xxx, IResponseSession session,Bundle bundle){
+    public void onTestIPCChat(IRequest request, String xxx, IResponseSession session,@Data(name = "extra")Bundle bundle){
         LogcatUtils.e("sad-jetpack","------------->onTestIPCChat收到信息:"+request.dataContainer().getMap());
+        tv.setText("onTestIPCChat收到信息:"+request.dataContainer().getMap());
         new Thread(){
             @Override
             public void run() {
@@ -43,13 +51,21 @@ public class MainActivity extends AppCompatActivity {
             }
         }.start();
     }
+    TextView tv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        tv=findViewById(R.id.myProcess);
+        tv.setText("当前App:"+getApplicationContext().getPackageName()+"\n当前进程:"+ Utils.getCurrAppProccessName(getApplicationContext()));
         //华安生态 宝盈互联网 鹏华混合 融通新能源、景气AB 国投新能源 广发新经济
         SCore.registerParasiticComponentFromHost(this);
-        testCall();
+        findViewById(R.id.shap).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this,RemoteActivity.class));
+            }
+        });
     }
 
     private void testCall(){
@@ -67,8 +83,8 @@ public class MainActivity extends AppCompatActivity {
                     .addData("xxx","666666")
                     .build()
                     ;
-            InstancesRepository instancesRepository=SCore.getCluster()
-                    .instancesRepositoryFactory(new ParasiticComponentRepositoryFactory(getApplicationContext()))
+            InstancesRepository instancesRepository=SCore.getCluster(getApplicationContext())
+                    .instancesRepositoryFactory(ParasiticComponentRepositoryFactory.newInstance())
                     .repository("test://ipc/chat")
                     ;
             SCore

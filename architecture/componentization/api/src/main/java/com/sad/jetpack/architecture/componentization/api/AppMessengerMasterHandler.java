@@ -28,6 +28,7 @@ final class AppMessengerMasterHandler extends Handler {
         super.handleMessage(msg);
         Bundle bundle=msg.getData();
         if (bundle!=null){
+            bundle.setClassLoader(getClass().getClassLoader());
             int action=bundle.getInt(CommonConstant.REMOTE_BUNDLE_ACTION);
             IRequest request=bundle.getParcelable(REMOTE_BUNDLE_REQUEST);
             ITarget target=bundle.getParcelable(REMOTE_BUNDLE_TARGET);
@@ -49,7 +50,9 @@ final class AppMessengerMasterHandler extends Handler {
                         throw new Exception("The messenger("+fromApp+":"+fromProcess+") that you wanna use to send some messages is null or not found,please check out the messenger.");
                     }
                     else {
-                        messenger.send(msg);
+                        LogcatUtils.e("ipc","-------------->通信");
+                        Message message=Message.obtain(msg);
+                        messenger.send(message);
                     }
                 }
                 else if (action == REMOTE_ACTION_UNREGISTER_FROM_MESSENGERS_POOL){
@@ -77,6 +80,7 @@ final class AppMessengerMasterHandler extends Handler {
     }
 
     private void registerToMessengersPool(Messenger messenger,String fromApp,String fromProcess){
+
         ConcurrentHashMap<String, Messenger> processMessengers= MESSENGERS_POOL.get(fromApp);
         if (processMessengers==null){
             processMessengers=new ConcurrentHashMap<>();
