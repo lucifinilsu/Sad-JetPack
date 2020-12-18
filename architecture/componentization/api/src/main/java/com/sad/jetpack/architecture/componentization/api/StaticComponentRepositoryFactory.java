@@ -14,6 +14,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,6 +71,17 @@ public class StaticComponentRepositoryFactory implements InstancesRepositoryFact
             e.printStackTrace();
         }
         //LogcatUtils.e("sad-jetpack",">>>> componentCallableInstances is "+componentCallableInstances);
+        Collections.sort(componentCallableInstances, new Comparator<IComponentCallable>() {
+            @Override
+            public int compare(IComponentCallable o1, IComponentCallable o2) {
+                IComponent c1=o1.component();
+                IComponent c2=o2.component();
+                if (c1!=null && c2!=null){
+                    return c2.priority()-c1.priority();
+                }
+                return 0;
+            }
+        });
         componentRepository.setComponentInstances(componentCallableInstances);
         componentRepository.setObjectInstances(objectInstances);
         return componentRepository;
