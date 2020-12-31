@@ -2,9 +2,9 @@ package com.sad.jetpack.architecture.componentization.api;
 
 public interface IRequestSession {
 
-    boolean replyRequestData(IDataContainer dataContainer,ICallerConfig callerConfig);
+    boolean replyRequestData(IBody body,ICallerConfig callerConfig);
 
-    default boolean replyRequestData(IDataContainer dataContainer){return replyRequestData(dataContainer, null);}
+    default boolean replyRequestData(IBody body){return replyRequestData(body, null);}
 
     boolean replyRequest(IRequest request,ICallerConfig callerConfig);
 

@@ -236,9 +236,9 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
                             IPCRemoteConnector finalRemoteConnector = remoteConnector;
                             listener.onRemoteCallReceivedResponse(response, new IRequestSession() {
                                 @Override
-                                public boolean replyRequestData(IDataContainer dataContainer, ICallerConfig callerConfig) {
+                                public boolean replyRequestData(IBody body, ICallerConfig callerConfig) {
                                     //外部调用方再次与远程组件进行通信
-                                    finalRequest.toBuilder().dataContainer(dataContainer).build();
+                                    finalRequest.toBuilder().body(body).build();
                                     return replyRequest(finalRequest,callerConfig);
                                 }
 

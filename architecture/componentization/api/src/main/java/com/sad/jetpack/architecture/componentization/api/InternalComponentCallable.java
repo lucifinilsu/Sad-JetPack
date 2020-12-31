@@ -108,8 +108,8 @@ final class InternalComponentCallable implements IComponentCallable,IComponentCa
             }
             IRequestSession requestSession= new IRequestSession() {
                 @Override
-                public boolean replyRequestData(IDataContainer dataContainer,ICallerConfig callerConfig) {
-                    return replyRequest(request.toBuilder().dataContainer(dataContainer).build(),callerConfig);
+                public boolean replyRequestData(IBody body,ICallerConfig callerConfig) {
+                    return replyRequest(request.toBuilder().body(body).build(),callerConfig);
                 }
 
                 @Override
@@ -121,10 +121,10 @@ final class InternalComponentCallable implements IComponentCallable,IComponentCa
             };
             component.onCall(request, new IResponseSession() {
                 @Override
-                public boolean postResponseData(IDataContainer dataContainer) {
+                public boolean postResponseData(IBody body) {
                     IResponse componentResponse= ResponseImpl
                             .newBuilder()
-                            .dataContainer(dataContainer)
+                            .body(body)
                             .request(request)
                             .build();
                     return postResponseData(componentResponse);

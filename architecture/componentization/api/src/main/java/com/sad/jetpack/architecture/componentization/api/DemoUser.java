@@ -18,6 +18,8 @@ import com.sad.jetpack.architecture.componentization.api.RequestImpl;
 import com.sad.jetpack.architecture.componentization.api.IRequest;
 import com.sad.jetpack.architecture.componentization.api.SCore;
 import com.sad.jetpack.architecture.componentization.api.TargetImpl;
+import com.sad.jetpack.architecture.componentization.api.extension.router.ActivityRouterParameters;
+import com.sad.jetpack.architecture.componentization.api.extension.router.IActivityRouterParameters;
 
 public class DemoUser {
     public static void main(String[] args) {
@@ -25,6 +27,12 @@ public class DemoUser {
                 .addData("s",00)
                 .addData("q",true)
                 .build();
+        ActivityRouterParameters.newInstance().toBuilder()
+            .action("")
+            .bundle(null)
+            .resultLauncher(null)
+            .build()
+            ;
 
     }
     static void testIPC(IRequest request) throws Exception {

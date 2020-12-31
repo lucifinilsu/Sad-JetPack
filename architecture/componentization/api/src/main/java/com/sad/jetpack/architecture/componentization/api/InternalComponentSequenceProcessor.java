@@ -122,7 +122,7 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
                                 if (currIndex.get()<units.size()-1){
                                     currIndex.set(currIndex.get()+1);
                                     IRequest nextRequest=response.request().toBuilder()
-                                            .dataContainer(response.dataContainer())
+                                            .body(response.body())
                                             .build()
                                             ;
                                     doSubmit(nextRequest);

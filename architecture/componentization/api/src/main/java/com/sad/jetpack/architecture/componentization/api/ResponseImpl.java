@@ -1,44 +1,36 @@
 package com.sad.jetpack.architecture.componentization.api;
 
 import android.os.Parcel;
+
 public class ResponseImpl implements IResponse, IResponse.Builder {
 
     private IRequest request;
-    private IDataContainer dataContainer;
-    private ResponseImpl(){};
+    private IBody body;
+
+    public static final Creator<IResponse> CREATOR = new Creator<IResponse>() {
+        @Override
+        public IResponse createFromParcel(Parcel in) {
+            IResponse response= new ResponseImpl();
+            response.readFromParcel(in);
+            return response;
+        }
+
+        @Override
+        public IResponse[] newArray(int size) {
+            return new ResponseImpl[size];
+        }
+    };
+
     public static IResponse newInstance(){
         return new ResponseImpl();
     }
     public static IResponse.Builder newBuilder(){
         return new ResponseImpl();
     }
-    protected ResponseImpl(Parcel in) {
-        request = in.readParcelable(IRequest.class.getClassLoader());
-        dataContainer= (IDataContainer) in.readSerializable();
+    protected ResponseImpl() {
+
     }
 
-    public static final Creator CREATOR = new Creator() {
-        @Override
-        public ResponseImpl createFromParcel(Parcel in) {
-            return new ResponseImpl(in);
-        }
-
-        @Override
-        public ResponseImpl[] newArray(int size) {
-            return new ResponseImpl[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(request, flags);
-        dest.writeSerializable(dataContainer);
-    }
 
     @Override
     public IRequest request() {
@@ -46,9 +38,10 @@ public class ResponseImpl implements IResponse, IResponse.Builder {
     }
 
     @Override
-    public IDataContainer dataContainer() {
-        return this.dataContainer;
+    public IBody body() {
+        return this.body;
     }
+
 
     @Override
     public Builder toBuilder() {
@@ -62,8 +55,8 @@ public class ResponseImpl implements IResponse, IResponse.Builder {
     }
 
     @Override
-    public Builder dataContainer(IDataContainer dataContainer) {
-        this.dataContainer=dataContainer;
+    public Builder body(IBody body) {
+        this.body=body;
         return this;
     }
 

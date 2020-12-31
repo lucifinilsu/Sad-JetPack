@@ -1,14 +1,30 @@
 package com.sad.jetpack.architecture.componentization.api;
 import android.content.Context;
 import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.util.Map;
 
-public class RequestImpl implements IRequest, IRequest.Builder {
+public class RequestImpl implements IRequest, IRequest.Builder, Parcelable {
     private String id;
     private String fromApp;
     private String fromProcess;
-    private IDataContainer dataContainer =DefaultDataContainer.newIntance();
+    private IBody body;
+
+
+    public static final Creator<IRequest> CREATOR = new Creator<IRequest>() {
+        @Override
+        public IRequest createFromParcel(Parcel in) {
+            IRequest request= new RequestImpl();
+            request.readFromParcel(in);
+            return request;
+        }
+
+        @Override
+        public IRequest[] newArray(int size) {
+            return new RequestImpl[size];
+        }
+    };
 
     public static IRequest newInstance(String id){
         return new RequestImpl(id);
@@ -17,6 +33,8 @@ public class RequestImpl implements IRequest, IRequest.Builder {
     public static IRequest.Builder newBuilder(String id){
         return new RequestImpl(id);
     }
+
+    protected RequestImpl(){}
 
     private RequestImpl(String id){
         this.id=id;
@@ -27,24 +45,8 @@ public class RequestImpl implements IRequest, IRequest.Builder {
         }
     }
 
-    protected RequestImpl(Parcel in) {
-        id = in.readString();
-        fromApp = in.readString();
-        fromProcess = in.readString();
-        dataContainer= (IDataContainer) in.readSerializable();
-    }
 
-    public static final Creator CREATOR = new Creator() {
-        @Override
-        public RequestImpl createFromParcel(Parcel in) {
-            return new RequestImpl(in);
-        }
 
-        @Override
-        public RequestImpl[] newArray(int size) {
-            return new RequestImpl[size];
-        }
-    };
 
     public String id() {
         return id;
@@ -55,6 +57,7 @@ public class RequestImpl implements IRequest, IRequest.Builder {
         return this;
     }
 
+
     public String fromApp() {
         return fromApp;
     }
@@ -64,9 +67,10 @@ public class RequestImpl implements IRequest, IRequest.Builder {
     }
 
     @Override
-    public IDataContainer dataContainer() {
-        return this.dataContainer;
+    public IBody body() {
+        return this.body;
     }
+
 
     public RequestImpl fromApp(String app){
         this.fromApp=app;
@@ -78,44 +82,23 @@ public class RequestImpl implements IRequest, IRequest.Builder {
         return this;
     }
 
-    public RequestImpl dataContainer(IDataContainer dataContainer){
-        this.dataContainer =dataContainer;
+    @Override
+    public Builder body(IBody body) {
+        this.body=body;
         return this;
     }
-    public RequestImpl addData(String name, Object data){
-        if (dataContainer !=null){
-            dataContainer.put(name,data);
-        }
+
+    @Override
+    public Builder id(String id) {
+        this.id=id;
         return this;
     }
-    public RequestImpl addData(Map data){
-        if (dataContainer !=null){
-            dataContainer.putAll(data);
-        }
-        return this;
-    }
-    public RequestImpl addData(IDataContainer data){
-        if (dataContainer !=null && data!=null){
-            dataContainer.putAll(data);
-        }
-        return this;
-    }
+
 
     @Override
     public RequestImpl build() {
         return this;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(fromApp);
-        dest.writeString(fromProcess);
-        dest.writeSerializable(dataContainer);
-    }
 }

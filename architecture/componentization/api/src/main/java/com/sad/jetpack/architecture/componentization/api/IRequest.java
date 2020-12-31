@@ -1,20 +1,40 @@
 package com.sad.jetpack.architecture.componentization.api;
 
+import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.Map;
 
-public interface IRequest extends Parcelable{
+public interface IRequest extends IParcelable<IRequest>{
 
     String fromApp();
 
     String fromProcess();
 
-    IDataContainer dataContainer();
+    IBody body();
 
     String id();
 
     Builder toBuilder();
+
+    @Override
+    default IRequest readFromParcel(Parcel in){
+        IRequest request=toBuilder()
+                .fromApp(in.readString())
+                .fromProcess(in.readString())
+                .body(in.readParcelable(IBody.class.getClassLoader()))
+                .id(in.readString())
+                .build();
+        return request;
+    }
+
+    @Override
+    default void writeToParcel(Parcel dest, int flags){
+        dest.writeString(fromApp());
+        dest.writeString(fromProcess());
+        dest.writeParcelable(body(),flags);
+        dest.writeString(id());
+    }
 
     interface Builder{
 
@@ -22,13 +42,9 @@ public interface IRequest extends Parcelable{
 
         Builder fromProcess(String fromProcess);
 
-        Builder dataContainer(IDataContainer dataContainer);
+        Builder body(IBody body);
 
-        Builder addData(String name,Object data);
-
-        Builder addData(Map data);
-
-        Builder addData(IDataContainer data);
+        Builder id(String id);
 
         IRequest build();
     }

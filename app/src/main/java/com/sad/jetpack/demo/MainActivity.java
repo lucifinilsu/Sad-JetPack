@@ -1,32 +1,19 @@
 package com.sad.jetpack.demo;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
 import com.sad.jetpack.architecture.componentization.annotation.Data;
-import com.sad.jetpack.architecture.componentization.annotation.DefaultConverter;
+import com.sad.jetpack.architecture.componentization.api.IBody;
+import com.sad.jetpack.architecture.componentization.api.BodyImpl;
 import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
-import androidx.work.BackoffPolicy;
-import androidx.work.Constraints;
-import androidx.work.NetworkType;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
 
-import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
-import com.sad.jetpack.architecture.appgo.api.AppGo;
 import com.sad.jetpack.architecture.componentization.annotation.IPCChat;
-import com.sad.jetpack.architecture.componentization.api.IComponentProcessorCallListener;
 import com.sad.jetpack.architecture.componentization.api.IRequest;
-import com.sad.jetpack.architecture.componentization.api.IRequestSession;
-import com.sad.jetpack.architecture.componentization.api.IResponse;
 import com.sad.jetpack.architecture.componentization.api.IResponseSession;
 import com.sad.jetpack.architecture.componentization.api.InstancesRepository;
 import com.sad.jetpack.architecture.componentization.api.ParasiticComponentRepositoryFactory;
@@ -34,20 +21,17 @@ import com.sad.jetpack.architecture.componentization.api.RequestImpl;
 import com.sad.jetpack.architecture.componentization.api.SCore;
 import com.sad.jetpack.architecture.componentization.api.Utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 
 public class MainActivity extends AppCompatActivity {
     @IPCChat(url = {"test://ipc/chat/ttt","test://ipc/chat/sss"},priority = {996,822})
     public void onTestIPCChat(IRequest request, String xxx, IResponseSession session,@Data(name = "extra")Bundle bundle){
-        LogcatUtils.e("sad-jetpack","------------->onTestIPCChat收到信息:"+request.dataContainer().getMap());
-        tv.setText("onTestIPCChat收到信息:"+request.dataContainer().getMap());
+        LogcatUtils.e("sad-jetpack","------------->onTestIPCChat收到信息:"+request.body().dataContainer().getMap());
+        tv.setText("onTestIPCChat收到信息:"+request.body().dataContainer().getMap());
         new Thread(){
             @Override
             public void run() {
-                session.postResponseData(request.dataContainer().put("xxx","89898989"));
+                request.body().dataContainer().put("xxx","89898989");
+                session.postResponseData(request.body());
             }
         }.start();
     }
@@ -79,8 +63,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void testPostMsgToLocal(){
         try {
-            IRequest request= RequestImpl.newBuilder("c")
+            IBody body= BodyImpl.newBuilder()
                     .addData("xxx","666666")
+                    .build();
+            IRequest request= RequestImpl.newBuilder("c")
+                    .body(body)
                     .build()
                     ;
             InstancesRepository instancesRepository=SCore.getCluster(getApplicationContext())

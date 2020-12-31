@@ -98,7 +98,7 @@ final class InternalComponentConcurrencyProcessor extends AbsInternalComponentPr
             for (Object o:units
                  ) {
                 IRequest r= RequestImpl.newBuilder(request.id())
-                        .dataContainer(request.dataContainer())
+                        .body(request.body())
                         .fromApp(request.fromApp())
                         .fromProcess(request.fromProcess())
                         .build()

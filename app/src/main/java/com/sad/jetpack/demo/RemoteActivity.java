@@ -62,14 +62,14 @@ public class RemoteActivity extends AppCompatActivity {
                             .toProcess(getApplicationContext().getPackageName())
                             .toApp(getApplicationContext().getPackageName())
                             .id("xxx://ssss.php.cn/java/base7/index?dww=cs")
-                            .processorMode(ProcessorMode.PROCESSOR_MODE_SEQUENCE)
+                            .processorMode(ProcessorMode.PROCESSOR_MODE_SINGLE)
                             .build()
                     )
                     .listener(new IPCRemoteCallListener() {
                         @Override
                         public boolean onRemoteCallReceivedResponse(IResponse response, IRequestSession session, ITarget target) {
                             LogcatUtils.e("收到了来自主进程的回应："+response.dataContainer().getMap());
-                            session.replyRequestData(response.dataContainer().put("remote","ooooooooooo"));
+                            //session.replyRequestData(response.dataContainer().put("remote","ooooooooooo"));
                             return false;
                         }
 

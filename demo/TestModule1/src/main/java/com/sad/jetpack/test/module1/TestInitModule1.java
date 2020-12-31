@@ -9,6 +9,7 @@ import com.sad.jetpack.architecture.appgo.annotation.ApplicationLifeCycleAction;
 import com.sad.jetpack.architecture.appgo.api.AppGo;
 import com.sad.jetpack.architecture.appgo.api.IApplicationLifecyclesObserver;
 import com.sad.jetpack.architecture.componentization.annotation.Component;
+import com.sad.jetpack.architecture.componentization.api.BodyImpl;
 import com.sad.jetpack.architecture.componentization.api.DefaultDataContainer;
 import com.sad.jetpack.architecture.componentization.api.IComponent;
 import com.sad.jetpack.architecture.componentization.api.IDataContainer;
@@ -46,14 +47,18 @@ public class TestInitModule1 implements IApplicationLifecyclesObserver, ICompone
         //Toast.makeText(AppGo.get().getContext(),"服务调用",Toast.LENGTH_LONG).show();
 
 
-        IDataContainer dataContainer=request.dataContainer();
+        IDataContainer dataContainer=request.body().dataContainer();
         if (dataContainer!=null){
+            LogcatUtils.e("---->收到请求信息："+request.body().dataContainer().getMap());
             if (dataContainer.getMap().containsKey("remote")){
                 LogcatUtils.e("---->远端回送信息："+dataContainer.getMap());
             }
+            else {
+                session.postResponseData(BodyImpl.newBuilder().dataContainer(DefaultDataContainer.newIntance().put("result","老大，我的工作做完了")).build());
+            }
         }
         else {
-            session.postResponseData(DefaultDataContainer.newIntance().put("result","老大，我的工作做完了"));
+            session.postResponseData(BodyImpl.newBuilder().dataContainer(DefaultDataContainer.newIntance().put("result","老大，我的工作做完了")).build());
         }
     }
 
