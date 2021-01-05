@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //startActivity(new Intent(MainActivity.this,RemoteActivity.class));
                 ActivityLauncherMaster.newInstance(MainActivity.this)
-                        .start("activity://demo/");
+                        .start("activity://demo/local/3");
             }
         });
     }

@@ -29,10 +29,10 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     api rootProject.ext.dependencies["appcompat"]
-    api project(rootProject.ext.dependencies["local_componentization_annotation"])
+    api rootProject.ext.dependencies["componentization_annotation"]
     //api rootProject.ext.dependencies["jsoup"]
     //api rootProject.ext.dependencies["componentization_annotation"]
-    api rootProject.ext.dependencies["workmanager"]
+    //api rootProject.ext.dependencies["workmanager"]
     api "com.sad.core.async:sad-async:latest.release"
     api "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru:latest.release"
 
@@ -41,4 +41,4 @@ dependencies {
     androidTestImplementation rootProject.ext.dependencies["espresso-core"]
 }
 
-//apply from: rootProject.file('/architecture/componentization/api/publishToJceneterScript.gradle')
+apply from: rootProject.file('/architecture/componentization/api/publishToJceneterScript.gradle')

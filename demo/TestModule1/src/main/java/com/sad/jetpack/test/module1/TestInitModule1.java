@@ -1,9 +1,14 @@
 package com.sad.jetpack.test.module1;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.os.Bundle;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.sad.jetpack.architecture.appgo.annotation.ApplicationLifeCycleAction;
 import com.sad.jetpack.architecture.appgo.api.AppGo;
@@ -30,6 +35,46 @@ public class TestInitModule1 implements IApplicationLifecyclesObserver, ICompone
         SCore.enableLog(true);
         SCore.initIPC(application);
         LogcatUtils.e(">>> 666666666666666666666");
+    }
+
+    @Override
+    public void onApplicationCreated(Application application) {
+        application.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+
+            }
+
+            @Override
+            public void onActivityStarted(@NonNull Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityResumed(@NonNull Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityPaused(@NonNull Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityStopped(@NonNull Activity activity) {
+
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
+
+            }
+
+            @Override
+            public void onActivityDestroyed(@NonNull Activity activity) {
+
+            }
+        });
     }
 
     @ApplicationLifeCycleAction(priority = 1561)

@@ -5,13 +5,19 @@ dependencies {
     //提交
     annotationProcessor rootProject.ext.dependencies["auto-service"]
     compileOnly rootProject.ext.dependencies["auto-service"]
-    api project(rootProject.ext.dependencies["local_componentization_annotation"])
+    api rootProject.ext.dependencies["componentization_annotation"]
     api rootProject.ext.dependencies["javapoet"]
     api rootProject.ext.dependencies["jsoup"]
     implementation rootProject.ext.dependencies["gson"]
 }
+/*tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}*/
+tasks.withType(Javadoc) {
+    options.encoding = "UTF-8"
+}
 sourceCompatibility = rootProject.ext.android.javaVersionInt
 targetCompatibility = rootProject.ext.android.javaVersionInt
 
-/*sourceCompatibility = "8"
-targetCompatibility = "8"*/
+//apply from: rootProject.file('/architecture/componentization/compiler/publishToJceneterScript.gradle')
+

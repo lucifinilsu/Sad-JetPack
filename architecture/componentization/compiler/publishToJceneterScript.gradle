@@ -8,14 +8,14 @@ def gitUrl = 'https://github.com/lucifinilsu/Sad-JetPack.git'
 //仓库组
 group = 'com.sad.jetpack.architecture.componentization'
 //版本
-def v="1.0.7"
+def v="1.0.0"
 version = v
 install {
     repositories.mavenInstaller {
         pom {
             project {
                 packaging 'jar'
-                name 'architecture-componentization-annotation'
+                name 'architecture-componentization-compiler'
                 url siteUrl
                 licenses {
                     license {
@@ -48,7 +48,9 @@ task androidSourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
 }*/
 
-
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
@@ -57,6 +59,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
+
 artifacts {
     /*archives androidSourcesJar
     archives androidJavadocsJar*/
@@ -74,11 +77,11 @@ bintray {
     pkg {
         version {
             name = v
-            desc = 'componentization在组件化中使用的注解'
+            desc = 'componentization在组件化中使用的注解处理器'
         }
         //repository 名称
         repo = 'sad-JetPack'
-        name = 'architecture-componentization-annotation'
+        name = 'architecture-componentization-compiler'
         licenses = ['Apache-2.0']
         vcsUrl = gitUrl
         publish = true
