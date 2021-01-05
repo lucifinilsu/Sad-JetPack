@@ -9,6 +9,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.sad.jetpack.architecture.appgo.api.AppGo;
+import com.sad.jetpack.architecture.componentization.annotation.ActivityRouter;
+import com.sad.jetpack.architecture.componentization.api.BodyImpl;
 import com.sad.jetpack.architecture.componentization.api.IPCRemoteCallListener;
 import com.sad.jetpack.architecture.componentization.api.IRequest;
 import com.sad.jetpack.architecture.componentization.api.IRequestSession;
@@ -23,7 +25,7 @@ import com.sad.jetpack.architecture.componentization.api.SCore;
 import com.sad.jetpack.architecture.componentization.api.StaticComponentRepositoryFactory;
 import com.sad.jetpack.architecture.componentization.api.TargetImpl;
 import com.sad.jetpack.architecture.componentization.api.Utils;
-
+@ActivityRouter(url = "activity://demo/remote/1")
 public class RemoteActivity extends AppCompatActivity {
     TextView tv;
     @Override
@@ -54,7 +56,7 @@ public class RemoteActivity extends AppCompatActivity {
                             .newBuilder("_remote_")
                             .fromProcess(Utils.getCurrAppProccessName(getApplicationContext()))
                             .fromApp(getApplicationContext().getPackageName())
-                            .addData("xxx","来自远方的朋友")
+                            .body(BodyImpl.newBuilder().addData("xxx","来自远方的朋友").build())
                             .build()
                     )
                     .instancesFactory(StaticComponentRepositoryFactory.newInstance())
@@ -68,7 +70,7 @@ public class RemoteActivity extends AppCompatActivity {
                     .listener(new IPCRemoteCallListener() {
                         @Override
                         public boolean onRemoteCallReceivedResponse(IResponse response, IRequestSession session, ITarget target) {
-                            LogcatUtils.e("收到了来自主进程的回应："+response.dataContainer().getMap());
+                            LogcatUtils.e("收到了来自主进程的回应："+response.body().dataContainer().getMap());
                             //session.replyRequestData(response.dataContainer().put("remote","ooooooooooo"));
                             return false;
                         }

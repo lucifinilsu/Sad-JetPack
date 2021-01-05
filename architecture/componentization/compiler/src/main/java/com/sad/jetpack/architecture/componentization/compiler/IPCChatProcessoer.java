@@ -116,7 +116,7 @@ public class IPCChatProcessoer extends AbsProcessor {
                 }
                 if (hasUnknownTypeParameters){
                     //若含有
-                    codeInvokeHostMethodBuilder.addStatement("$T dataContainer=request.dataContainer()",ClassName.bestGuess(Constant.PACKAGE_API+".IDataContainer"));
+                    codeInvokeHostMethodBuilder.addStatement("$T dataContainer=request.body().dataContainer()",ClassName.bestGuess(Constant.PACKAGE_API+".IDataContainer"));
                     //遍历未知类型参数
                     for (VariableElement ve:listParams
                          ) {

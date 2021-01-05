@@ -12,7 +12,7 @@ public class NameUtils {
     }
 
     public static String getActivityRouteProxyComponentClassSimpleName(String srcCanonicalName,String componentName,String separator){
-        String prefix="ActivityRouteProxy";
+        String prefix="ActivityClassSupplierProxy";
         return getNewComponentClassSimpleName(prefix,srcCanonicalName,componentName,separator);
     }
 

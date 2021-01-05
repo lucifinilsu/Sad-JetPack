@@ -1,2 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sad.jetpack.test.module1" />
+    package="com.sad.jetpack.test.module1" >
+    <application>
+        <activity
+            android:label="本地2"
+            android:launchMode="standard"
+            android:name=".Activity_2"
+            />
+        <activity
+            android:label="本地3"
+            android:launchMode="standard"
+            android:name=".Activity_3"
+            />
+    </application>
+</manifest>

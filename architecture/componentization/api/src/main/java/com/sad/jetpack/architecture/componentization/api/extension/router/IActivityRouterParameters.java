@@ -9,9 +9,9 @@ import com.sad.jetpack.architecture.componentization.api.IRequest;
 
 public interface IActivityRouterParameters<I extends IActivityRouterParameters<I,B>,B extends IActivityRouterParameters.Builder<B,I>> extends IRouterParameters<I,B>{
 
-    Bundle transitionBundle();
-
     int requestCode();
+
+    Bundle options();
 
     ActivityResultLauncher resultLauncher();
 
@@ -19,9 +19,9 @@ public interface IActivityRouterParameters<I extends IActivityRouterParameters<I
 
     interface Builder<B extends Builder<B,I>,I extends IActivityRouterParameters<I,B>> extends IRouterParameters.Builder<B,I>{
 
-        B transitionBundle(Bundle transitionBundle);
-
         B requestCode(int code);
+
+        B options(Bundle options);
 
         B resultLauncher(ActivityResultLauncher resultLauncher);
 
@@ -33,8 +33,8 @@ public interface IActivityRouterParameters<I extends IActivityRouterParameters<I
         I base=IRouterParameters.super.readFromParcel(in);
         B builder=base.toBuilder();
         I curr=builder
-                .transitionBundle(in.readBundle())
                 .requestCode(in.readInt())
+                .options(in.readBundle())
                 .resultLauncher((ActivityResultLauncher) in.readValue(getClass().getClassLoader()))
                 .build()
                 ;
@@ -43,8 +43,8 @@ public interface IActivityRouterParameters<I extends IActivityRouterParameters<I
 
     @Override
     default void writeToParcel(Parcel dest, int flags) {
-        dest.writeBundle(bundle());
         dest.writeInt(requestCode());
+        dest.writeBundle(options());
         dest.writeValue(resultLauncher());
     }
 }

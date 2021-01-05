@@ -12,12 +12,12 @@ import java.util.List;
 
 public class ActivityRouterParameters implements IActivityRouterParameters<ActivityRouterParameters,ActivityRouterParameters>, IActivityRouterParameters.Builder<ActivityRouterParameters,ActivityRouterParameters> {
 
-    private Bundle transitionBundle;
     private int requestCode;
     private ActivityResultLauncher resultLauncher;
     private String action="";
     private List<Integer> flags=new ArrayList<>();
     private Bundle bundle;
+    private Bundle options;
     private String targetPackage="";
     private Uri uri;
     private ActivityRouterParameters(){}
@@ -40,13 +40,13 @@ public class ActivityRouterParameters implements IActivityRouterParameters<Activ
     };
 
     @Override
-    public Bundle transitionBundle() {
-        return this.transitionBundle;
+    public int requestCode() {
+        return this.requestCode;
     }
 
     @Override
-    public int requestCode() {
-        return this.requestCode;
+    public Bundle options() {
+        return this.options;
     }
 
     @Override
@@ -85,14 +85,14 @@ public class ActivityRouterParameters implements IActivityRouterParameters<Activ
     }
 
     @Override
-    public ActivityRouterParameters transitionBundle(Bundle transitionBundle) {
-        this.transitionBundle=transitionBundle;
+    public ActivityRouterParameters requestCode(int code) {
+        this.requestCode=code;
         return this;
     }
 
     @Override
-    public ActivityRouterParameters requestCode(int code) {
-        this.requestCode=code;
+    public ActivityRouterParameters options(Bundle options) {
+        this.options=options;
         return this;
     }
 

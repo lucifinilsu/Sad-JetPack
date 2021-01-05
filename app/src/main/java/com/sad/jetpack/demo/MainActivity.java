@@ -1,16 +1,20 @@
 package com.sad.jetpack.demo;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.sad.jetpack.architecture.componentization.annotation.ActivityRouter;
 import com.sad.jetpack.architecture.componentization.annotation.Data;
 import com.sad.jetpack.architecture.componentization.api.IBody;
 import com.sad.jetpack.architecture.componentization.api.BodyImpl;
 import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.sad.jetpack.architecture.componentization.annotation.IPCChat;
 import com.sad.jetpack.architecture.componentization.api.IRequest;
@@ -20,7 +24,7 @@ import com.sad.jetpack.architecture.componentization.api.ParasiticComponentRepos
 import com.sad.jetpack.architecture.componentization.api.RequestImpl;
 import com.sad.jetpack.architecture.componentization.api.SCore;
 import com.sad.jetpack.architecture.componentization.api.Utils;
-
+import com.sad.jetpack.architecture.componentization.api.extension.router.ActivityLauncherMaster;
 
 public class MainActivity extends AppCompatActivity {
     @IPCChat(url = {"test://ipc/chat/ttt","test://ipc/chat/sss"},priority = {996,822})
@@ -47,7 +51,9 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.shap).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this,RemoteActivity.class));
+                //startActivity(new Intent(MainActivity.this,RemoteActivity.class));
+                ActivityLauncherMaster.newInstance(MainActivity.this)
+                        .start("activity://demo/");
             }
         });
     }

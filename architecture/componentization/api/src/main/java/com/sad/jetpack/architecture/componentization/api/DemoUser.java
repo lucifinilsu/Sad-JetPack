@@ -23,7 +23,7 @@ import com.sad.jetpack.architecture.componentization.api.extension.router.IActiv
 
 public class DemoUser {
     public static void main(String[] args) {
-        IRequest request= RequestImpl.newBuilder("cs")
+        /*IRequest request= RequestImpl.newBuilder("cs")
                 .addData("s",00)
                 .addData("q",true)
                 .build();
@@ -33,7 +33,7 @@ public class DemoUser {
             .resultLauncher(null)
             .build()
             ;
-
+*/
     }
     static void testIPC(IRequest request) throws Exception {
         Context context=null;
@@ -45,9 +45,9 @@ public class DemoUser {
                 .listener(new IPCRemoteCallListener() {
                     @Override
                     public boolean onRemoteCallReceivedResponse(IResponse response, IRequestSession session, ITarget target) {
-                        IDataContainer dataContainer=response.dataContainer();
+                        IDataContainer dataContainer=response.body().dataContainer();
                         dataContainer.getMap().put("new request","干的很好");
-                        session.replyRequestData(dataContainer);
+                        session.replyRequestData(BodyImpl.newBuilder().dataContainer(dataContainer).build());
                         return false;
                     }
 
