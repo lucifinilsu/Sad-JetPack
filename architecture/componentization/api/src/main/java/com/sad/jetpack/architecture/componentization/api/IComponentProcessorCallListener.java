@@ -18,19 +18,21 @@ public interface IComponentProcessorCallListener{
         return request;
     }
 
-    boolean onChildComponentReceivedResponse(IResponse response, IRequestSession session, String componentId);
+    default boolean onChildComponentReceivedResponse(IResponse response, IRequestSession session, String componentId){return false;};
 
-    void onChildComponentException(IRequest request, Throwable throwable,String componentId);
+    default void onChildComponentException(IRequest request, Throwable throwable,String componentId){};
 
     default IRequest onChildProcessorInputRequest(IRequest request,String childProcessorId){
         return request;
     }
 
-    boolean onChildProcessorReceivedResponse(IResponse response,String childProcessorId);
+    default boolean onChildProcessorReceivedResponse(IResponse response,String childProcessorId){
+        return false;
+    };
 
     default IResponse onChildProcessorMergeResponses(ConcurrentLinkedHashMap<IResponse,String> responses,IResponse childResponse,String childProcessorId){
         return childResponse;
     }
 
-    void onChildProcessorException(IRequest request, Throwable throwable,String childProcessorId);
+    default void onChildProcessorException(IRequest request, Throwable throwable,String childProcessorId){};
 }

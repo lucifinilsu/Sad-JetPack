@@ -3,14 +3,27 @@ package com.sad.jetpack.architecture.componentization.api;
 import java.util.LinkedList;
 import java.util.List;
 
-abstract class AbsInternalComponentProcessor implements IComponentProcessor,IComponentProcessor.Builder{
+abstract class AbsInternalComponentProcessor implements IComponentProcessor,IComponentProcessor.Builder,IResponseBackTrackable{
 
     protected String processorId="";
     protected IComponentProcessorCallListener callListener;
     protected ICallerConfig callerConfig;
     protected List<Object> units =new LinkedList<>();
     protected boolean listenerCrossed=false;
-     @Override
+    protected int priority=0;
+
+    @Override
+    public int priority() {
+        return this.priority;
+    }
+
+    @Override
+    public Builder priority(int priority) {
+        this.priority=priority;
+        return this;
+    }
+
+    @Override
      public boolean listenerCrossed() {
          return this.listenerCrossed;
      }

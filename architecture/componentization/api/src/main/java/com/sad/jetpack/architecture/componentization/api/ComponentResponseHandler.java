@@ -70,9 +70,9 @@ final class ComponentResponseHandler extends Handler {
                 }
                 else {
                     IComponentProcessor.Builder processorBuilder=(processorMode==ProcessorMode.PROCESSOR_MODE_CONCURRENCY?
-                            InternalComponentConcurrencyProcessor.newBuilder()
+                            InternalComponentConcurrencyProcessor.newBuilder(target.id())
                             :
-                            InternalComponentSequenceProcessor.newBuilder());
+                            InternalComponentSequenceProcessor.newBuilder(target.id()));
                     processorBuilder
                             .callerConfig(callerConfig)
                             .listenerCrossed(false)

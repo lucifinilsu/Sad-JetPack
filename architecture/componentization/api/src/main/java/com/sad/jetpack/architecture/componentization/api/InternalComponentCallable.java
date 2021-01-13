@@ -8,15 +8,19 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-final class InternalComponentCallable implements IComponentCallable,IComponentCallable.Builder{
+final class InternalComponentCallable implements IComponentCallable,IComponentCallable.Builder,IResponseBackTrackable{
     private IComponent component;
     private ICallerConfig callerConfig;
     private IComponentCallListener listener;
     private String id="";
 
-    protected static IComponentCallable with(IComponent component){
-        return new InternalComponentCallable(component);
+    @Override
+    public void onBackTrackResponse(IComponentChain chain) throws Exception {
+        if (component!=null){
+            component.onBackTrackResponse(chain);
+        }
     }
+
     protected static IComponentCallable.Builder newBuilder(IComponent component){
         return new InternalComponentCallable(component);
     }
@@ -139,6 +143,13 @@ final class InternalComponentCallable implements IComponentCallable,IComponentCa
                     }
                     return false;
                 }
+
+                @Override
+                public void throwException(Throwable throwable, Object extra) {
+                    if (listener!=null){
+                        listener.onComponentException(request,throwable,id);
+                    }
+                }
             });
         }catch (Exception e){
             e.printStackTrace();
@@ -170,5 +181,13 @@ final class InternalComponentCallable implements IComponentCallable,IComponentCa
     @Override
     public IComponentCallable build() {
         return this;
+    }
+
+    @Override
+    public int priority() {
+        if (component!=null){
+            return component.priority();
+        }
+        return 0;
     }
 }

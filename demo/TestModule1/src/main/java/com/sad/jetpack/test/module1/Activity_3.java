@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.sad.jetpack.architecture.componentization.annotation.ActivityRouter;
 
-@ActivityRouter(url = "activity://demo/local/3",priority = -50)
+@ActivityRouter(url = "activity://demo.v1/local/3",priority = -50)
 public class Activity_3 extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

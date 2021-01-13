@@ -41,18 +41,18 @@ public class Utils {
         return elist;
     }
 
-    public static List<String> crmPaths(String url){
-        List<String> elist=new ArrayList<>();
+    public static String crmPaths(String crm,String url){
         URI uri=URI.create(url);
-        String path=uri.getPath();
+        String scheme=uri.getScheme();
+        String host=uri.getHost();
+        String path="/"+scheme+"/"+host+uri.getPath();//uri.getPath();
         StringBuilder crmPath=new StringBuilder();
         crmPath
-                .append("crm"/*+ File.separator*/)
+                .append(crm/*+ File.separator*/)
                 //.append(InternalContextHolder.get().getContext().getPackageName())
                 .append(path.replace("/",File.separator));
         String e=crmPath.toString();
-        elist.add(e);
-        return elist;
+        return e;
     }
 
     public static String creatExposedWorkerClassName(String exposedServiceCN,String url){

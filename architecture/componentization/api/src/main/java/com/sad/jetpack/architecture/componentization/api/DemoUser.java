@@ -65,7 +65,7 @@ public class DemoUser {
 
     static void testCall(IRequest request){
         Context context=null;
-        SCore.asSequenceProcessor()
+        SCore.asSequenceProcessor("sss")
                 .listener(new IComponentProcessorCallListener() {
                     @Override
                     public boolean onProcessorReceivedResponse(IResponse response, String processorId) {

@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //startActivity(new Intent(MainActivity.this,RemoteActivity.class));
                 ActivityLauncherMaster.newInstance(MainActivity.this)
-                        .start("activity://demo/local/3");
+                        .start("activity://demo.v1");
             }
         });
     }
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                     .repository("test://ipc/chat")
                     ;
             SCore
-                    .asSequenceProcessor()
+                    .asSequenceProcessor("5")
                     .build()
                     .join(instancesRepository.componentCallableInstances())
                     .submit(request);

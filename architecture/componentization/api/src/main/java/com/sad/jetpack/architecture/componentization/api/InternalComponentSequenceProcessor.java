@@ -8,23 +8,54 @@ import com.sad.core.async.ISADTaskProccessListener;
 import com.sad.core.async.SADTaskRunnable;
 import com.sad.core.async.SADTaskSchedulerClient;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-final class InternalComponentSequenceProcessor extends AbsInternalComponentProcessor{
+final class InternalComponentSequenceProcessor extends AbsInternalComponentProcessor {
     private CountDownLatch countDownLatch;
     private IResponse response;
     //private ConcurrentLinkedHashMap<IResponse,String> responses;
-    protected static IComponentProcessor.Builder newBuilder(){
-        return new InternalComponentSequenceProcessor();
+    protected static IComponentProcessor.Builder newBuilder(String id){
+        return new InternalComponentSequenceProcessor(id);
     }
-    protected static IComponentProcessor newInstance(){
-        return new InternalComponentSequenceProcessor();
+    protected static IComponentProcessor newInstance(String id){
+        return new InternalComponentSequenceProcessor(id);
     }
-    private InternalComponentSequenceProcessor(){
+    private InternalComponentSequenceProcessor(String id){
+        this.processorId=id;
         response= ResponseImpl.newInstance();
+    }
+
+    @Override
+    public void onBackTrackResponse(IComponentChain chain) throws Exception {
+        //先进行内部回溯，完成后再回溯上级
+        callInternalChain(chain.parentId(), chain.response(), new IComponentChain.IComponentChainTerminalCallback() {
+            @Override
+            public void onLast(IResponse response, String id) throws Exception{
+                chain.proceedResponse(response,chain.parentId());
+            }
+        });
+    }
+
+    private void callInternalChain(String id,IResponse response,IComponentChain.IComponentChainTerminalCallback chainTerminalCallback) throws Exception{
+        Object[] units_reSort=new Object[units.size()];
+        //任务重新倒序
+        for (Object o:units
+             ) {
+            units_reSort[units.size()-1-units.indexOf(o)]=o;
+        }
+        List<Object> units_reSort_list=new ArrayList<>(Arrays.asList(units_reSort));
+        InternalComponentChain chain=new InternalComponentChain(units_reSort_list);
+        chain.setTerminalCallback(chainTerminalCallback);
+        chain.proceedResponse(response,id);
+
     }
     @Override
     public void submit(IRequest request) {
@@ -39,12 +70,34 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
             }
             return;
         }
+        //任务排序
+        Collections.sort(units, new Comparator<Object>() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                if (o1 instanceof ISortable && o2 instanceof ISortable){
+                    return ((ISortable) o2).priority()-((ISortable) o1).priority();
+                }
+                return 0;
+            }
+        });
         countDownLatch=new CountDownLatch(units.size());
         SADTaskSchedulerClient.newInstance().execute(new SADTaskRunnable<IResponse>("PROCESSOR_COUNTDOWN", new ISADTaskProccessListener<IResponse>() {
             @Override
             public void onSuccess(IResponse result) {
-                if (callListener!=null){
-                    callListener.onProcessorReceivedResponse(result, processorId);
+                try {
+                    callInternalChain(processorId,result,new IComponentChain.IComponentChainTerminalCallback() {
+                        @Override
+                        public void onLast(IResponse response, String id) throws Exception{
+                            if (callListener!=null){
+                                callListener.onProcessorReceivedResponse(response, id);
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    if (callListener!=null){
+                        callListener.onProcessorException(r,e,processorId);
+                    }
                 }
             }
 

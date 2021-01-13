@@ -51,9 +51,9 @@ ext {
             "local_componentization_api"       : ":architecture:componentization:api",
             "local_componentization_annotation": ":architecture:componentization:annotation",
             "local_componentization_compiler"  : ":architecture:componentization:compiler",
-            "componentization_annotation"      : "com.sad.jetpack.architecture.componentization:annotation:1.0.7",
-            "componentization_api"             : "com.sad.jetpack.architecture.componentization:api:1.0.3",
-            "componentization_compiler"        : "com.sad.jetpack.architecture.componentization:compiler:1.0.0",
+            "componentization_annotation"      : "com.sad.jetpack.architecture.componentization:annotation:1.0.8",
+            "componentization_api"             : "com.sad.jetpack.architecture.componentization:api:1.1.1",
+            "componentization_compiler"        : "com.sad.jetpack.architecture.componentization:compiler:1.0.1",
             //SAD
             /*"sad-architecture-api"     : "com.sad.architecture.api:sad-architecture-api:${dependVersion["sad-architecture-api"]}",
             "sad-appgo-api"            : "com.sad.core.appgo:sad-appgo-api:${dependVersion["sad-appgo-api"]}",

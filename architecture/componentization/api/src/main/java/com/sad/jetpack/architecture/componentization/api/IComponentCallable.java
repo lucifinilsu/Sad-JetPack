@@ -1,6 +1,6 @@
 package com.sad.jetpack.architecture.componentization.api;
 
-public interface IComponentCallable {
+public interface IComponentCallable extends ISortable{
 
     String componentId();
 

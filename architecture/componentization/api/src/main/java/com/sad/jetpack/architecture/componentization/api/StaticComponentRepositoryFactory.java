@@ -57,15 +57,8 @@ public class StaticComponentRepositoryFactory implements InstancesRepositoryFact
                     url=url.substring(0,url.length()-1);
                 }
                 LogcatUtils.e("sad-jetpack",">>>>扫描："+url);
-                List<String> crmPaths= Utils.crmPaths(url);
-                for (String ermPath:crmPaths
-                ) {
-                    try {
-                        traverse(context,ermPath,componentCallableInstances,objectInstances,allConstructor,constructors,componentInitializeListener);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+                String crmPath= Utils.crmPaths("crm",url);
+                traverse(context,crmPath,componentCallableInstances,objectInstances,allConstructor,constructors,componentInitializeListener);
             }
         }catch (Exception e){
             e.printStackTrace();

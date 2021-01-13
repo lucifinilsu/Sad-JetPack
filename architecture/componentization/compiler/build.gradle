@@ -8,7 +8,7 @@ dependencies {
     api rootProject.ext.dependencies["componentization_annotation"]
     api rootProject.ext.dependencies["javapoet"]
     api rootProject.ext.dependencies["jsoup"]
-    implementation rootProject.ext.dependencies["gson"]
+    api rootProject.ext.dependencies["gson"]
 }
 /*tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"

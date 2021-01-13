@@ -153,9 +153,10 @@ public class ComponentsFactoryProcessor extends AbsProcessor{
 
         }
         URI uri=new URI(u);
-        String protocol=uri.getScheme();
+        String scheme=uri.getScheme();
         String host=uri.getHost();
-        String path=uri.getPath();
+        log.error(">>> 目标url信息：scheme="+scheme+",host="+host);
+        String path="/"+scheme+"/"+host+uri.getPath();
         //log.error(">>> 目标路径："+new URL(u).getPath())
         String name=path.substring(path.lastIndexOf('/')+1);
         log.error(">>> 目标名称："+name);
@@ -165,9 +166,10 @@ public class ComponentsFactoryProcessor extends AbsProcessor{
             StringBuilder sbApath=new StringBuilder();
             StringBuilder crmPath=new StringBuilder();
             crmPath
-                    .append(CRM_DIR/*+File.separator*/)
+                    .append(Utils.crmPaths(CRM_DIR,u)/*+File.separator*/)
                     //.append(packageName)
-                    .append(path.replace("/",File.separator));
+                    //.append(path.replace("/",File.separator))
+            ;
             sbApath
                     .append(rootPath+File.separator)
                     .append(assetsDir)

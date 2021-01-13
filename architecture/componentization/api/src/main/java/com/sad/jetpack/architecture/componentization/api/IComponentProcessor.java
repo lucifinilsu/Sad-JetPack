@@ -3,7 +3,7 @@ package com.sad.jetpack.architecture.componentization.api;
 
 import java.util.List;
 
-public interface IComponentProcessor{
+public interface IComponentProcessor extends ISortable{
 
     boolean listenerCrossed();
 
@@ -30,6 +30,8 @@ public interface IComponentProcessor{
         Builder listenerCrossed(boolean crossed);
 
         Builder callerConfig(ICallerConfig callerConfig);
+
+        Builder priority(int priority);
 
         IComponentProcessor build();
     }

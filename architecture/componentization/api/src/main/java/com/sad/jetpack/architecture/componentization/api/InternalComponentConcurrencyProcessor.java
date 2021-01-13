@@ -9,6 +9,8 @@ import com.sad.core.async.ISADTaskProccessListener;
 import com.sad.core.async.SADTaskRunnable;
 import com.sad.core.async.SADTaskSchedulerClient;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -16,13 +18,14 @@ import java.util.concurrent.TimeoutException;
 final class InternalComponentConcurrencyProcessor extends AbsInternalComponentProcessor{
     private CountDownLatch countDownLatch;
     private ConcurrentLinkedHashMap<IResponse,String> responses;
-    protected static IComponentProcessor.Builder newBuilder(){
-        return new InternalComponentConcurrencyProcessor();
+    protected static IComponentProcessor.Builder newBuilder(String id){
+        return new InternalComponentConcurrencyProcessor(id);
     }
-    protected static IComponentProcessor newInstance(){
-        return new InternalComponentConcurrencyProcessor();
+    protected static IComponentProcessor newInstance(String id){
+        return new InternalComponentConcurrencyProcessor(id);
     }
-    private InternalComponentConcurrencyProcessor(){
+    private InternalComponentConcurrencyProcessor(String id){
+        this.processorId=id;
         responses=new ConcurrentLinkedHashMap.Builder<IResponse,String>()
                 .maximumWeightedCapacity(999)
                 .weigher(Weighers.singleton())
@@ -41,6 +44,16 @@ final class InternalComponentConcurrencyProcessor extends AbsInternalComponentPr
             }
             return;
         }
+        //排序
+        Collections.sort(units, new Comparator<Object>() {
+            @Override
+            public int compare(Object o1, Object o2) {
+                if (o1 instanceof ISortable && o2 instanceof ISortable){
+                    return ((ISortable) o2).priority()-((ISortable) o1).priority();
+                }
+                return 0;
+            }
+        });
         countDownLatch=new CountDownLatch(units.size());
         SADTaskSchedulerClient.newInstance().execute(new SADTaskRunnable<ConcurrentLinkedHashMap<IResponse,String>>("PROCESSOR_COUNTDOWN", new ISADTaskProccessListener<ConcurrentLinkedHashMap<IResponse, String>>() {
             @Override

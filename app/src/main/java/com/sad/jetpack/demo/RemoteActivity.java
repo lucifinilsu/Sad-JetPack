@@ -25,7 +25,7 @@ import com.sad.jetpack.architecture.componentization.api.SCore;
 import com.sad.jetpack.architecture.componentization.api.StaticComponentRepositoryFactory;
 import com.sad.jetpack.architecture.componentization.api.TargetImpl;
 import com.sad.jetpack.architecture.componentization.api.Utils;
-@ActivityRouter(url = "activity://demo/remote/1")
+@ActivityRouter(url = "activity://demo.v1/remote/1")
 public class RemoteActivity extends AppCompatActivity {
     TextView tv;
     @Override

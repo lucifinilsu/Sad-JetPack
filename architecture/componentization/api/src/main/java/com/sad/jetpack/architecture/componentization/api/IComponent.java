@@ -4,9 +4,11 @@ import com.sad.jetpack.architecture.componentization.annotation.Component;
 
 import java.lang.annotation.Annotation;
 
-public interface IComponent extends Comparable<IComponent>{
+public interface IComponent extends Comparable<IComponent>,ISortable,IResponseBackTrackable{
 
-    void onCall(IRequest request, IResponseSession session) throws Exception;
+    default void onCall(IRequest request, IResponseSession session) throws Exception{};
+
+    default <T> T toDo(IRequest request) throws Exception{return null;}
 
     default String[] urls(){
         Component component=info();

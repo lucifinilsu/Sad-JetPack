@@ -14,6 +14,14 @@ public class SCore {
         InternalContextInitializerProvider.mContext=context;
     }*/
 
+    public static IComponentCallable toComponentCallable(String c_url,IComponent component){
+        IComponentCallable componentCallable=InternalComponentCallable.newBuilder(component)
+                .componentId(c_url)
+                .build()
+                ;
+        return componentCallable;
+    }
+
     public static void enableLog(boolean e){
         CommonConstant.enableLog=e;
     }
@@ -63,12 +71,12 @@ public class SCore {
         registerParasiticComponentFromHost(host,null);
     }
 
-    public static IComponentProcessor.Builder asSequenceProcessor(){
-        return InternalComponentSequenceProcessor.newBuilder();
+    public static IComponentProcessor.Builder asSequenceProcessor(String id){
+        return InternalComponentSequenceProcessor.newBuilder(id);
     }
 
-    public static IComponentProcessor.Builder asConcurrencyProcessor(){
-        return InternalComponentConcurrencyProcessor.newBuilder();
+    public static IComponentProcessor.Builder asConcurrencyProcessor(String id){
+        return InternalComponentConcurrencyProcessor.newBuilder(id);
     }
 
     public static void initIPC(Context context){

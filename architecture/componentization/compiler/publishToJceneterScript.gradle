@@ -8,7 +8,7 @@ def gitUrl = 'https://github.com/lucifinilsu/Sad-JetPack.git'
 //仓库组
 group = 'com.sad.jetpack.architecture.componentization'
 //版本
-def v="1.0.0"
+def v="1.0.1"
 version = v
 install {
     repositories.mavenInstaller {

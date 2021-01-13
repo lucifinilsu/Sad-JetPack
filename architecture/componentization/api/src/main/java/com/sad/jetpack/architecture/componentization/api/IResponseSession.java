@@ -6,4 +6,6 @@ public interface IResponseSession {
 
     boolean postResponseData(IResponse response);
 
+    void throwException(Throwable throwable,Object extra);
+
 }
