@@ -14,10 +14,12 @@ import java.util.Comparator;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 final class InternalComponentConcurrencyProcessor extends AbsInternalComponentProcessor{
     private CountDownLatch countDownLatch;
     private ConcurrentLinkedHashMap<IResponse,String> responses;
+    private AtomicReference<Throwable> currThrowable=new AtomicReference<>();
     protected static IComponentProcessor.Builder newBuilder(String id){
         return new InternalComponentConcurrencyProcessor(id);
     }

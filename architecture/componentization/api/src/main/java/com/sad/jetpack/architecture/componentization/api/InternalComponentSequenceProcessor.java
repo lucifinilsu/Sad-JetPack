@@ -17,10 +17,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 final class InternalComponentSequenceProcessor extends AbsInternalComponentProcessor {
     private CountDownLatch countDownLatch;
     private IResponse response;
+    private AtomicReference<Throwable> currThrowable=new AtomicReference<>();
     //private ConcurrentLinkedHashMap<IResponse,String> responses;
     protected static IComponentProcessor.Builder newBuilder(String id){
         return new InternalComponentSequenceProcessor(id);
@@ -103,6 +105,7 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
 
             @Override
             public void onFail(Throwable throwable) {
+                currThrowable.set(null);
                 if (callListener!=null){
                     callListener.onProcessorException(r,throwable,processorId);
                 }
@@ -114,9 +117,13 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
             }
         }) {
             @Override
-            public IResponse doInBackground() throws Exception {
+            public IResponse doInBackground() throws Exception{
                 if (needCheckTimeout()){
                     if (countDownLatch.await(callerConfig.timeout(), TimeUnit.MILLISECONDS)){
+                        Throwable throwable=currThrowable.get();
+                        if (throwable!=null){
+                            throw (Exception) throwable;
+                        }
                         return response;
                     }
                     else {
@@ -125,6 +132,10 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
                 }
                 else {
                     countDownLatch.await();
+                    Throwable throwable=currThrowable.get();
+                    if (throwable!=null){
+                        throw (Exception) throwable;
+                    }
                 }
                 return response;
             }
@@ -185,6 +196,7 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
 
                             @Override
                             public void onComponentException(IRequest request, Throwable throwable,String componentId) {
+                                currThrowable.set(throwable);
                                 if (listenerSelf!=null){
                                     listenerSelf.onComponentException(request,throwable,componentId);
                                 }
@@ -325,6 +337,7 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
 
                             @Override
                             public void onProcessorException(IRequest request, Throwable throwable, String processorId) {
+                                currThrowable.set(throwable);
                                 if (listenerSelf!=null){
                                     listenerSelf.onProcessorException(request,throwable,processorId);
                                 }
