@@ -10,6 +10,7 @@ public class RequestImpl implements IRequest, IRequest.Builder, Parcelable {
     private String fromApp;
     private String fromProcess;
     private IBody body;
+    private IResponse previousResponse;
 
 
     public static final Creator<IRequest> CREATOR = new Creator<IRequest>() {
@@ -53,6 +54,11 @@ public class RequestImpl implements IRequest, IRequest.Builder, Parcelable {
     }
 
     @Override
+    public IResponse previousResponse() {
+        return this.previousResponse;
+    }
+
+    @Override
     public Builder toBuilder() {
         return this;
     }
@@ -91,6 +97,12 @@ public class RequestImpl implements IRequest, IRequest.Builder, Parcelable {
     @Override
     public Builder id(String id) {
         this.id=id;
+        return this;
+    }
+
+    @Override
+    public Builder previousResponse(IResponse response) {
+        this.previousResponse=response;
         return this;
     }
 

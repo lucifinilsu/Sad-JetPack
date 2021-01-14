@@ -13,6 +13,11 @@ abstract class AbsInternalComponentProcessor implements IComponentProcessor,ICom
     protected int priority=0;
 
     @Override
+    public String backTrackableId() {
+        return processorId();
+    }
+
+    @Override
     public int priority() {
         return this.priority;
     }

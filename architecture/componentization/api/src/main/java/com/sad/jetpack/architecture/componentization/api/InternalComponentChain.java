@@ -8,8 +8,16 @@ final class InternalComponentChain implements IComponentChain{
     private IResponse response;
     private String id="";
     private List<Object> units =new LinkedList<>();
-    private int currIndex=0;
+    private int currIndex=-1;
     private IComponentChain.IComponentChainTerminalCallback terminalCallback;
+
+    public void setResponse(IResponse response) {
+        this.response = response;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public void setTerminalCallback(IComponentChainTerminalCallback terminalCallback) {
         this.terminalCallback = terminalCallback;
@@ -31,20 +39,28 @@ final class InternalComponentChain implements IComponentChain{
 
     @Override
     public void proceedResponse(IResponse response, String id) throws Exception {
+
         if (currIndex>units.size()-1){
+            LogcatUtils.e(">>>回溯链已经结束");
             return;
         }
         this.response=response;
         this.id=id;
-        if (currIndex==units.size()-1 && terminalCallback!=null){
+        currIndex++;
+        //LogcatUtils.e(">>>回溯链信息：currIdx="+currIndex+",size="+units.size());
+        if (currIndex>units.size()-1 && terminalCallback!=null){
+            LogcatUtils.e(">>>回溯链末端回调");
             terminalCallback.onLast(response,id);
         }
         else {
             Object o=units.get(currIndex);
             if (o instanceof IResponseBackTrackable){
+                LogcatUtils.e(">>>回溯链调用：rid="+((IResponseBackTrackable) o).backTrackableId()+",response="+response+",id="+id);
                 ((IResponseBackTrackable) o).onBackTrackResponse(this);
             }
+            else {
+                LogcatUtils.e(">>>非回溯链类型");
+            }
         }
-        currIndex++;
     }
 }

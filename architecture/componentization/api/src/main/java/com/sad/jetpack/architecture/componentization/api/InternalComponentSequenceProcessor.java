@@ -37,6 +37,7 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
 
     @Override
     public void onBackTrackResponse(IComponentChain chain) throws Exception {
+        LogcatUtils.e(">>>>Processor回溯");
         //先进行内部回溯，完成后再回溯上级
         callInternalChain(chain.parentId(), chain.response(), new IComponentChain.IComponentChainTerminalCallback() {
             @Override
@@ -54,7 +55,10 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
             units_reSort[units.size()-1-units.indexOf(o)]=o;
         }
         List<Object> units_reSort_list=new ArrayList<>(Arrays.asList(units_reSort));
+
         InternalComponentChain chain=new InternalComponentChain(units_reSort_list);
+        chain.setResponse(response);
+        chain.setId(id);
         chain.setTerminalCallback(chainTerminalCallback);
         chain.proceedResponse(response,id);
 
@@ -185,8 +189,9 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
                                 countDownLatch.countDown();
                                 if (currIndex.get()<units.size()-1){
                                     currIndex.set(currIndex.get()+1);
-                                    IRequest nextRequest=response.request().toBuilder()
-                                            .body(response.body())
+                                    IRequest nextRequest=response.request()
+                                            .toBuilder()
+                                            .previousResponse(response)
                                             .build()
                                             ;
                                     doSubmit(nextRequest);
@@ -320,6 +325,15 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
                                 }
                                 InternalComponentSequenceProcessor.this.response=response;
                                 countDownLatch.countDown();
+                                if (currIndex.get()<units.size()-1){
+                                    currIndex.set(currIndex.get()+1);
+                                    IRequest nextRequest=response.request()
+                                            .toBuilder()
+                                            .previousResponse(response)
+                                            .build()
+                                            ;
+                                    doSubmit(nextRequest);
+                                }
                                 return false;
                             }
 

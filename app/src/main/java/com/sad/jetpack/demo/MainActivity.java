@@ -6,10 +6,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import com.sad.jetpack.architecture.componentization.annotation.ActivityRouter;
 import com.sad.jetpack.architecture.componentization.annotation.Data;
 import com.sad.jetpack.architecture.componentization.api.IBody;
 import com.sad.jetpack.architecture.componentization.api.BodyImpl;
+import com.sad.jetpack.architecture.componentization.api.IComponentProcessorCallListener;
+import com.sad.jetpack.architecture.componentization.api.IResponse;
 import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -52,14 +55,37 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //startActivity(new Intent(MainActivity.this,RemoteActivity.class));
-                ActivityLauncherMaster.newInstance(MainActivity.this)
-                        .start("activity://demo.v1");
+                //ActivityLauncherMaster.newInstance(MainActivity.this)
+                //        .start("activity://demo.v1");
+                testCall();
             }
         });
     }
 
     private void testCall(){
-        SCore.getComponentCallable(getApplicationContext(),"xxx://ssss.php.cn/java").call(RequestImpl.newBuilder("551").build());
+        //SCore.getComponentCallable(getApplicationContext(),"xxx://ssss.php.cn/java").call(RequestImpl.newBuilder("551").build());
+        SCore.asSequenceProcessor("xxx")
+                .listener(new IComponentProcessorCallListener() {
+                    @Override
+                    public boolean onProcessorReceivedResponse(IResponse response, String processorId) {
+                        LogcatUtils.e(">>>回调完毕："+response);
+                        return false;
+                    }
+
+                    @Override
+                    public IResponse onProcessorMergeResponses(ConcurrentLinkedHashMap<IResponse, String> responses, String processorId) {
+                        return null;
+                    }
+
+                    @Override
+                    public void onProcessorException(IRequest request, Throwable throwable, String processorId) {
+
+                    }
+                })
+                .build()
+                .join(SCore.getCluster(getApplicationContext()).repository("test://tsc/").componentCallableInstances())
+                .submit(RequestImpl.newBuilder("666").body(BodyImpl.newBuilder().extraObject("xxxxxx").build()).build());
+        ;
     }
 
     private void testPostMsgRemote(){
