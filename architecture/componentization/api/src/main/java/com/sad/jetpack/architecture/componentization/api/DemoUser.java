@@ -68,7 +68,7 @@ public class DemoUser {
         SCore.asSequenceProcessor("sss")
                 .listener(new IComponentProcessorCallListener() {
                     @Override
-                    public boolean onProcessorReceivedResponse(IResponse response, String processorId) {
+                    public boolean onProcessorReceivedResponse(IResponse response, String processorId,boolean intercepted) {
                         return false;
                     }
 
@@ -83,7 +83,7 @@ public class DemoUser {
                     }
 
                     @Override
-                    public boolean onChildComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                    public boolean onChildComponentReceivedResponse(IResponse response, IRequestSession session, String componentId,boolean intercepted) {
                         return false;
                     }
 
@@ -93,7 +93,7 @@ public class DemoUser {
                     }
 
                     @Override
-                    public boolean onChildProcessorReceivedResponse(IResponse response, String childProcessorId) {
+                    public boolean onChildProcessorReceivedResponse(IResponse response, String childProcessorId,boolean intercepted) {
                         return false;
                     }
 
@@ -111,7 +111,7 @@ public class DemoUser {
                 .toBuilder()
                 .listener(new IComponentCallListener() {
                     @Override
-                    public boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                    public boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId,boolean intercepted) {
                         return false;
                     }
 
@@ -127,7 +127,7 @@ public class DemoUser {
                 .toBuilder()
                 .listener(new IComponentCallListener() {
                     @Override
-                    public boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                    public boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId,boolean intercepted) {
                         return false;
                     }
 

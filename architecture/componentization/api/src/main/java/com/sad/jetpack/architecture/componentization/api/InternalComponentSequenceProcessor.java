@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -23,6 +24,7 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
     private CountDownLatch countDownLatch;
     private IResponse response;
     private AtomicReference<Throwable> currThrowable=new AtomicReference<>();
+
     //private ConcurrentLinkedHashMap<IResponse,String> responses;
     protected static IComponentProcessor.Builder newBuilder(String id){
         return new InternalComponentSequenceProcessor(id);
@@ -38,16 +40,23 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
     @Override
     public void onBackTrackResponse(IComponentChain chain) throws Exception {
         LogcatUtils.e(">>>>Processor回溯");
-        //先进行内部回溯，完成后再回溯上级
-        callInternalChain(chain.parentId(), chain.response(), new IComponentChain.IComponentChainTerminalCallback() {
+        //先进行内部回溯，完成后再回溯上级，注意，内部回溯依然要根据拦截情况设定回溯路径。
+        callInternalChain(units,isIntercepted.get(),indexIntercepted.get(),chain.parentId(), chain.response(), new IComponentChain.IComponentChainTerminalCallback() {
             @Override
-            public void onLast(IResponse response, String id) throws Exception{
+            public void onLast(IResponse response, String id,boolean intercepted) throws Exception{
                 chain.proceedResponse(response,chain.parentId());
             }
         });
     }
 
-    private void callInternalChain(String id,IResponse response,IComponentChain.IComponentChainTerminalCallback chainTerminalCallback) throws Exception{
+    private void callInternalChain(
+            List<Object> o_units,
+            boolean intercepted,
+            int indexIntercepted,
+            String id,
+            IResponse response,
+            IComponentChain.IComponentChainTerminalCallback chainTerminalCallback) throws Exception{
+        List<Object> units=o_units.subList(0,indexIntercepted+1);
         Object[] units_reSort=new Object[units.size()];
         //任务重新倒序
         for (Object o:units
@@ -56,7 +65,7 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
         }
         List<Object> units_reSort_list=new ArrayList<>(Arrays.asList(units_reSort));
 
-        InternalComponentChain chain=new InternalComponentChain(units_reSort_list);
+        InternalComponentChain chain=new InternalComponentChain(units_reSort_list,intercepted);
         chain.setResponse(response);
         chain.setId(id);
         chain.setTerminalCallback(chainTerminalCallback);
@@ -86,16 +95,18 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
                 return 0;
             }
         });
+        indexIntercepted.set(units.size()-1);
         countDownLatch=new CountDownLatch(units.size());
         SADTaskSchedulerClient.newInstance().execute(new SADTaskRunnable<IResponse>("PROCESSOR_COUNTDOWN", new ISADTaskProccessListener<IResponse>() {
             @Override
             public void onSuccess(IResponse result) {
                 try {
-                    callInternalChain(processorId,result,new IComponentChain.IComponentChainTerminalCallback() {
+                    LogcatUtils.e(">>>拦截信息：index="+indexIntercepted.get()+",intercepted="+isIntercepted.get());
+                    callInternalChain(units,isIntercepted.get(),indexIntercepted.get(),processorId,result,new IComponentChain.IComponentChainTerminalCallback() {
                         @Override
-                        public void onLast(IResponse response, String id) throws Exception{
+                        public void onLast(IResponse response, String id,boolean intercepted) throws Exception{
                             if (callListener!=null){
-                                callListener.onProcessorReceivedResponse(response, id);
+                                callListener.onProcessorReceivedResponse(response, id,intercepted);
                             }
                         }
                     });
@@ -178,23 +189,37 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
                             }
 
                             @Override
-                            public boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                            public boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId,boolean intercepted) {
                                 if (listenerSelf!=null){
-                                    listenerSelf.onComponentReceivedResponse(response,session,componentId);
+                                    listenerSelf.onComponentReceivedResponse(response,session,componentId,intercepted);
                                 }
                                 if (callListener!=null){
-                                    callListener.onChildComponentReceivedResponse(response,session,componentId);
+                                    callListener.onChildComponentReceivedResponse(response,session,componentId,intercepted);
                                 }
                                 InternalComponentSequenceProcessor.this.response=response;
-                                countDownLatch.countDown();
-                                if (currIndex.get()<units.size()-1){
-                                    currIndex.set(currIndex.get()+1);
-                                    IRequest nextRequest=response.request()
-                                            .toBuilder()
-                                            .previousResponse(response)
-                                            .build()
-                                            ;
-                                    doSubmit(nextRequest);
+                                isIntercepted.set(intercepted);
+                                if (!intercepted){
+                                    countDownLatch.countDown();
+                                    if (currIndex.get()<units.size()-1){
+                                        currIndex.set(currIndex.get()+1);
+                                        IRequest nextRequest=response.request()
+                                                .toBuilder()
+                                                .previousResponse(response)
+                                                .build()
+                                                ;
+                                        doSubmit(nextRequest);
+                                    }
+                                }
+                                else {
+                                    int start=currIndex.get();
+                                    indexIntercepted.set(start);
+                                    LogcatUtils.e(">>>出现拦截点：index="+indexIntercepted.get());
+                                    for (int i = start; i < units.size(); i++) {
+                                        currIndex.set(i);
+                                        LogcatUtils.e(">>>强制关停线程等待计数：i="+i+",total="+units.size());
+                                        countDownLatch.countDown();
+                                    }
+
                                 }
                                 return false;
                             }
@@ -208,12 +233,11 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
                                 if (callListener!=null){
                                     callListener.onChildComponentException(request,throwable,componentId);
                                 }
-                                if (currIndex.get()<units.size()-1){
-                                    for (int i = currIndex.get(); i < units.size()-1; i++) {
-                                        countDownLatch.countDown();
-                                    }
-                                }
-                                else {
+
+                                int start=currIndex.get();
+                                indexIntercepted.set(start);
+                                for (int i = start; i < units.size(); i++) {
+                                    currIndex.set(i);
                                     countDownLatch.countDown();
                                 }
 
@@ -251,12 +275,12 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
                             }
 
                             @Override
-                            public boolean onChildComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                            public boolean onChildComponentReceivedResponse(IResponse response, IRequestSession session, String componentId,boolean intercepted) {
                                 if (listenerSelf!=null){
-                                    listenerSelf.onChildComponentReceivedResponse(response,session,componentId);
+                                    listenerSelf.onChildComponentReceivedResponse(response,session,componentId,intercepted);
                                 }
                                 if (listenerCrossed && callListener!=null){
-                                    callListener.onChildComponentReceivedResponse(response,session,componentId);
+                                    callListener.onChildComponentReceivedResponse(response,session,componentId,intercepted);
                                 }
                                 return false;
                             }
@@ -283,12 +307,12 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
                             }
 
                             @Override
-                            public boolean onChildProcessorReceivedResponse(IResponse response, String childProcessorId) {
+                            public boolean onChildProcessorReceivedResponse(IResponse response, String childProcessorId,boolean intercepted) {
                                 if (listenerSelf!=null){
-                                    listenerSelf.onChildProcessorReceivedResponse(response,childProcessorId);
+                                    listenerSelf.onChildProcessorReceivedResponse(response,childProcessorId,intercepted);
                                 }
                                 if (listenerCrossed && callListener!=null){
-                                    callListener.onChildProcessorReceivedResponse(response,childProcessorId);
+                                    callListener.onChildProcessorReceivedResponse(response,childProcessorId,intercepted);
                                 }
                                 return false;
                             }
@@ -316,23 +340,35 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
                             }
 
                             @Override
-                            public boolean onProcessorReceivedResponse(IResponse response, String processorId) {
+                            public boolean onProcessorReceivedResponse(IResponse response, String processorId,boolean intercepted) {
                                 if (listenerSelf!=null){
-                                    listenerSelf.onProcessorReceivedResponse(response,processorId);
+                                    listenerSelf.onProcessorReceivedResponse(response,processorId,intercepted);
                                 }
                                 if (callListener!=null){
-                                    callListener.onChildProcessorReceivedResponse(response,processorId);
+                                    callListener.onChildProcessorReceivedResponse(response,processorId,intercepted);
                                 }
                                 InternalComponentSequenceProcessor.this.response=response;
-                                countDownLatch.countDown();
-                                if (currIndex.get()<units.size()-1){
-                                    currIndex.set(currIndex.get()+1);
-                                    IRequest nextRequest=response.request()
-                                            .toBuilder()
-                                            .previousResponse(response)
-                                            .build()
-                                            ;
-                                    doSubmit(nextRequest);
+                                isIntercepted.set(intercepted);
+                                if (!intercepted) {
+                                    countDownLatch.countDown();
+                                    if (currIndex.get() < units.size() - 1) {
+                                        currIndex.set(currIndex.get() + 1);
+                                        IRequest nextRequest = response.request()
+                                                .toBuilder()
+                                                .previousResponse(response)
+                                                .build();
+                                        doSubmit(nextRequest);
+                                    }
+                                }
+                                else {
+                                    int start=currIndex.get();
+                                    indexIntercepted.set(start);
+                                    LogcatUtils.e(">>>出现拦截点：index="+indexIntercepted.get());
+                                    for (int i = start; i < units.size(); i++) {
+                                        currIndex.set(i);
+                                        LogcatUtils.e(">>>强制关停线程等待计数：i="+i+",total="+units.size());
+                                        countDownLatch.countDown();
+                                    }
                                 }
                                 return false;
                             }
@@ -358,12 +394,10 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
                                 if (callListener!=null){
                                     callListener.onChildProcessorException(request,throwable,processorId);
                                 }
-                                if (currIndex.get()<units.size()-1){
-                                    for (int i = currIndex.get(); i < units.size()-1; i++) {
-                                        countDownLatch.countDown();
-                                    }
-                                }
-                                else {
+                                int start=currIndex.get();
+                                indexIntercepted.set(start);
+                                for (int i = start; i < units.size(); i++) {
+                                    currIndex.set(i);
                                     countDownLatch.countDown();
                                 }
                             }

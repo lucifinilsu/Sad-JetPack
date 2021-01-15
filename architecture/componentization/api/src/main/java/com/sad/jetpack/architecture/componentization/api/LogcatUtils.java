@@ -13,14 +13,10 @@ public class LogcatUtils {
 
     public static void e(boolean whole,String tag,String log){
         if (whole){
-            //Log.e(tag,log);
-            if (whole){
-                print(Log.ERROR,tag,log);
-            }
-            else {
-                Log.e(tag,log);
-            }
-
+            print(Log.ERROR,tag,log);
+        }
+        else {
+            Log.e(tag,log);
         }
     }
     public static void e(String tag,String log){

@@ -56,13 +56,14 @@ final class InternalComponentConcurrencyProcessor extends AbsInternalComponentPr
                 return 0;
             }
         });
+        indexIntercepted.set(units.size());
         countDownLatch=new CountDownLatch(units.size());
         SADTaskSchedulerClient.newInstance().execute(new SADTaskRunnable<ConcurrentLinkedHashMap<IResponse,String>>("PROCESSOR_COUNTDOWN", new ISADTaskProccessListener<ConcurrentLinkedHashMap<IResponse, String>>() {
             @Override
             public void onSuccess(ConcurrentLinkedHashMap<IResponse, String> result) {
                 if (callListener!=null){
                     IResponse response=callListener.onProcessorMergeResponses(result,processorId);
-                    callListener.onProcessorReceivedResponse(response, processorId);
+                    callListener.onProcessorReceivedResponse(response, processorId,isIntercepted.get());
                 }
             }
 
@@ -135,12 +136,12 @@ final class InternalComponentConcurrencyProcessor extends AbsInternalComponentPr
                                 }
 
                                 @Override
-                                public boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                                public boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId,boolean intercepted) {
                                     if (listenerSelf!=null){
-                                        listenerSelf.onComponentReceivedResponse(response,session,componentId);
+                                        listenerSelf.onComponentReceivedResponse(response,session,componentId,intercepted);
                                     }
                                     if (callListener!=null){
-                                        callListener.onChildComponentReceivedResponse(response,session,componentId);
+                                        callListener.onChildComponentReceivedResponse(response,session,componentId,intercepted);
                                     }
                                     responses.put(response, callable.componentId());
                                     countDownLatch.countDown();
@@ -190,12 +191,12 @@ final class InternalComponentConcurrencyProcessor extends AbsInternalComponentPr
                                 }
 
                                 @Override
-                                public boolean onChildComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                                public boolean onChildComponentReceivedResponse(IResponse response, IRequestSession session, String componentId,boolean intercepted) {
                                     if (listenerSelf!=null){
-                                        listenerSelf.onChildComponentReceivedResponse(response,session,componentId);
+                                        listenerSelf.onChildComponentReceivedResponse(response,session,componentId,intercepted);
                                     }
                                     if (listenerCrossed && callListener!=null){
-                                        callListener.onChildComponentReceivedResponse(response,session,componentId);
+                                        callListener.onChildComponentReceivedResponse(response,session,componentId,intercepted);
                                     }
                                     return false;
                                 }
@@ -222,12 +223,12 @@ final class InternalComponentConcurrencyProcessor extends AbsInternalComponentPr
                                 }
 
                                 @Override
-                                public boolean onChildProcessorReceivedResponse(IResponse response, String childProcessorId) {
+                                public boolean onChildProcessorReceivedResponse(IResponse response, String childProcessorId,boolean intercepted) {
                                     if (listenerSelf!=null){
-                                        listenerSelf.onChildProcessorReceivedResponse(response,childProcessorId);
+                                        listenerSelf.onChildProcessorReceivedResponse(response,childProcessorId,intercepted);
                                     }
                                     if (listenerCrossed && callListener!=null){
-                                        callListener.onChildProcessorReceivedResponse(response,childProcessorId);
+                                        callListener.onChildProcessorReceivedResponse(response,childProcessorId,intercepted);
                                     }
                                     return false;
                                 }
@@ -255,12 +256,12 @@ final class InternalComponentConcurrencyProcessor extends AbsInternalComponentPr
                                 }
 
                                 @Override
-                                public boolean onProcessorReceivedResponse(IResponse response, String processorId) {
+                                public boolean onProcessorReceivedResponse(IResponse response, String processorId,boolean intercepted) {
                                     if (listenerSelf!=null){
-                                        listenerSelf.onProcessorReceivedResponse(response,processorId);
+                                        listenerSelf.onProcessorReceivedResponse(response,processorId,intercepted);
                                     }
                                     if (callListener!=null){
-                                        callListener.onChildProcessorReceivedResponse(response,processorId);
+                                        callListener.onChildProcessorReceivedResponse(response,processorId,intercepted);
                                     }
                                     responses.put(response, processorId);
                                     countDownLatch.countDown();

@@ -10,8 +10,14 @@ import com.sad.jetpack.architecture.componentization.api.IResponseSession;
 import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
 import com.sad.jetpack.architecture.componentization.api.ResponseImpl;
 
-@Component(url = "test://tsc/2",description = "回溯链成员2")
-public class TestStaticComponent2 implements IComponent {
+@Component(url = "test://tsc/4",description = "回溯链成员4")
+public class TestStaticComponent4 implements IComponent {
+
+    @Override
+    public void onCall(IRequest request, IResponseSession session) throws Exception {
+        throw new Exception(">>>模拟异常");
+        //session.postResponseData(ResponseImpl.newBuilder().request(request).build());
+    }
 
     @NonNull
     @Override
@@ -20,18 +26,13 @@ public class TestStaticComponent2 implements IComponent {
     }
 
     @Override
-    public void onCall(IRequest request, IResponseSession session) throws Exception {
-        session.postResponseData(ResponseImpl.newBuilder().request(request).build(),false);
+    public int priority() {
+        return 666;
     }
 
     @Override
     public void onBackTrackResponse(IComponentChain chain) throws Exception {
-        LogcatUtils.e(">>>回溯链响应2："+chain.response());
+        LogcatUtils.e(">>>回溯链响应4："+chain.response());
         chain.proceedResponse();
-    }
-
-    @Override
-    public int priority() {
-        return 888;
     }
 }

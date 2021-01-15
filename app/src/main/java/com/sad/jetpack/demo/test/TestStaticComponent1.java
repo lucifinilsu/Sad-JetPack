@@ -10,7 +10,7 @@ import com.sad.jetpack.architecture.componentization.api.IResponseSession;
 import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
 import com.sad.jetpack.architecture.componentization.api.ResponseImpl;
 
-@Component(url = "test://atsc/1",description = "回溯链成员1")
+@Component(url = "test://tsc/1",description = "回溯链成员1")
 public class TestStaticComponent1 implements IComponent {
 
     @NonNull

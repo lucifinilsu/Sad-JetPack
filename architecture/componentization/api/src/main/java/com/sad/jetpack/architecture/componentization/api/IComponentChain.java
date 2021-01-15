@@ -14,7 +14,7 @@ public interface IComponentChain {
 
     interface IComponentChainTerminalCallback{
 
-        void onLast(IResponse response,String id) throws Exception;
+        void onLast(IResponse response,String id,boolean intercepted) throws Exception;
 
     }
 

@@ -8,7 +8,7 @@ public interface IComponentProcessorCallListener{
         return request;
     }
 
-    boolean onProcessorReceivedResponse(IResponse response,String processorId);
+    boolean onProcessorReceivedResponse(IResponse response,String processorId,boolean intercepted);
 
     IResponse onProcessorMergeResponses(ConcurrentLinkedHashMap<IResponse,String> responses,String processorId);
 
@@ -18,7 +18,7 @@ public interface IComponentProcessorCallListener{
         return request;
     }
 
-    default boolean onChildComponentReceivedResponse(IResponse response, IRequestSession session, String componentId){return false;};
+    default boolean onChildComponentReceivedResponse(IResponse response, IRequestSession session, String componentId,boolean intercepted){return false;};
 
     default void onChildComponentException(IRequest request, Throwable throwable,String componentId){};
 
@@ -26,7 +26,7 @@ public interface IComponentProcessorCallListener{
         return request;
     }
 
-    default boolean onChildProcessorReceivedResponse(IResponse response,String childProcessorId){
+    default boolean onChildProcessorReceivedResponse(IResponse response,String childProcessorId,boolean intercepted){
         return false;
     };
 

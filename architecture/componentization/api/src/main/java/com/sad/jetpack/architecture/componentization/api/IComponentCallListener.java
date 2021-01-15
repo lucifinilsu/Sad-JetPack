@@ -6,7 +6,7 @@ public interface IComponentCallListener {
         return request;
     }
 
-    boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId);
+    boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId,boolean intercepted);
 
     void onComponentException(IRequest request, Throwable throwable,String componentId);
 }

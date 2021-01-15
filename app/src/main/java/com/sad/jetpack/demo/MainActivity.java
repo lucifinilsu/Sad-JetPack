@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         SCore.asSequenceProcessor("xxx")
                 .listener(new IComponentProcessorCallListener() {
                     @Override
-                    public boolean onProcessorReceivedResponse(IResponse response, String processorId) {
+                    public boolean onProcessorReceivedResponse(IResponse response, String processorId,boolean intercepted) {
                         LogcatUtils.e(">>>回调完毕："+response);
                         return false;
                     }
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onProcessorException(IRequest request, Throwable throwable, String processorId) {
-
+                        LogcatUtils.e(">>>外部捕获异常："+throwable.getMessage());
                     }
                 })
                 .build()

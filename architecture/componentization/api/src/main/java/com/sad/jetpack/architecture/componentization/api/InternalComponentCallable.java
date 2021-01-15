@@ -136,28 +136,28 @@ final class InternalComponentCallable implements IComponentCallable,IComponentCa
 
                 @Override
                 public boolean replyRequest(IRequest request,ICallerConfig callerConfig) {
-                    callerConfig(config);
+                    callerConfig(callerConfig);
                     call(request);
                     return false;
                 }
             };
             component.onCall(request, new IResponseSession() {
                 @Override
-                public boolean postResponseData(IBody body) {
+                public boolean postResponseData(IBody body,boolean intercepted) {
                     IResponse componentResponse= ResponseImpl
                             .newBuilder()
                             .body(body)
                             .request(request)
                             .build();
-                    return postResponseData(componentResponse);
+                    return postResponseData(componentResponse,intercepted);
                 }
 
                 @Override
-                public boolean postResponseData(IResponse response) {
+                public boolean postResponseData(IResponse response,boolean intercepted) {
                     isComponentDone.getAndSet(true);
                     finishTimeout();
                     if (listener!=null && (!needTimeout || !isTimeout.get())){
-                        listener.onComponentReceivedResponse(response,requestSession, id);
+                        listener.onComponentReceivedResponse(response,requestSession, id,intercepted);
                     }
                     return false;
                 }

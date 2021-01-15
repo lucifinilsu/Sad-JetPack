@@ -2,6 +2,8 @@ package com.sad.jetpack.architecture.componentization.api;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 abstract class AbsInternalComponentProcessor implements IComponentProcessor,IComponentProcessor.Builder,IResponseBackTrackable{
 
@@ -12,6 +14,8 @@ abstract class AbsInternalComponentProcessor implements IComponentProcessor,ICom
     protected boolean listenerCrossed=false;
     protected int priority=0;
 
+    protected AtomicBoolean isIntercepted=new AtomicBoolean(false);
+    protected AtomicInteger indexIntercepted=new AtomicInteger(0);
     @Override
     public String backTrackableId() {
         return processorId();

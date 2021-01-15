@@ -34,7 +34,7 @@ final class ComponentResponseHandler extends Handler {
                             .callerConfig(callerConfig)
                             .listener(new IComponentCallListener() {
                                 @Override
-                                public boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                                public boolean onComponentReceivedResponse(IResponse response, IRequestSession session, String componentId,boolean intercepted) {
                                     try {
                                         bundle.setClassLoader(ComponentResponseHandler.this.getClass().getClassLoader());
                                         bundle.putParcelable(CommonConstant.REMOTE_BUNDLE_RESPONSE,response);
@@ -78,7 +78,7 @@ final class ComponentResponseHandler extends Handler {
                             .listenerCrossed(false)
                             .listener(new IComponentProcessorCallListener() {
                                 @Override
-                                public boolean onProcessorReceivedResponse(IResponse response, String processorId) {
+                                public boolean onProcessorReceivedResponse(IResponse response, String processorId,boolean intercepted) {
                                     try {
                                         bundle.setClassLoader(ComponentResponseHandler.this.getClass().getClassLoader());
                                         bundle.putParcelable(CommonConstant.REMOTE_BUNDLE_RESPONSE,response);
@@ -117,7 +117,7 @@ final class ComponentResponseHandler extends Handler {
                                 }
 
                                 @Override
-                                public boolean onChildComponentReceivedResponse(IResponse response, IRequestSession session, String componentId) {
+                                public boolean onChildComponentReceivedResponse(IResponse response, IRequestSession session, String componentId,boolean intercepted) {
                                     return false;
                                 }
 
@@ -127,7 +127,7 @@ final class ComponentResponseHandler extends Handler {
                                 }
 
                                 @Override
-                                public boolean onChildProcessorReceivedResponse(IResponse response, String childProcessorId) {
+                                public boolean onChildProcessorReceivedResponse(IResponse response, String childProcessorId,boolean intercepted) {
                                     return false;
                                 }
 

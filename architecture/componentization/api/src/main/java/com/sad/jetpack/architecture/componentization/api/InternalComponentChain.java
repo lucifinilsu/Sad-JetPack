@@ -10,6 +10,7 @@ final class InternalComponentChain implements IComponentChain{
     private List<Object> units =new LinkedList<>();
     private int currIndex=-1;
     private IComponentChain.IComponentChainTerminalCallback terminalCallback;
+    private boolean outsideIntercepted=false;
 
     public void setResponse(IResponse response) {
         this.response = response;
@@ -23,8 +24,9 @@ final class InternalComponentChain implements IComponentChain{
         this.terminalCallback = terminalCallback;
     }
 
-    protected InternalComponentChain(List<Object> units){
+    protected InternalComponentChain(List<Object> units,boolean outsideIntercepted ){
         this.units=units;
+        this.outsideIntercepted=outsideIntercepted;
     }
 
     @Override
@@ -50,7 +52,7 @@ final class InternalComponentChain implements IComponentChain{
         //LogcatUtils.e(">>>回溯链信息：currIdx="+currIndex+",size="+units.size());
         if (currIndex>units.size()-1 && terminalCallback!=null){
             LogcatUtils.e(">>>回溯链末端回调");
-            terminalCallback.onLast(response,id);
+            terminalCallback.onLast(response,id,outsideIntercepted);
         }
         else {
             Object o=units.get(currIndex);
