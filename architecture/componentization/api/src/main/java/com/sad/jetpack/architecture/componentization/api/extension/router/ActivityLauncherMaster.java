@@ -1,17 +1,12 @@
 package com.sad.jetpack.architecture.componentization.api.extension.router;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
 import android.text.TextUtils;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.sad.jetpack.architecture.componentization.api.CommonConstant;
 import com.sad.jetpack.architecture.componentization.api.IComponentsCluster;
 import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
 import com.sad.jetpack.architecture.componentization.api.MapTraverseUtils;
@@ -152,10 +147,11 @@ public class ActivityLauncherMaster implements IActivityLauncherMaster{
                                     ;
                         }
                     });
-                    for (Intent ii:intents
+                    /*for (Intent ii:intents
                          ) {
+
                         LogcatUtils.e(">>>意图队列成员_"+intents.indexOf(ii)+":"+intent);
-                    }
+                    }*/
                     if (useSystemStackPerforming){
                         if (launchActivityAction!=null){
                             launchActivityAction.doStartActivities(context,intents.toArray(new Intent[intents.size()]),parameters);

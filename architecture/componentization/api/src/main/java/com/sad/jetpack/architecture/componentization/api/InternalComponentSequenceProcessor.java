@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -39,7 +38,7 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
 
     @Override
     public void onBackTrackResponse(IComponentChain chain) throws Exception {
-        LogcatUtils.e(">>>>Processor回溯");
+        LogcatUtils.internalLog(">>>>Processor回溯");
         //先进行内部回溯，完成后再回溯上级，注意，内部回溯依然要根据拦截情况设定回溯路径。
         callInternalChain(units,isIntercepted.get(),indexIntercepted.get(),chain.parentId(), chain.response(), new IComponentChain.IComponentChainTerminalCallback() {
             @Override
@@ -101,7 +100,7 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
             @Override
             public void onSuccess(IResponse result) {
                 try {
-                    LogcatUtils.e(">>>拦截信息：index="+indexIntercepted.get()+",intercepted="+isIntercepted.get());
+                    LogcatUtils.internalLog(">>>拦截信息：index="+indexIntercepted.get()+",intercepted="+isIntercepted.get());
                     callInternalChain(units,isIntercepted.get(),indexIntercepted.get(),processorId,result,new IComponentChain.IComponentChainTerminalCallback() {
                         @Override
                         public void onLast(IResponse response, String id,boolean intercepted) throws Exception{
@@ -213,10 +212,10 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
                                 else {
                                     int start=currIndex.get();
                                     indexIntercepted.set(start);
-                                    LogcatUtils.e(">>>出现拦截点：index="+indexIntercepted.get());
+                                    LogcatUtils.internalLog(">>>出现拦截点：index="+indexIntercepted.get());
                                     for (int i = start; i < units.size(); i++) {
                                         currIndex.set(i);
-                                        LogcatUtils.e(">>>强制关停线程等待计数：i="+i+",total="+units.size());
+                                        LogcatUtils.internalLog(">>>强制关停线程等待计数：i="+i+",total="+units.size());
                                         countDownLatch.countDown();
                                     }
 
@@ -363,10 +362,10 @@ final class InternalComponentSequenceProcessor extends AbsInternalComponentProce
                                 else {
                                     int start=currIndex.get();
                                     indexIntercepted.set(start);
-                                    LogcatUtils.e(">>>出现拦截点：index="+indexIntercepted.get());
+                                    LogcatUtils.internalLog(">>>出现拦截点：index="+indexIntercepted.get());
                                     for (int i = start; i < units.size(); i++) {
                                         currIndex.set(i);
-                                        LogcatUtils.e(">>>强制关停线程等待计数：i="+i+",total="+units.size());
+                                        LogcatUtils.internalLog(">>>强制关停线程等待计数：i="+i+",total="+units.size());
                                         countDownLatch.countDown();
                                     }
                                 }

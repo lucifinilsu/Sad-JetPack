@@ -84,10 +84,10 @@ final class ComponentResponseHandler extends Handler {
                                         bundle.putParcelable(CommonConstant.REMOTE_BUNDLE_RESPONSE,response);
                                         msg.what=RemoteActionResultState.REMOTE_ACTION_RESULT_STATE_SUCCESS;
                                         msg.setData(bundle);
-                                        LogcatUtils.e("ipc","--------->msg="+msg.toString());
+                                        LogcatUtils.internalLog("ipc","--------->msg="+msg.toString());
                                         Message message=Message.obtain();
                                         message.copyFrom(msg);
-                                        LogcatUtils.e("ipc","--------->message="+message.toString());
+                                        LogcatUtils.internalLog("ipc","--------->message="+message.toString());
                                         replyMessenger.send(message);
                                     }catch (Exception e){
                                         e.printStackTrace();
@@ -109,7 +109,9 @@ final class ComponentResponseHandler extends Handler {
                                         msg.setData(bundle);
                                         Message message=Message.obtain();
                                         message.copyFrom(msg);
-                                        LogcatUtils.e("ipc","--------->message="+message.toString());
+                                        if (CommonConstant.enableInternalLog){
+                                            LogcatUtils.internalLog("ipc","--------->message="+message.toString());
+                                        }
                                         replyMessenger.send(message);
                                     }catch (Exception e){
                                         e.printStackTrace();

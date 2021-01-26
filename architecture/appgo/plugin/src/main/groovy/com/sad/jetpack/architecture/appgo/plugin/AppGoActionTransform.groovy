@@ -310,7 +310,6 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
     }
 
 
-
     private void setAnchor(ClassScanResult scanResult,
             String overwriteApplicationMethodName,
             String anchorMethodName,
@@ -371,6 +370,7 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
         anchorCode=ps.toString()
         if (anchorCode!=null && !"".equals(anchorCode.toString())){
             CtMethod method=Anchor.getOverwirteMethodFromApplication(project,scanResult.applicationClass,overwriteApplicationMethodName,anchorMethodParametersClass)
+
             setAnchor(scanResult,method,anchorCode,!anchorMethodName.contains("Pre"))
         }
     }

@@ -1,14 +1,13 @@
 package com.sad.jetpack.demo;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
-import com.sad.jetpack.architecture.componentization.annotation.ActivityRouter;
 import com.sad.jetpack.architecture.componentization.annotation.Data;
+import com.sad.jetpack.architecture.componentization.annotation.ExtraObject;
+import com.sad.jetpack.architecture.componentization.annotation.What;
 import com.sad.jetpack.architecture.componentization.api.IBody;
 import com.sad.jetpack.architecture.componentization.api.BodyImpl;
 import com.sad.jetpack.architecture.componentization.api.IComponentProcessorCallListener;
@@ -16,8 +15,6 @@ import com.sad.jetpack.architecture.componentization.api.IResponse;
 import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.sad.jetpack.architecture.componentization.annotation.IPCChat;
 import com.sad.jetpack.architecture.componentization.api.IRequest;
@@ -27,11 +24,10 @@ import com.sad.jetpack.architecture.componentization.api.ParasiticComponentRepos
 import com.sad.jetpack.architecture.componentization.api.RequestImpl;
 import com.sad.jetpack.architecture.componentization.api.SCore;
 import com.sad.jetpack.architecture.componentization.api.Utils;
-import com.sad.jetpack.architecture.componentization.api.extension.router.ActivityLauncherMaster;
 
 public class MainActivity extends AppCompatActivity {
     @IPCChat(url = {"test://ipc/chat/ttt","test://ipc/chat/sss"},priority = {996,822})
-    public void onTestIPCChat(IRequest request, String xxx, IResponseSession session,@Data(name = "extra")Bundle bundle){
+    public void onTestIPCChat(IRequest request, String xxx, IResponseSession session,@Data(name = "extra")Bundle bundle,@ExtraObject TestInit ex,@What int w,@Data(name = "cc") @ExtraObject Long sc){
         LogcatUtils.e("sad-jetpack","------------->onTestIPCChat收到信息:"+request.body().dataContainer().getMap());
         tv.setText("onTestIPCChat收到信息:"+request.body().dataContainer().getMap());
         new Thread(){
@@ -47,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        LogcatUtils.e("test","------->日志测试。。。。");
         tv=findViewById(R.id.myProcess);
         tv.setText("当前App:"+getApplicationContext().getPackageName()+"\n当前进程:"+ Utils.getCurrAppProccessName(getApplicationContext()));
         //华安生态 宝盈互联网 鹏华混合 融通新能源、景气AB 国投新能源 广发新经济

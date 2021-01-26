@@ -43,7 +43,7 @@ final class InternalComponentChain implements IComponentChain{
     public void proceedResponse(IResponse response, String id) throws Exception {
 
         if (currIndex>units.size()-1){
-            LogcatUtils.e(">>>回溯链已经结束");
+            LogcatUtils.internalLog(">>>回溯链已经结束");
             return;
         }
         this.response=response;
@@ -51,17 +51,17 @@ final class InternalComponentChain implements IComponentChain{
         currIndex++;
         //LogcatUtils.e(">>>回溯链信息：currIdx="+currIndex+",size="+units.size());
         if (currIndex>units.size()-1 && terminalCallback!=null){
-            LogcatUtils.e(">>>回溯链末端回调");
+            LogcatUtils.internalLog(">>>回溯链末端回调");
             terminalCallback.onLast(response,id,outsideIntercepted);
         }
         else {
             Object o=units.get(currIndex);
             if (o instanceof IResponseBackTrackable){
-                LogcatUtils.e(">>>回溯链调用：rid="+((IResponseBackTrackable) o).backTrackableId()+",response="+response+",id="+id);
+                LogcatUtils.internalLog(">>>回溯链调用：rid="+((IResponseBackTrackable) o).backTrackableId()+",response="+response+",id="+id);
                 ((IResponseBackTrackable) o).onBackTrackResponse(this);
             }
             else {
-                LogcatUtils.e(">>>非回溯链类型");
+                LogcatUtils.internalLog(">>>非回溯链类型");
             }
         }
     }

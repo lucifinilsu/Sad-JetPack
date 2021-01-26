@@ -11,7 +11,7 @@
   "createdBy": {
     "gradle": {
       "version": "6.5",
-      "buildId": "ndt75mdxqreifa75mob4igz4di"
+      "buildId": "jicyg53fozhkharjeakauiu3o4"
     }
   },
   "variants": [
@@ -28,11 +28,11 @@
         {
           "name": "plugin-1.0.0-test.jar",
           "url": "plugin-1.0.0-test.jar",
-          "size": 32595,
-          "sha512": "d44499b0fe9524de510d6c6a6b936c6b936925d04caaac1add2ba30ca8842c35efe83ff34de8ffda238464b591e5d20d770fea3e0025a053cf93dc787f0fd30c",
-          "sha256": "6004104b75c2b40de27ff0dd27a50b8dcab734868cc17cb1fe0721e31f23223c",
-          "sha1": "a5e674a12ca243133f048541c28daa6180db3349",
-          "md5": "663369636354c5e1031640282c8dfce9"
+          "size": 32947,
+          "sha512": "c77a93ba2a10357a758511425562e9eb15ce18ef049eb3903e56c0bdc9ab4ccabb807171c4fe88fb07b21fd47281863c526e177111dafad3c8dbf04a99fe8041",
+          "sha256": "5e73a12a93e905522f43a78ccb70cd85e11c7e4e8a55d15ee8603f2071e9ea4d",
+          "sha1": "cbe341dfde5bd8cf3626daf8f0dcf595bfc24be6",
+          "md5": "fb3a40c2a1ab97e286af1d391916e28e"
         }
       ]
     },
@@ -57,7 +57,7 @@
           "group": "com.sad.jetpack.lib.classscanner",
           "module": "ClassScanner",
           "version": {
-            "requires": "1.0.1-Beta5"
+            "requires": "1.0.1-Beta6"
           }
         },
         {
@@ -79,11 +79,11 @@
         {
           "name": "plugin-1.0.0-test.jar",
           "url": "plugin-1.0.0-test.jar",
-          "size": 32595,
-          "sha512": "d44499b0fe9524de510d6c6a6b936c6b936925d04caaac1add2ba30ca8842c35efe83ff34de8ffda238464b591e5d20d770fea3e0025a053cf93dc787f0fd30c",
-          "sha256": "6004104b75c2b40de27ff0dd27a50b8dcab734868cc17cb1fe0721e31f23223c",
-          "sha1": "a5e674a12ca243133f048541c28daa6180db3349",
-          "md5": "663369636354c5e1031640282c8dfce9"
+          "size": 32947,
+          "sha512": "c77a93ba2a10357a758511425562e9eb15ce18ef049eb3903e56c0bdc9ab4ccabb807171c4fe88fb07b21fd47281863c526e177111dafad3c8dbf04a99fe8041",
+          "sha256": "5e73a12a93e905522f43a78ccb70cd85e11c7e4e8a55d15ee8603f2071e9ea4d",
+          "sha1": "cbe341dfde5bd8cf3626daf8f0dcf595bfc24be6",
+          "md5": "fb3a40c2a1ab97e286af1d391916e28e"
         }
       ]
     }

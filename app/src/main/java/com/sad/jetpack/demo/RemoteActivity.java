@@ -8,7 +8,6 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.sad.jetpack.architecture.appgo.api.AppGo;
 import com.sad.jetpack.architecture.componentization.annotation.ActivityRouter;
 import com.sad.jetpack.architecture.componentization.api.BodyImpl;
 import com.sad.jetpack.architecture.componentization.api.IPCRemoteCallListener;
@@ -17,7 +16,6 @@ import com.sad.jetpack.architecture.componentization.api.IRequestSession;
 import com.sad.jetpack.architecture.componentization.api.IResponse;
 import com.sad.jetpack.architecture.componentization.api.ITarget;
 import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
-import com.sad.jetpack.architecture.componentization.api.ParasiticComponentRepositoryFactory;
 import com.sad.jetpack.architecture.componentization.api.ProcessorMode;
 import com.sad.jetpack.architecture.componentization.api.RemoteAction;
 import com.sad.jetpack.architecture.componentization.api.RequestImpl;

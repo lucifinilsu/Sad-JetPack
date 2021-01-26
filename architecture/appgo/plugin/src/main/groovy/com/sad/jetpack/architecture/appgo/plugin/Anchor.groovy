@@ -55,6 +55,13 @@ class Anchor {
         }
         return names
     }
+
+    private static void appInitContext(StringBuilder defaultCode){
+        StringBuffer initContextCode=new StringBuffer()
+        initContextCode.append("if(com.sad.jetpack.architecture.appgo.api.AppGo.get().getContext()==null)\n{\ncom.sad.jetpack.architecture.appgo.api.AppGo.init(this);\n}")
+        defaultCode.append(initContextCode.toString())
+    }
+
     static CtMethod getOverwirteMethodFromApplication(Project project,CtClass applicationClass,String methodName,CtClass... parameters){
         CtMethod method = null;
         try{
@@ -64,6 +71,13 @@ class Anchor {
         }
 
         if (method==null){
+            StringBuilder defaultCode=new StringBuilder();
+            defaultCode.append("{\nsuper."+methodName+"(\$\$);")
+            if ("onCreate".equals(methodName)){
+                appInitContext(defaultCode)
+            }
+            defaultCode.append("\n}")
+
             //方法1
             /*StringBuilder defaultCode=new StringBuilder();
             defaultCode.append("public void "+methodName)
@@ -85,18 +99,18 @@ class Anchor {
             }
             method = CtMethod.make(defaultCode.toString(),applicationClass)//此方法返回值的attr属性为null*/
 
+
             //方法2
-            StringBuilder defaultCode=new StringBuilder();
+
             method = new CtMethod(CtClass.voidType, methodName, parameters, applicationClass);
             method.setModifiers(Modifier.PUBLIC);
-            defaultCode.append("{super."+methodName+"(\$\$);}")
             /*if (parameters!=null && parameters.length>0){
                 defaultCode.append("{super."+methodName+"(\$\$);}")
             }
             else {
                 defaultCode.append("{super."+methodName+"();}")
             }*/
-            method.setBody(defaultCode.toString());
+            method.setBody(defaultCode.toString())
             applicationClass.addMethod(method)
             //方法3
            /* try{

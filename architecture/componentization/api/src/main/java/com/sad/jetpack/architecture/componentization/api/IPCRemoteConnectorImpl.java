@@ -35,12 +35,12 @@ public class IPCRemoteConnectorImpl implements IPCRemoteConnector,IPCRemoteConne
         Intent intent;
         boolean isBindCurrAppMainProcess= TextUtils.isEmpty(app) || context.getPackageName().equals(app);
         if (isBindCurrAppMainProcess) {
-            LogcatUtils.e("ipc","------------------->连接当前App服务端："+app);
+            LogcatUtils.internalLog("ipc","------------------->连接当前App服务端："+app);
             intent = new Intent(context, AppIPCService.class);
         }
         else {
             //跨App调起事件分发服务
-            LogcatUtils.e("ipc","------------------->连接其他App服务端："+app);
+            LogcatUtils.internalLog("ipc","------------------->连接其他App服务端："+app);
             intent = new Intent(app + ".ipc");
             intent.setPackage(app);
         }

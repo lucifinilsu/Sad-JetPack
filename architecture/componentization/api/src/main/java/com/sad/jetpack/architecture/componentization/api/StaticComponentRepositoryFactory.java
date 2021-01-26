@@ -1,11 +1,9 @@
 package com.sad.jetpack.architecture.componentization.api;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
-import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
 
 import com.sad.jetpack.architecture.componentization.annotation.Utils;
 
@@ -56,7 +54,7 @@ public class StaticComponentRepositoryFactory implements InstancesRepositoryFact
                 if (url.endsWith("/")){
                     url=url.substring(0,url.length()-1);
                 }
-                LogcatUtils.e("sad-jetpack",">>>>扫描："+url);
+                LogcatUtils.internalLog("sad-jetpack",">>>>扫描："+url);
                 String crmPath= Utils.crmPaths("crm",url);
                 traverse(context,crmPath,componentCallableInstances,objectInstances,allConstructor,constructors,componentInitializeListener);
             }
@@ -118,7 +116,7 @@ public class StaticComponentRepositoryFactory implements InstancesRepositoryFact
                     }
                     if (IComponent.class.isAssignableFrom(cls)){
                         IComponent component= (IComponent) instance;
-                        LogcatUtils.e("sad-jetpack",">>>>'"+crmPath+"' whose type is IComponent is found,it is "+component);
+                        LogcatUtils.internalLog("sad-jetpack",">>>>'"+crmPath+"' whose type is IComponent is found,it is "+component);
                         IComponentCallable componentCallable=InternalComponentCallable.newBuilder(component)
                                 .componentId(c_url)
                                 .build()
@@ -173,7 +171,7 @@ public class StaticComponentRepositoryFactory implements InstancesRepositoryFact
             return result;
         }catch (Exception e){
             //e.printStackTrace();
-            LogcatUtils.e("sad-jetpack",">>>>"+fn+" is not file");
+            LogcatUtils.internalLog("sad-jetpack",">>>>"+fn+" is not file");
             return null;
         }
     }

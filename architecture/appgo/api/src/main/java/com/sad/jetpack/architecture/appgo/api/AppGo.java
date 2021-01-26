@@ -14,6 +14,11 @@ public class AppGo {
         mContext = context;
     }
 
+    public static AppGo init(Context context){
+        ApplicationContextInitializerProvider.mContext=context;
+        return get();
+    }
+
     /**
      * 获取实例
      */
@@ -23,7 +28,7 @@ public class AppGo {
                 if (instance == null) {
                     Context context = ApplicationContextInitializerProvider.mContext;
                     if (context == null) {
-                        throw new IllegalStateException("context == null");
+                        //throw new IllegalStateException("context == null");
                     }
                     instance = new AppGo(context);
                 }

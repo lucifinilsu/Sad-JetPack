@@ -16,7 +16,7 @@ public class InternalContextInitializerProvider extends ContentProvider {
     protected static Context mContext;
     @Override
     public boolean onCreate() {
-        Log.e("SAD","-------------->初始化Context");
+        LogcatUtils.internalLog("SAD","-------------->初始化Context");
         mContext = getContext();
         return false;
     }

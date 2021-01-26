@@ -35,9 +35,12 @@ public class RequestImpl implements IRequest, IRequest.Builder, Parcelable {
         return new RequestImpl(id);
     }
 
-    protected RequestImpl(){}
+    protected RequestImpl(){
+        previousResponse(ResponseImpl.newBuilder().request(this).build());
+    }
 
     private RequestImpl(String id){
+        this();
         this.id=id;
         Context context=InternalContextHolder.get().getContext();
         if (context!=null){

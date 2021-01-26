@@ -5,13 +5,11 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.sad.jetpack.architecture.appgo.annotation.ApplicationLifeCycleAction;
-import com.sad.jetpack.architecture.appgo.api.AppGo;
 import com.sad.jetpack.architecture.appgo.api.IApplicationLifecyclesObserver;
 import com.sad.jetpack.architecture.componentization.annotation.Component;
 import com.sad.jetpack.architecture.componentization.api.BodyImpl;
@@ -32,7 +30,8 @@ public class TestInitModule1 implements IApplicationLifecyclesObserver, ICompone
     @ApplicationLifeCycleAction(priority = 9999)
     @Override
     public void onApplicationPreCreated(Application application) {
-        SCore.enableLog(true);
+        SCore.enableLogUtils(true);
+        SCore.enableInternalLog(false);
         SCore.initIPC(application);
         LogcatUtils.e(">>> 666666666666666666666");
     }

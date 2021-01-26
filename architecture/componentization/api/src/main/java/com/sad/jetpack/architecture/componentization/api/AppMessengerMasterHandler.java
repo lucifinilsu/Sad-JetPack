@@ -50,7 +50,7 @@ final class AppMessengerMasterHandler extends Handler {
                         throw new Exception("The messenger("+fromApp+":"+fromProcess+") that you wanna use to send some messages is null or not found,please check out the messenger.");
                     }
                     else {
-                        LogcatUtils.e("ipc","-------------->通信");
+                        LogcatUtils.internalLog("ipc","-------------->通信");
                         Message message=Message.obtain(msg);
                         messenger.send(message);
                     }

@@ -22,10 +22,12 @@ public class SCore {
         return componentCallable;
     }
 
-    public static void enableLog(boolean e){
-        CommonConstant.enableLog=e;
+    public static void enableLogUtils(boolean e){
+        CommonConstant.enableLogUtils =e;
     }
-
+    public static void enableInternalLog(boolean e){
+        CommonConstant.enableInternalLog =e;
+    }
     public static IComponentsCluster getCluster(Context context){
         return InternalComponentCluster.newInstance(context);
     }

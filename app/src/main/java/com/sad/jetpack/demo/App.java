@@ -2,10 +2,13 @@ package com.sad.jetpack.demo;
 
 import android.app.Application;
 import android.content.Context;
+
+import com.sad.jetpack.architecture.appgo.api.AppGo;
 import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
 
 
 import com.sad.jetpack.architecture.appgo.annotation.ApplicationAccess;
+import com.sad.jetpack.architecture.componentization.api.SCore;
 
 
 @ApplicationAccess
@@ -14,6 +17,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         LogcatUtils.e("test","------->i am onreate");
+        AppGo.init(this);
     }
 
 

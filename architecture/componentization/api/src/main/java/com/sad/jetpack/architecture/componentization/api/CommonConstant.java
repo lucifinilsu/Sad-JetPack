@@ -21,7 +21,9 @@ public class CommonConstant {
 
     public static final String REMOTE_BUNDLE_CALLER_INSTANCES_REPOSITORY_FACTORY = "REMOTE_BUNDLE_CALLER_INSTANCES_REPOSITORY_FACTORY";
 
-    protected static boolean enableLog=false;
+    protected static boolean enableLogUtils =false;
+
+    protected static boolean enableInternalLog=false;
 
     protected static boolean wholeLog=false;
 }

@@ -11,19 +11,37 @@ public class LogcatUtils {
         CommonConstant.wholeLog=wholeLog;
     }
 
-    public static void e(boolean whole,String tag,String log){
-        if (whole){
-            print(Log.ERROR,tag,log);
-        }
-        else {
-            Log.e(tag,log);
+    public static void e(boolean whole, String tag, String log){
+        if (CommonConstant.enableLogUtils){
+            if (whole){
+                print(Log.ERROR,tag,log);
+            }
+            else {
+                Log.e(tag,log);
+            }
         }
     }
-    public static void e(String tag,String log){
+    public static void e(String tag, String log){
         e(CommonConstant.wholeLog,tag,log);
     }
     public static void e(String log){
         e("SAD-JETPACK",log);
+    }
+
+
+
+
+    protected static void internalLog(boolean whole, String tag, String log){
+        if (CommonConstant.enableInternalLog){
+            e(whole,tag,log);
+        }
+
+    }
+    protected static void internalLog(String tag, String log){
+        internalLog(CommonConstant.wholeLog,tag,log);
+    }
+    protected static void internalLog(String log){
+        internalLog("SAD-JETPACK-INTERNAL",log);
     }
 
     /**

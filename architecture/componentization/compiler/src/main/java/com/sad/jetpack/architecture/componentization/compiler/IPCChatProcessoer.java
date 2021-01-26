@@ -2,11 +2,14 @@ package com.sad.jetpack.architecture.componentization.compiler;
 
 import com.google.auto.service.AutoService;
 import com.sad.jetpack.architecture.componentization.annotation.Data;
+import com.sad.jetpack.architecture.componentization.annotation.Description;
 import com.sad.jetpack.architecture.componentization.annotation.EncryptUtil;
+import com.sad.jetpack.architecture.componentization.annotation.ExtraObject;
 import com.sad.jetpack.architecture.componentization.annotation.IDataConverter;
 import com.sad.jetpack.architecture.componentization.annotation.IPCChat;
 import com.sad.jetpack.architecture.componentization.annotation.NameUtils;
 import com.sad.jetpack.architecture.componentization.annotation.ValidUtils;
+import com.sad.jetpack.architecture.componentization.annotation.What;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
@@ -18,6 +21,7 @@ import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -114,37 +118,52 @@ public class IPCChatProcessoer extends AbsProcessor {
                         break;
                     }
                 }
+                //预置请求参数备用
+                String randomString= RandomStringUtils.randomAlphabetic(5);
+                String vn_extraObject="_extraObject_"+randomString;
+                String vn_what="_what_"+randomString;
+                String vn_description="_description_"+randomString;
+                String vn_body="_requestBody_"+randomString;
+
                 if (hasUnknownTypeParameters){
+
+                    codeInvokeHostMethodBuilder.addStatement("$T $L = request.body()",ClassName.bestGuess(Constant.PACKAGE_API+".IBody"),vn_body);
+                    codeInvokeHostMethodBuilder.addStatement("$T $L = $L.what()",int.class,vn_what,vn_body);
+                    codeInvokeHostMethodBuilder.addStatement("$T $L = $L.description()",String.class,vn_description,vn_body);
+                    codeInvokeHostMethodBuilder.addStatement("$T $L = $L.extraObject()",Object.class,vn_extraObject,vn_body);
                     //若含有
-                    codeInvokeHostMethodBuilder.addStatement("$T dataContainer=request.body().dataContainer()",ClassName.bestGuess(Constant.PACKAGE_API+".IDataContainer"));
+                    codeInvokeHostMethodBuilder.addStatement("$T dataContainer=$L.dataContainer()",ClassName.bestGuess(Constant.PACKAGE_API+".IDataContainer"),vn_body);
+
                     //遍历未知类型参数
-                    for (VariableElement ve:listParams
-                         ) {
-                        if (!typeUtils.isSubtype(typeUtils.erasure(ve.asType()),typeUtils.erasure(elementIAC_Request.asType()))
-                                && !typeUtils.isSubtype(typeUtils.erasure(ve.asType()),typeUtils.erasure(elementIAC_ResponseSession.asType()))
-                        ) {
-                            String p_name=ve.getSimpleName().toString();
-                            Data data=ve.getAnnotation(Data.class);
-                            //TypeMirror dm=null;
-                            Class<? extends IDataConverter> converterClass=null;
-                            if (data!=null){
-                                p_name=data.name();
-                                //converterClass=data.converter();
-                                //dm=getConverterClassTypeMirror(data);
-                            }
-                            codeInvokeHostMethodBuilder.addStatement("$T $L = dataContainer.get($S)",ve.asType(),ve.getSimpleName().toString(),p_name);
-
-                            /*if (dm!=null){
-                                codeInvokeHostMethodBuilder.addStatement("Object _$L = dataContainer.get($S)",ve.getSimpleName().toString(),p_name);
-                                codeInvokeHostMethodBuilder.addStatement("$T dataConverter_$L = new $T()",IDataConverter.class,ve.getSimpleName().toString(),ClassName.bestGuess(dm.toString()));
-                                codeInvokeHostMethodBuilder.addStatement("$T $L = dataConverter_$L.convert(_$L)",ve.asType(),ve.getSimpleName().toString(),ve.getSimpleName().toString(),ve.getSimpleName().toString());
-                            }*/
-                            /*else {
-                                codeInvokeHostMethodBuilder.addStatement("$T $L = dataContainer.get($S)",ve.asType(),ve.getSimpleName().toString(),p_name);
-                            }*/
-
-                        }
-                    }
+//                    for (VariableElement ve:listParams
+//                         ) {
+//                        if (!typeUtils.isSubtype(typeUtils.erasure(ve.asType()),typeUtils.erasure(elementIAC_Request.asType()))
+//                                && !typeUtils.isSubtype(typeUtils.erasure(ve.asType()),typeUtils.erasure(elementIAC_ResponseSession.asType()))
+//                        ) {
+//                            String p_name=ve.getSimpleName().toString();
+//                            Data data=ve.getAnnotation(Data.class);
+//                            //TypeMirror dm=null;
+//                            Class<? extends IDataConverter> converterClass=null;
+//                            String vn_dataName=ve.getSimpleName().toString();
+//                            if (data!=null){
+//                                p_name=data.name();
+//                                vn_dataName="_"+ve.getSimpleName().toString()+"_"+randomString;
+//                                //converterClass=data.converter();
+//                                //dm=getConverterClassTypeMirror(data);
+//                            }
+//                            codeInvokeHostMethodBuilder.addStatement("$T $L = dataContainer.get($S)",ve.asType(),vn_dataName,p_name);
+//
+//                            if (dm!=null){
+//                                codeInvokeHostMethodBuilder.addStatement("Object _$L = dataContainer.get($S)",ve.getSimpleName().toString(),p_name);
+//                                codeInvokeHostMethodBuilder.addStatement("$T dataConverter_$L = new $T()",IDataConverter.class,ve.getSimpleName().toString(),ClassName.bestGuess(dm.toString()));
+//                                codeInvokeHostMethodBuilder.addStatement("$T $L = dataConverter_$L.convert(_$L)",ve.asType(),ve.getSimpleName().toString(),ve.getSimpleName().toString(),ve.getSimpleName().toString());
+//                            }
+//                            else {
+//                                codeInvokeHostMethodBuilder.addStatement("$T $L = dataContainer.get($S)",ve.asType(),ve.getSimpleName().toString(),p_name);
+//                            }
+//
+//                        }
+//                    }
                     //log.error(String.format("错误的方法参数类型，@%s方法不能含有IRequest、IResponseSession之外的类型",executable_e_method.getSimpleName().toString()));
 
                 }
@@ -154,6 +173,7 @@ public class IPCChatProcessoer extends AbsProcessor {
                 for (VariableElement ve:listParams
                      ) {
                     String sp=(listParams.indexOf(ve)==listParams.size()-1?"":",");
+                    String vn_dataName=ve.getSimpleName().toString();
                     if (typeUtils.isSubtype(typeUtils.erasure(ve.asType()),typeUtils.erasure(elementIAC_Request.asType()))){
 
                         ps+="request"+sp;
@@ -162,7 +182,32 @@ public class IPCChatProcessoer extends AbsProcessor {
                         ps+="session"+sp;
                     }
                     else {
-                        ps+=ve.getSimpleName().toString()+sp;
+                        Data data=ve.getAnnotation(Data.class);
+                        Description description=ve.getAnnotation(Description.class);
+                        What what=ve.getAnnotation(What.class);
+                        ExtraObject extraObject=ve.getAnnotation(ExtraObject.class);
+                        //这里注解有效性的优先级是：ExtraObject>Data>What>Description
+                        if (extraObject!=null){
+                            ps+="("+ve.asType()+")"+vn_extraObject+sp;
+                            continue;
+                        }
+                        if (data!=null){
+                            String p_name=data.name();
+                            vn_dataName="_"+ve.getSimpleName().toString()+"_"+randomString;
+                            codeInvokeHostMethodBuilder.addStatement("$T $L = dataContainer.get($S)",ve.asType(),vn_dataName,p_name);
+                            ps+=vn_dataName+sp;
+                            continue;
+                        }
+                        if (what!=null){
+                            ps+=vn_what+sp;
+                            continue;
+                        }
+                        if (description!=null){
+                            ps+=vn_description+sp;
+                        }
+                        codeInvokeHostMethodBuilder.addStatement("$T $L = dataContainer.get($S)",ve.asType(),vn_dataName,vn_dataName);
+                        ps+=vn_dataName+sp;
+
                     }
                 }
                 codeInvokeHostMethodBuilder.addStatement("getHost().$L("+ps+")",executable_e_method.getSimpleName());
