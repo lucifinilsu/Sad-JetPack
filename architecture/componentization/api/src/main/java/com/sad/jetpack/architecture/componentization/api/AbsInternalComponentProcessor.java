@@ -1,5 +1,6 @@
 package com.sad.jetpack.architecture.componentization.api;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -50,6 +51,38 @@ abstract class AbsInternalComponentProcessor implements IComponentProcessor,ICom
     @Override
     public ICallerConfig callerConfig() {
         return callerConfig;
+    }
+
+    @Override
+    public int childrenCount() {
+        return units.size();
+    }
+
+    @Override
+    public IComponentProcessor remove(String url,boolean traverseChildren) {
+        Iterator<Object> iterator = units.iterator();
+        while (iterator.hasNext()) {
+            Object s = iterator.next();
+            if (s instanceof IComponentCallable){
+                if (((IComponentCallable) s).componentId().equals(url)){
+                    iterator.remove();
+                }
+            }
+            else if (s instanceof IComponentProcessor){
+                if (((IComponentProcessor) s).processorId().equals(url)){
+                    iterator.remove();
+                }
+                else {
+                    if (traverseChildren){
+                        IComponentProcessor ss=((IComponentProcessor) s).remove(url);
+                        if (ss.childrenCount()==0){
+                            iterator.remove();
+                        }
+                    }
+                }
+            }
+        }
+        return this;
     }
 
     @Override

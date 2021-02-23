@@ -1,4 +1,4 @@
-rootProject.name='Sad-JetPack'
+rootProject.name='sad-JetPack'
 include ':app'
 include ':integration:classic'
 include ':architecture:appgo:api'

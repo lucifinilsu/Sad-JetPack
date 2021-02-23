@@ -13,11 +13,17 @@ public interface IComponentProcessor extends ISortable{
 
     ICallerConfig callerConfig();
 
+    IComponentProcessor remove(String url,boolean traverseChildren);
+
+    default IComponentProcessor remove(String url){return remove(url,false);}
+
     IComponentProcessor join(IComponentCallable componentCallable);
 
     IComponentProcessor join(List<IComponentCallable> componentCallables);
 
     IComponentProcessor join(IComponentProcessor processor);
+
+    int childrenCount();
 
     void submit(IRequest request);
 
