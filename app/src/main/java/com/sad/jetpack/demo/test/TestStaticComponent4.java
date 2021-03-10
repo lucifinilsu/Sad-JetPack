@@ -8,14 +8,15 @@ import com.sad.jetpack.architecture.componentization.api.IComponentChain;
 import com.sad.jetpack.architecture.componentization.api.IRequest;
 import com.sad.jetpack.architecture.componentization.api.IResponseSession;
 import com.sad.jetpack.architecture.componentization.api.LogcatUtils;
+import com.sad.jetpack.architecture.componentization.api.ResponseImpl;
 
 @Component(url = "test://tsc/4",description = "回溯链成员4")
 public class TestStaticComponent4 implements IComponent {
 
     @Override
     public void onCall(IRequest request, IResponseSession session) throws Exception {
-        throw new Exception(">>>模拟异常");
-        //session.postResponseData(ResponseImpl.newBuilder().request(request).build());
+        //throw new Exception(">>>模拟异常");
+        session.postResponseData(ResponseImpl.newBuilder().request(request).build());
     }
 
     @NonNull

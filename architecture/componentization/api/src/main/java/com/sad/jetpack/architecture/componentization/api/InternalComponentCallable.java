@@ -1,8 +1,11 @@
 package com.sad.jetpack.architecture.componentization.api;
 
+import android.net.Uri;
+
 import com.sad.core.async.SADHandlerAssistant;
 import com.sad.core.async.SADTaskSchedulerClient;
 
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeoutException;
@@ -141,6 +144,19 @@ final class InternalComponentCallable implements IComponentCallable,IComponentCa
                     return false;
                 }
             };
+            /*if (request.parseUrlParameters()){
+                try {
+                    Uri uri=Uri.parse(id);
+                    Set<String> keys=uri.getQueryParameterNames();
+                    for (String k:keys
+                         ) {
+                        String v=uri.getQueryParameter(k);
+                        request.body().dataContainer().put(k,v);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }*/
             component.onCall(request, new IResponseSession() {
                 @Override
                 public boolean postResponseData(IBody body,boolean intercepted) {
@@ -195,6 +211,7 @@ final class InternalComponentCallable implements IComponentCallable,IComponentCa
         this.id=id;
         return this;
     }
+
 
     @Override
     public IComponentCallable build() {

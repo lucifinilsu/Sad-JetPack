@@ -1,9 +1,12 @@
 package com.sad.jetpack.architecture.componentization.api;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
+
+import androidx.core.net.UriCompat;
 
 import com.sad.jetpack.architecture.componentization.annotation.Utils;
 
@@ -12,6 +15,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -44,7 +49,10 @@ public class StaticComponentRepositoryFactory implements InstancesRepositoryFact
     private StaticComponentRepositoryFactory(){
     }
     @Override
-    public InstancesRepository from(Context context,String url, IConstructor allConstructor, Map<String,IConstructor> constructors, IComponentCallableInitializeListener componentInitializeListener) {
+    public InstancesRepository from(Context context,String o_url, IConstructor allConstructor, Map<String,IConstructor> constructors, IComponentCallableInitializeListener componentInitializeListener) {
+        Uri u=Uri.parse(o_url);
+        u=u.buildUpon().clearQuery().build();
+        String url=u.toString();
         InternalInstancesRepository componentRepository=new InternalInstancesRepository(url);
         LinkedHashMap<Object, String> objectInstances =new LinkedHashMap<>();
         List<IComponentCallable> componentCallableInstances =new LinkedList<>();

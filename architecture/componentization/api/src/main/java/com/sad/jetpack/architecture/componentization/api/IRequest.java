@@ -17,6 +17,8 @@ public interface IRequest extends IParcelable<IRequest>{
 
     IResponse previousResponse();
 
+    /*boolean parseUrlParameters();*/
+
     Builder toBuilder();
 
     @Override
@@ -26,6 +28,7 @@ public interface IRequest extends IParcelable<IRequest>{
                 .fromProcess(in.readString())
                 .body(in.readParcelable(IBody.class.getClassLoader()))
                 .id(in.readString())
+                /*.parseUrlParameters(in.readInt()==0)*/
                 .previousResponse(in.readParcelable(IResponse.class.getClassLoader()))
                 .build();
         return request;
@@ -37,7 +40,9 @@ public interface IRequest extends IParcelable<IRequest>{
         dest.writeString(fromProcess());
         dest.writeParcelable(body(),flags);
         dest.writeString(id());
+        /*dest.writeInt(parseUrlParameters()?0:1);*/
         dest.writeParcelable(previousResponse(),flags);
+
     }
 
     interface Builder{
@@ -51,6 +56,8 @@ public interface IRequest extends IParcelable<IRequest>{
         Builder id(String id);
 
         Builder previousResponse(IResponse response);
+
+        /*Builder parseUrlParameters(boolean p);*/
 
         IRequest build();
     }

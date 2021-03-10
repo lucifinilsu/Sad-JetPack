@@ -5,7 +5,6 @@ import android.os.Parcel;
 
 import androidx.activity.result.ActivityResultLauncher;
 
-import com.sad.jetpack.architecture.componentization.api.IRequest;
 
 public interface IActivityRouterParameters<I extends IActivityRouterParameters<I,B>,B extends IActivityRouterParameters.Builder<B,I>> extends IRouterParameters<I,B>{
 

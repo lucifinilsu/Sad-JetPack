@@ -36,7 +36,7 @@ public class RequestImpl implements IRequest, IRequest.Builder, Parcelable {
     }
 
     protected RequestImpl(){
-        previousResponse(ResponseImpl.newBuilder().request(this).build());
+        previousResponse(ResponseImpl.newBuilder().build());
     }
 
     private RequestImpl(String id){

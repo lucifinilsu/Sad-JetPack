@@ -39,7 +39,13 @@ public class ParasiticComponentRepositoryFactory implements InstancesRepositoryF
     }
 
     @Override
-    public InstancesRepository from(Context context,String url, IConstructor allConstructor, Map<String,IConstructor> constructors, IComponentCallableInitializeListener componentCallableInitializeListener) {
+    public InstancesRepository from(Context context,String o_url, IConstructor allConstructor, Map<String,IConstructor> constructors, IComponentCallableInitializeListener componentCallableInitializeListener) {
+        Uri u=Uri.parse(o_url);
+        u=u.buildUpon().clearQuery().build();
+        String url=u.toString();
+        String scheme=u.getScheme();
+        String host=u.getAuthority();
+        String path=u.getPath();
         InternalInstancesRepository componentRepository=new InternalInstancesRepository(url);
         List<IComponentCallable> componentCallableInstances =new LinkedList<>();
         MapTraverseUtils.traverseGroup(DYNAMIC_COMPONENT_STORAGE, new MapTraverseUtils.ITraverseAction<Object,List<IComponentCallable>>() {
@@ -53,11 +59,6 @@ public class ParasiticComponentRepositoryFactory implements InstancesRepositoryF
                         String c_scheme=c_uri.getScheme();
                         String c_host=c_uri.getAuthority();
                         String c_path=c_uri.getPath();
-
-                        Uri uri=Uri.parse(url);
-                        String scheme=uri.getScheme();
-                        String host=uri.getAuthority();
-                        String path=uri.getPath();
 
                         if (TextUtils.isEmpty(cid) || (c_scheme.equals(scheme) && c_host.equals(host) && c_path.startsWith(path))){
                             if (componentCallableInitializeListener!=null){
