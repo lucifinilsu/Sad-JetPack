@@ -5,9 +5,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentFactory;
 
+import com.sad.jetpack.architecture.appgo.api.AppGo;
 import com.sad.jetpack.architecture.componentization.annotation.ActivityRouter;
 import com.sad.jetpack.architecture.componentization.api.BodyImpl;
 import com.sad.jetpack.architecture.componentization.api.IPCRemoteCallListener;
@@ -32,6 +36,7 @@ public class RemoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         tv=findViewById(R.id.myProcess);
         tv.setText("当前App:"+getApplicationContext().getPackageName()+"\n当前进程:"+ Utils.getCurrAppProccessName(getApplicationContext()));
+        LogcatUtils.e(">>>初始化进程："+ Utils.getCurrAppProccessName(getApplicationContext())+",AppGo可用性："+ AppGo.getContext());
         findViewById(R.id.shap).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

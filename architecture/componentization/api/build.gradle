@@ -41,4 +41,4 @@ dependencies {
     androidTestImplementation rootProject.ext.dependencies["espresso-core"]
 }
 
-apply from: rootProject.file('/architecture/componentization/api/publishToJceneterScript.gradle')
+//apply from: rootProject.file('/architecture/componentization/api/publishToJceneterScript.gradle')

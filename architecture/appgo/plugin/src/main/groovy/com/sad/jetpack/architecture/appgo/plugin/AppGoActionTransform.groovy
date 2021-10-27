@@ -112,7 +112,7 @@ class AppGoActionTransform extends Transform implements ClassScanner.OnFileScann
         classPool.importPackage("android.os")
         classPool.importPackage("android.util")
         classPool.importPackage("android.content.res.Configuration")
-
+        classPool.importPackage("android.util.Log")
         if (!scannedFile.name.endsWith("class")) {
             return false
         }

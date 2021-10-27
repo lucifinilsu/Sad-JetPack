@@ -1,51 +1,23 @@
 package com.sad.jetpack.architecture.appgo.api;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 
 public class AppGo {
 
-    @SuppressLint("StaticFieldLeak")
-    private static volatile AppGo instance;
-    private Context mContext;
-
-    private AppGo(Context context) {
-        mContext = context;
-    }
-
-    public static AppGo init(Context context){
-        ApplicationContextInitializerProvider.mContext=context;
-        return get();
-    }
-
-    /**
-     * 获取实例
-     */
-    public static AppGo get() {
-        if (instance == null) {
-            synchronized (AppGo.class) {
-                if (instance == null) {
-                    Context context = ApplicationContextInitializerProvider.mContext;
-                    if (context == null) {
-                        //throw new IllegalStateException("context == null");
-                    }
-                    instance = new AppGo(context);
-                }
-            }
+    public static boolean init(Context context){
+        if (getContext()==null){
+            ApplicationContextInitializerProvider.mContext=context;
+            return true;
         }
-        return instance;
+        return false;
     }
 
-    /**
-     * 获取上下文
-     */
-    public Context getContext() {
-        return mContext;
+    public static Context getContext(){
+        return ApplicationContextInitializerProvider.mContext;
     }
-
-    public Application getApplication() {
-        return (Application) mContext.getApplicationContext();
+    public static <A extends Application> A getApplication(){
+        return (A) ApplicationContextInitializerProvider.mContext;
     }
 }
 

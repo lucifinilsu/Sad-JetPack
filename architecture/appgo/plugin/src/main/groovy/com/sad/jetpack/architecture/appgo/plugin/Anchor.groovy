@@ -1,6 +1,7 @@
 package com.sad.jetpack.architecture.appgo.plugin
 
 import com.sad.jetpack.architecture.appgo.annotation.ApplicationLifeCycleAction
+import javassist.CodeConverter
 import javassist.CtClass
 import javassist.CtMethod
 import javassist.CtNewMethod
@@ -8,9 +9,23 @@ import javassist.Modifier
 import javassist.bytecode.CodeAttribute
 import javassist.bytecode.LocalVariableAttribute
 import javassist.bytecode.MethodInfo
+import javassist.expr.ExprEditor
 import org.gradle.api.Project
 
 import java.lang.reflect.Method
+
+/*符号	含义
+$0, $1, $2, ...	this and 方法的参数
+$args	方法参数数组.它的类型为 Object[]
+$$	所有实参。例如, m($$) 等价于 m($1,$2,...)
+$cflow(...)	cflow 变量
+$r	返回结果的类型，用于强制类型转换
+$w	包装器类型，用于强制类型转换
+$_	返回值
+$sig	类型为 java.lang.Class 的参数类型数组
+$type	一个 java.lang.Class 对象，表示返回值类型
+$class	一个 java.lang.Class 对象，表示当前正在修改的类
+*/
 class Anchor {
     private Builder builder;
     private Anchor(Builder builder){
@@ -56,9 +71,9 @@ class Anchor {
         return names
     }
 
-    private static void appInitContext(StringBuilder defaultCode){
+    private static void appInitContext(Project project,StringBuilder defaultCode){
         StringBuffer initContextCode=new StringBuffer()
-        initContextCode.append("if(com.sad.jetpack.architecture.appgo.api.AppGo.get().getContext()==null)\n{\ncom.sad.jetpack.architecture.appgo.api.AppGo.init(this);\n}")
+        initContextCode.append("com.sad.jetpack.architecture.appgo.api.AppGo.init(this);")
         defaultCode.append(initContextCode.toString())
     }
 
@@ -73,8 +88,9 @@ class Anchor {
         if (method==null){
             StringBuilder defaultCode=new StringBuilder();
             defaultCode.append("{\nsuper."+methodName+"(\$\$);")
+            project.logger.error(">> super  is inited !!!!");
             if ("onCreate".equals(methodName)){
-                appInitContext(defaultCode)
+                appInitContext(project,defaultCode)
             }
             defaultCode.append("\n}")
 
@@ -119,8 +135,8 @@ class Anchor {
             }catch(Exception e){
                 project.logger.error(">> "+methodName+" method is not found in superClass:"+applicationClass.getSuperclass().name)
             }*/
-
-
+        }
+        else{
 
         }
         return method

@@ -9,7 +9,7 @@ buildscript {
         maven {
             url = uri("$rootDir/architecture/componentization/plugin-repo")
         }
-        maven {url "https://dl.bintray.com/lucifinilsu/sad-JetPack/"}
+        //maven {url "https://dl.bintray.com/lucifinilsu/sad-JetPack/"}
         google()
         jcenter()
         maven { url "https://jitpack.io" }
@@ -20,6 +20,7 @@ buildscript {
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:latest.release'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:latest.release'
 
+        //classpath 'com.sad.jetpack.architecture.appgo:plugin:latest.release'
         classpath 'com.sad.jetpack.architecture.appgo:plugin:1.0.0-test'
         classpath 'com.sad.jetpack.architecture.componentization:plugin:1.0.0-test'
         classpath 'com.renny.initiator:plugin:latest.release'
@@ -41,7 +42,7 @@ allprojects {
         maven {
             url = uri("$rootDir/architecture/componentization/plugin-repo")
         }
-        maven {url "https://dl.bintray.com/lucifinilsu/sad-JetPack/"}
+        //maven {url "https://dl.bintray.com/lucifinilsu/sad-JetPack/"}
         google()
         jcenter()
         maven { url "https://jitpack.io" }

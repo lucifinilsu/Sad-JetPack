@@ -52,10 +52,10 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.shap).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //startActivity(new Intent(MainActivity.this,RemoteActivity.class));
+                startActivity(new Intent(MainActivity.this,RemoteActivity.class));
                 //ActivityLauncherMaster.newInstance(MainActivity.this)
                 //        .start("activity://demo.v1");
-                testCall();
+                //testCall();
             }
         });
     }

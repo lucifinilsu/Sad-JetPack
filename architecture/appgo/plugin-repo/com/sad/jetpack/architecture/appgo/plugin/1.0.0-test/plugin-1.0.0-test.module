@@ -11,7 +11,7 @@
   "createdBy": {
     "gradle": {
       "version": "6.5",
-      "buildId": "jicyg53fozhkharjeakauiu3o4"
+      "buildId": "paetdemswzgydkoyt5goj33q5a"
     }
   },
   "variants": [
@@ -28,11 +28,11 @@
         {
           "name": "plugin-1.0.0-test.jar",
           "url": "plugin-1.0.0-test.jar",
-          "size": 32947,
-          "sha512": "c77a93ba2a10357a758511425562e9eb15ce18ef049eb3903e56c0bdc9ab4ccabb807171c4fe88fb07b21fd47281863c526e177111dafad3c8dbf04a99fe8041",
-          "sha256": "5e73a12a93e905522f43a78ccb70cd85e11c7e4e8a55d15ee8603f2071e9ea4d",
-          "sha1": "cbe341dfde5bd8cf3626daf8f0dcf595bfc24be6",
-          "md5": "fb3a40c2a1ab97e286af1d391916e28e"
+          "size": 31520,
+          "sha512": "1bfefe5c6b7e59cf56aaf6673daf7e280462d156dccfa7136840ddca2e6d1184e282f22c87f4bc8e6e9ff425f6a7c2ed54b37b5881f04ff8e5d7aebba48e47e4",
+          "sha256": "5abf6a4af6116b5af2da25def9adc4dc61cc0da4ecacc51d18db45930e90e064",
+          "sha1": "f3df965cc3095c2cea2205963869dec6cb6b23c2",
+          "md5": "ac9a5bef5a2ae764091f13491f5fb2bf"
         }
       ]
     },
@@ -79,11 +79,11 @@
         {
           "name": "plugin-1.0.0-test.jar",
           "url": "plugin-1.0.0-test.jar",
-          "size": 32947,
-          "sha512": "c77a93ba2a10357a758511425562e9eb15ce18ef049eb3903e56c0bdc9ab4ccabb807171c4fe88fb07b21fd47281863c526e177111dafad3c8dbf04a99fe8041",
-          "sha256": "5e73a12a93e905522f43a78ccb70cd85e11c7e4e8a55d15ee8603f2071e9ea4d",
-          "sha1": "cbe341dfde5bd8cf3626daf8f0dcf595bfc24be6",
-          "md5": "fb3a40c2a1ab97e286af1d391916e28e"
+          "size": 31520,
+          "sha512": "1bfefe5c6b7e59cf56aaf6673daf7e280462d156dccfa7136840ddca2e6d1184e282f22c87f4bc8e6e9ff425f6a7c2ed54b37b5881f04ff8e5d7aebba48e47e4",
+          "sha256": "5abf6a4af6116b5af2da25def9adc4dc61cc0da4ecacc51d18db45930e90e064",
+          "sha1": "f3df965cc3095c2cea2205963869dec6cb6b23c2",
+          "md5": "ac9a5bef5a2ae764091f13491f5fb2bf"
         }
       ]
     }
