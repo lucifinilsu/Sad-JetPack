@@ -10,7 +10,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/architecture" />
             <option value="$PROJECT_DIR$/architecture/appgo" />
             <option value="$PROJECT_DIR$/architecture/appgo/annotation" />
@@ -21,8 +20,6 @@
             <option value="$PROJECT_DIR$/architecture/componentization/api" />
             <option value="$PROJECT_DIR$/architecture/componentization/compiler" />
             <option value="$PROJECT_DIR$/architecture/componentization/plugin" />
-            <option value="$PROJECT_DIR$/demo" />
-            <option value="$PROJECT_DIR$/demo/TestModule1" />
             <option value="$PROJECT_DIR$/foundation" />
             <option value="$PROJECT_DIR$/foundation/data" />
             <option value="$PROJECT_DIR$/foundation/data/repository" />
