@@ -12,18 +12,6 @@
   <version>1.0.0-test</version>
   <dependencies>
     <dependency>
-      <groupId>com.sad.jetpack.architecture.componentization</groupId>
-      <artifactId>annotation</artifactId>
-      <version>1.0.6</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.sad.jetpack.lib.classscanner</groupId>
-      <artifactId>ClassScanner</artifactId>
-      <version>1.0.1-Beta6</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>RELEASE</version>

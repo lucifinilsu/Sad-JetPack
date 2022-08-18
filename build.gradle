@@ -21,8 +21,8 @@ buildscript {
         classpath 'com.github.dcendents:android-maven-gradle-plugin:latest.release'
 
         //classpath 'com.sad.jetpack.architecture.appgo:plugin:latest.release'
-        classpath 'com.sad.jetpack.architecture.appgo:plugin:1.0.0-test'
-        classpath 'com.sad.jetpack.architecture.componentization:plugin:1.0.0-test'
+        //classpath 'com.sad.jetpack.architecture.appgo:plugin:1.0.0-test'
+        //classpath 'com.sad.jetpack.architecture.componentization:plugin:1.0.0-test'
         classpath 'com.renny.initiator:plugin:latest.release'
         /*classpath ('com.renny.initiator:plugin:latest.release'){
             exclude group:"org.javassist"
@@ -47,6 +47,11 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
     }
+    /*configurations.all {
+        resolutionStrategy.force 'androidx.appcompat:appcompat:' + rootProject.ext.androidxAppCompatVersion
+        resolutionStrategy.force "androidx.fragment:fragment:" + rootProject.ext.androidxFragmentVersion
+        resolutionStrategy.force 'androidx.lifecycle:lifecycle-viewmodel-ktx:' + rootProject.ext.androidxLifecycleVersion
+    }*/
 }
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"

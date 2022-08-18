@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 //apply plugin: 'com.mob.sdk'
-apply plugin: 'architecture-appgo-plugin'
-apply plugin: 'architecture-componentization-plugin'
+//apply plugin: 'architecture-appgo-plugin'
+//apply plugin: 'architecture-componentization-plugin'
 //apply plugin: 'initiator'
 android {
     compileSdkVersion rootProject.ext.android.compileSdkVersion

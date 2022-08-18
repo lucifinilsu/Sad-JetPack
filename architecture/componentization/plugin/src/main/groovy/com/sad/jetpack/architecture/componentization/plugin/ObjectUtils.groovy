@@ -31,7 +31,7 @@ class ObjectUtils {
 
     public static void checkEmptyObject(Object o) throws Exception{
         if(isEmpty(o)) {
-            //throw new Exception("Hey bro!! u r making a mistake---->null��������");
+            //throw new Exception("Hey bro!! u r making a mistake---->null");
         }
 
     }

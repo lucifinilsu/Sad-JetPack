@@ -29,11 +29,12 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     api rootProject.ext.dependencies["appcompat"]
-    api rootProject.ext.dependencies["componentization_annotation"]
+    //api rootProject.ext.dependencies["componentization_annotation"]
+    api project(rootProject.ext.dependencies["local_componentization_annotation"])
     //api rootProject.ext.dependencies["jsoup"]
     //api rootProject.ext.dependencies["componentization_annotation"]
     //api rootProject.ext.dependencies["workmanager"]
-    api "com.sad.core.async:sad-async:latest.release"
+    api "com.github.lucifinilsu:sad-async:0.2.6"
     api "com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru:latest.release"
 
     testImplementation 'junit:junit:4.12'
