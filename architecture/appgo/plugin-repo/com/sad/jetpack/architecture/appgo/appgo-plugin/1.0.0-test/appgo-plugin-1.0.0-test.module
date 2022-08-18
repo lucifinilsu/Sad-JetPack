@@ -1,0 +1,77 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.sad.jetpack.architecture.appgo",
+    "module": "appgo-plugin",
+    "version": "1.0.0-test",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "6.5",
+      "buildId": "rejdcnj7m5fvpmsncqudmez46e"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "appgo-plugin-1.0.0-test.jar",
+          "url": "appgo-plugin-1.0.0-test.jar",
+          "size": 32948,
+          "sha512": "2dc65335eef7e75beca06dba757c149055813872477eab636a588233ed82de21b438655071104e35e36c99627ce9b9c7552b4f598350ccc6bd7999ba509e627e",
+          "sha256": "d41f1231101734c6d620cb34c0a78ed912452cb93be893fab26658621d50f12c",
+          "sha1": "c426e848aba0a8661441a05d0ddcb6173a359300",
+          "md5": "c1490038175c84df973cdef052739410"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.android.tools.build",
+          "module": "gradle-api",
+          "version": {
+            "requires": "3.1.3"
+          }
+        },
+        {
+          "group": "org.javassist",
+          "module": "javassist",
+          "version": {
+            "requires": "latest.release"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "appgo-plugin-1.0.0-test.jar",
+          "url": "appgo-plugin-1.0.0-test.jar",
+          "size": 32948,
+          "sha512": "2dc65335eef7e75beca06dba757c149055813872477eab636a588233ed82de21b438655071104e35e36c99627ce9b9c7552b4f598350ccc6bd7999ba509e627e",
+          "sha256": "d41f1231101734c6d620cb34c0a78ed912452cb93be893fab26658621d50f12c",
+          "sha1": "c426e848aba0a8661441a05d0ddcb6173a359300",
+          "md5": "c1490038175c84df973cdef052739410"
+        }
+      ]
+    }
+  ]
+}
