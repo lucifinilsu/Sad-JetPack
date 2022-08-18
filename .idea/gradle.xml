@@ -24,8 +24,6 @@
             <option value="$PROJECT_DIR$/foundation/data" />
             <option value="$PROJECT_DIR$/foundation/data/repository" />
             <option value="$PROJECT_DIR$/foundation/data/repository/api" />
-            <option value="$PROJECT_DIR$/integration" />
-            <option value="$PROJECT_DIR$/integration/classic" />
             <option value="$PROJECT_DIR$/lib" />
             <option value="$PROJECT_DIR$/lib/ClassScanner" />
             <option value="$PROJECT_DIR$/ui" />

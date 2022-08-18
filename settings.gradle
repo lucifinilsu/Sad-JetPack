@@ -1,6 +1,6 @@
 rootProject.name='sad-JetPack'
 //include ':app'
-include ':integration:classic'
+//include ':integration:classic'
 include ':architecture:appgo:api'
 include ':architecture:appgo:annotation'
 include ':architecture:appgo:plugin'
