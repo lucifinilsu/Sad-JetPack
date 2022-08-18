@@ -21,7 +21,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
       <module name="sad-JetPack.app" target="11" />
-      <module name="sad-JetPack.architecture.appgo.api" target="11" />
+      <module name="sad-JetPack.architecture.appgo.appgo-api" target="11" />
       <module name="sad-JetPack.architecture.componentization.api" target="11" />
       <module name="sad-JetPack.demo.TestModule1" target="11" />
       <module name="sad-JetPack.foundation.data.repository.api" target="11" />
